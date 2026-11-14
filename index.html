@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My writing challenges</title>
+<meta name="theme-color" content="#eef3fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Writing">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;800&family=Cinzel:wght@600;800&family=Orbitron:wght@600;800&family=DM+Serif+Display&family=Press+Start+2P&family=Quicksand:wght@600;700&family=Libre+Baskerville:wght@700&family=Cormorant+Garamond:wght@600;700&display=swap">
+<style>
+:root{--bg:#edf5e8;--card:#fff;--ink:#1f3326;--mute:#5a7563;--line:#d0e1c8;--accent:#cf6a14;--accent2:#2e8b57;--on:#1b1230;
+--m1:#8f84d6;--m2:#7fb0d8;--m3:#86cdb9;--m4:#efc974;--m5:#f4976b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10211a;--card:#19322a;--ink:#e9f6ea;--mute:#9bbaa4;--line:#2c4d3f;--accent:#f2b45a;--accent2:#7ddc9a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10211a;--card:#19322a;--ink:#e9f6ea;--mute:#9bbaa4;--line:#2c4d3f;--accent:#f2b45a;--accent2:#7ddc9a;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}
+main{max-width:880px;margin:0 auto;padding:28px 18px 60px}
+h1,h2,.big{font-family:Fraunces,Georgia,serif;font-weight:700;margin:0}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.nav{display:flex;align-items:center;gap:6px}
+button{font:inherit;color:inherit;cursor:pointer}
+.ghost{background:none;border:1px solid var(--line);border-radius:999px;width:38px;height:38px;font-size:18px}
+.ghost:hover{border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+.month{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:1.15rem;min-width:9em;text-align:center;text-transform:capitalize}
+.hero{margin:26px 0 8px}
+.name{font:700 clamp(1.7rem,5vw,2.5rem)/1.15 Fraunces,Georgia,serif;background:none;border:0;border-bottom:1px dashed var(--line);color:var(--ink);width:100%;padding:2px 0}
+.count{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:18px}
+.big{font-size:clamp(3.2rem,13vw,6rem);line-height:1;color:var(--accent)}
+.of{color:var(--mute);font-size:1.05rem}
+.of input{width:5.5em;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:3px 8px}
+.bar{height:14px;border-radius:99px;background:var(--line);overflow:hidden;margin:14px 0 4px}
+.bar i{display:block;height:100%;background:var(--accent2);border-radius:99px;transition:width .5s}
+.pct{color:var(--mute);font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.stat b{display:block;font:700 1.6rem Fraunces,Georgia,serif}
+.stat span{color:var(--mute);font-size:.88rem}
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin-top:18px}
+h2{font-size:1.3rem;margin-bottom:12px}
+.entry{display:grid;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+label{display:grid;gap:4px;font-size:.88rem;color:var(--mute)}
+input[type=number],input[type=date],textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+textarea{width:100%;resize:vertical;min-height:48px}
+.moods{display:flex;gap:8px}
+.mood{width:48px;height:48px;border-radius:50%;border:2px solid transparent;font-size:24px;background:var(--bg)}
+.mood[aria-pressed=true]{border-color:var(--accent);transform:scale(1.12)}
+.save{background:var(--accent);color:var(--on);border:0;border-radius:12px;padding:11px 20px;font-weight:700}
+.save:hover{filter:brightness(1.08)}
+.toast{color:var(--accent2);font-size:.9rem;min-height:1.2em}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wd{font-size:.78rem;color:var(--mute);text-align:center}
+.day{min-height:96px;border-radius:4px 28px 4px 28px;border:1px solid var(--line);background:var(--bg);padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;font-size:.72rem;color:var(--mute);min-width:0}
+.day.has{color:var(--on);border-color:transparent}
+.day.sel{outline:2px solid var(--accent);outline-offset:1px}
+.day.today .n{font-weight:700;text-decoration:underline}
+.day .w{font-weight:700;font-size:.82rem}
+.day .e{font-size:1rem;line-height:1}
+.empty{border:0;background:none;min-height:0}.day .t{font-size:.62rem;line-height:1.2;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow-wrap:anywhere;width:100%;opacity:.85}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--mute);font-size:.82rem}
+.chartwrap{overflow-x:auto}
+svg text{fill:var(--mute);font:11px "DM Sans",sans-serif}
+@media (max-width:520px){.day{min-height:78px}.day .w{font-size:.7rem}.day .t{font-size:.56rem;-webkit-line-clamp:2}.day .e{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}#plant{animation:none!important}}
+.ms{display:grid;gap:12px}.ms select,.ms input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;max-width:100%}.mstotal{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.mstotal .big{font-size:clamp(2.4rem,9vw,3.6rem);color:var(--accent2)}.hist{display:grid;gap:8px}.hrow{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 14px;text-align:left;width:100%}.hrow small{color:var(--mute)}.hrow.on{border-color:var(--accent)}.notes{display:grid;gap:10px;margin-top:20px}.nrow{border-left:5px solid var(--accent2);background:var(--bg);border-radius:0 12px 12px 0;padding:8px 14px}.nrow b{font-family:Fraunces,Georgia,serif}.nrow small{color:var(--mute);margin-left:8px}.nrow p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.nempty{color:var(--mute);font-size:.9rem}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.08;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Ctext x='10' y='42' font-size='28'%3E🌿%3C/text%3E%3Ctext x='88' y='100' font-size='24'%3E🍃%3C/text%3E%3Ctext x='22' y='128' font-size='20'%3E🌸%3C/text%3E%3C/svg%3E")}
+.plantbox{display:flex;align-items:center;gap:14px;margin-top:16px}
+#plant{font-size:3.8rem;line-height:1;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.plantlbl{color:var(--mute);font-size:.98rem;font-style:italic}
+section.panel{box-shadow:0 6px 18px -12px var(--accent2)}
+section.panel:nth-of-type(1) h2::before{content:"🪴 "}section.panel:nth-of-type(2) h2::before{content:"✍️ "}section.panel:nth-of-type(3) h2::before{content:"🌿 "}section.panel:nth-of-type(4) h2::before{content:"🌻 "}section.panel:nth-of-type(5) h2::before{content:"🍄 "}section.panel:nth-of-type(6) h2::before{content:"🌰 "}
+:root{--bg:#eef3fb;--card:#fff;--ink:#1d2a44;--mute:#566a8c;--line:#d2ddee;--accent:#b8322a;--accent2:#2c7a4b;--snow:#9db9e0;--onacc:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a2e;--card:#172a45;--ink:#eaf2ff;--mute:#9db3d4;--line:#2b4468;--accent:#ffcf6b;--accent2:#86d8a6;--snow:#fff;--onacc:#1b1230}}
+:root[data-theme="dark"]{--bg:#0e1a2e;--card:#172a45;--ink:#eaf2ff;--mute:#9db3d4;--line:#2b4468;--accent:#ffcf6b;--accent2:#86d8a6;--snow:#fff;--onacc:#1b1230}
+.save{background:var(--accent);color:var(--onacc)}
+.day{border-radius:32px}
+.day.empty{border-radius:0}
+body::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Ctext x='10' y='42' font-size='28'%3E❄️%3C/text%3E%3Ctext x='88' y='100' font-size='24'%3E🎄%3C/text%3E%3Ctext x='22' y='128' font-size='20'%3E⭐%3C/text%3E%3C/svg%3E")}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;background-image:radial-gradient(3px 3px at 20px 30px,var(--snow),transparent),radial-gradient(2px 2px at 90px 120px,var(--snow),transparent),radial-gradient(3px 3px at 150px 60px,var(--snow),transparent),radial-gradient(2px 2px at 50px 160px,var(--snow),transparent);background-size:180px 180px;animation:snow 14s linear infinite}
+@keyframes snow{to{background-position:0 180px}}
+@media (prefers-reduced-motion:reduce){body::after{animation:none}}
+section.panel:nth-of-type(1) h2::before{content:"🎁 "}section.panel:nth-of-type(3) h2::before{content:"❄️ "}section.panel:nth-of-type(4) h2::before{content:"🎄 "}section.panel:nth-of-type(5) h2::before{content:"⛄ "}section.panel:nth-of-type(6) h2::before{content:"🔔 "}
+
+:root[data-th="garden"]{--bg:#edf5e8;--card:#fff;--ink:#1f3326;--mute:#5a7563;--line:#d0e1c8;--accent:#cf6a14;--accent2:#2e8b57;--onacc:#1b1230}
+:root[data-th="twilight"]{--bg:#f4f0fb;--card:#fff;--ink:#241a3d;--mute:#6f6490;--line:#ddd3f0;--accent:#c2561f;--accent2:#2f8f83;--onacc:#1b1230}
+@media (prefers-color-scheme:dark){:root[data-th="garden"]:not([data-theme="light"]){--bg:#10211a;--card:#19322a;--ink:#e9f6ea;--mute:#9bbaa4;--line:#2c4d3f;--accent:#f2b45a;--accent2:#7ddc9a;--onacc:#1b1230}:root[data-th="twilight"]:not([data-theme="light"]){--bg:#171027;--card:#241a3d;--ink:#f1eaff;--mute:#a699cc;--line:#3a2d5c;--accent:#f2b45a;--accent2:#5fd1c1;--onacc:#1b1230}}
+:root:not([data-th="winter"]) body::after{display:none}
+body::before{background-image:var(--pat,none)}
+section.panel:nth-of-type(n) h2::before{content:attr(data-i) " "}
+.themes{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.th{width:auto;padding:0 14px;font-size:.9rem}.th[aria-pressed=true]{border-color:var(--accent);background:var(--card)}
+.sprint{border:1px dashed var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:10px}
+.spt{font:700 2.4rem "Playfair Display",Georgia,serif;font-variant-numeric:tabular-nums}
+.chrow{display:grid;grid-template-columns:1fr 110px 100px 38px;gap:8px;margin-bottom:8px}
+.chrow input,.chrow select,#xFin,#xName,#msGoal,#xFcode,#spMin,#spW{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.85rem;background:var(--bg)}.chip.ok{background:var(--accent2);color:var(--onacc);border-color:transparent}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}.badge{display:grid;gap:2px;justify-items:center;text-align:center;padding:12px 8px;border-radius:16px;border:1px solid var(--line);background:var(--bg);font-size:.8rem}.badge b{font-size:1.8rem}.badge.off{opacity:.45;filter:grayscale(1)}
+.yr{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px}.yr i{border-radius:3px;background:var(--line)}
+.fr{display:grid;gap:4px;margin-top:10px}.fbar{height:12px;border-radius:9px;background:var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--accent2)}
+@media (max-width:520px){.chrow{grid-template-columns:1fr 90px 38px}.chrow .chn{grid-column:1/-1}}
+:root[data-th="galaxy"]{--bg:#eceaff;--card:#fff;--ink:#1a1740;--mute:#5f5c94;--line:#d6d2f5;--accent:#6a3de8;--accent2:#0c8aa0;--snow:#8a6ae8;--onacc:#fff}
+:root[data-th="cafe"]{--bg:#f1e6d8;--card:#fffaf4;--ink:#3b2417;--mute:#7a5b48;--line:#e2cfbb;--accent:#8a4b22;--accent2:#5c7a4a;--onacc:#fff}
+:root[data-th="arcade"]{--bg:#fdeefa;--card:#fff;--ink:#2a0f4a;--mute:#7a5a9e;--line:#f0cdea;--accent:#d6208f;--accent2:#0a8fb8;--onacc:#fff}
+@media (prefers-color-scheme:dark){:root[data-th="galaxy"]:not([data-theme="light"]){--bg:#070818;--card:#12143a;--ink:#e8ebff;--mute:#98a0d8;--line:#272a66;--accent:#ff7ad9;--accent2:#4be3f0;--snow:#fff;--onacc:#1b1230}:root[data-th="cafe"]:not([data-theme="light"]){--bg:#1d130d;--card:#2b1e15;--ink:#f6e8d8;--mute:#c2a58d;--line:#4a3426;--accent:#f0b36a;--accent2:#a9c98a;--onacc:#20140c}:root[data-th="arcade"]:not([data-theme="light"]){--bg:#0f0720;--card:#1c0f3a;--ink:#f7e9ff;--mute:#b79ce0;--line:#43246e;--accent:#ff4fc3;--accent2:#3ef0ff;--onacc:#12041f}}
+:root[data-th="galaxy"] body::after{display:block;opacity:.8;animation:tw 5s ease-in-out infinite}
+@keyframes tw{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){:root[data-th="galaxy"] body::after{animation:none}}
+:root[data-th="arcade"] h1,:root[data-th="arcade"] h2,:root[data-th="arcade"] .big,:root[data-th="arcade"] .name,:root[data-th="arcade"] .month,:root[data-th="arcade"] .stat b,:root[data-th="arcade"] .spt{font-family:ui-monospace,Menlo,Consolas,monospace}
+:root[data-th="arcade"] .day{border-radius:4px}:root[data-th="arcade"] section.panel{border-radius:6px;border-width:2px;box-shadow:4px 4px 0 var(--accent2)}
+:root[data-th="cafe"] .day{border-radius:18px 18px 8px 8px}:root[data-th="cafe"] section.panel{border-style:dashed}
+
+.off{display:none!important}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 4px;padding:6px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
+.tab{white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--card);font-size:.92rem}
+.tab[aria-current=true]{background:var(--accent);color:var(--onacc);border-color:transparent;font-weight:700}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin-top:18px;box-shadow:0 6px 18px -12px var(--accent2)}
+section.panel,.gcard{position:relative;padding-top:44px}
+section.panel::before,.gcard::before{content:"";position:absolute;left:0;right:0;top:0;height:70px;background-image:var(--vine,none);background-repeat:repeat-x;background-position:10px 0;background-size:240px 100px;pointer-events:none;transform-origin:50% 0;animation:vs 7s ease-in-out infinite alternate;border-radius:22px 22px 0 0}
+section.panel>*,.gcard>*{position:relative;z-index:1}
+@keyframes vs{from{transform:skewX(-1.2deg)}to{transform:skewX(1.2deg)}}
+@media (prefers-reduced-motion:reduce){section.panel::before,.gcard::before{animation:none}}
+
+body{overflow-x:hidden}
+section.panel,.gcard{margin-top:38px;padding-top:20px}
+section.panel::before,.gcard::before{top:-27px;height:40px;background-image:var(--garland,none);background-position:0 0;background-size:260px 40px;border-radius:0;animation:none}
+section.panel::after,.gcard::after{content:"";position:absolute;left:-20px;right:-20px;top:-12px;height:150px;max-height:calc(100% + 12px);background-image:var(--sideL,none),var(--sideR,none);background-repeat:no-repeat;background-position:left top,right top;background-size:24px 150px;pointer-events:none}
+
+:root[data-th="ocean"]{--bg:#e6f6f8;--card:#fff;--ink:#0f3d4a;--mute:#4f7f8c;--line:#c3e4ea;--accent:#d9503a;--accent2:#12889b;--onacc:#fff}
+:root[data-th="autumn"]{--bg:#f6ead9;--card:#fffaf2;--ink:#3b2412;--mute:#7d5d44;--line:#e8d2b5;--accent:#b5441b;--accent2:#6b7a2a;--onacc:#fff}
+:root[data-th="sakura"]{--bg:#fdf1f5;--card:#fff;--ink:#4a2a3d;--mute:#8a6b7c;--line:#f3d3df;--accent:#c93d78;--accent2:#4f9b80;--onacc:#fff}
+@media (prefers-color-scheme:dark){:root[data-th="ocean"]:not([data-theme="light"]){--bg:#06202b;--card:#0d3441;--ink:#e2f7fa;--mute:#85b9c4;--line:#1c5566;--accent:#ff8f7a;--accent2:#5fe0e8;--onacc:#06202b}:root[data-th="autumn"]:not([data-theme="light"]){--bg:#1f130b;--card:#2d1c10;--ink:#f7e6d0;--mute:#c9a98a;--line:#4d3320;--accent:#f4a340;--accent2:#c4cf6a;--onacc:#20140c}:root[data-th="sakura"]:not([data-theme="light"]){--bg:#1f0f1c;--card:#2f1a2b;--ink:#ffe9f1;--mute:#c9a1b6;--line:#4f2b45;--accent:#ff8ab8;--accent2:#8fe0c0;--onacc:#2a0f1f}}
+:root[data-th="winter"]{--hf:"Playfair Display"}:root[data-th="garden"]{--hf:"Fraunces"}:root[data-th="twilight"]{--hf:"Cinzel"}:root[data-th="galaxy"]{--hf:"Orbitron"}:root[data-th="cafe"]{--hf:"DM Serif Display"}:root[data-th="arcade"]{--hf:"Press Start 2P"}:root[data-th="ocean"]{--hf:"Quicksand"}:root[data-th="autumn"]{--hf:"Libre Baskerville"}:root[data-th="sakura"]{--hf:"Cormorant Garamond"}
+:root[data-th] h1,:root[data-th] h2,:root[data-th] .big,:root[data-th] .name,:root[data-th] .month,:root[data-th] .stat b,:root[data-th] .spt{font-family:var(--hf,Fraunces),Georgia,serif}
+:root[data-th="arcade"] h2,:root[data-th="arcade"] .month{font-size:.85rem;line-height:1.6}
+:root[data-th="arcade"] .big{font-size:clamp(1.6rem,7vw,2.8rem)}:root[data-th="arcade"] .name{font-size:clamp(.95rem,3.6vw,1.4rem);line-height:1.5}:root[data-th="arcade"] .stat b{font-size:1rem}:root[data-th="arcade"] .spt{font-size:1.5rem}
+:root[data-th="galaxy"] .name,:root[data-th="galaxy"] .big{letter-spacing:.04em}
+:root[data-th="twilight"] h2,:root[data-th="twilight"] .name{letter-spacing:.06em}
+:root[data-th="winter"] section.panel,:root[data-th="winter"] .gcard{border-radius:24px}
+:root[data-th="garden"] section.panel,:root[data-th="garden"] .gcard{border-radius:30px 8px 30px 8px}
+:root[data-th="twilight"] section.panel,:root[data-th="twilight"] .gcard{border-radius:46px 46px 14px 14px}
+:root[data-th="galaxy"] section.panel,:root[data-th="galaxy"] .gcard{border-radius:12px;box-shadow:0 0 22px -6px var(--accent2)}
+:root[data-th="ocean"] section.panel,:root[data-th="ocean"] .gcard{border-radius:34px 34px 34px 8px}
+:root[data-th="autumn"] section.panel,:root[data-th="autumn"] .gcard{border:3px double var(--line);border-radius:12px}
+:root[data-th="sakura"] section.panel,:root[data-th="sakura"] .gcard{border-color:transparent;border-radius:26px;box-shadow:0 10px 24px -14px var(--accent)}
+:root[data-th="garden"] .day{border-radius:4px 20px 4px 20px}:root[data-th="twilight"] .day{border-radius:20px 20px 6px 6px}:root[data-th="ocean"] .day{border-radius:22px 22px 22px 6px}:root[data-th="autumn"] .day{border-radius:6px}:root[data-th="sakura"] .day{border-radius:24px}
+section.panel::before,.gcard::before{content:"";position:absolute;left:-18px;top:-18px;right:auto;bottom:auto;width:160px;height:160px;background-image:var(--corner,none);background-size:160px 160px;background-repeat:no-repeat;background-position:0 0;transform:rotate(180deg);animation:none;border-radius:0;pointer-events:none}
+section.panel::after,.gcard::after{content:"";position:absolute;right:-18px;bottom:-18px;left:auto;top:auto;width:160px;height:160px;max-height:none;background-image:var(--corner,none);background-size:160px 160px;background-repeat:no-repeat;background-position:0 0;pointer-events:none}
+
+section.panel::before,.gcard::before{transform-origin:50% 50%}
+.mbars{display:flex;align-items:flex-end;gap:6px;height:110px}
+.mbar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;font-size:.68rem;color:var(--mute);min-width:0}
+.mbar i{display:block;width:100%;background:var(--accent2);border-radius:6px 6px 2px 2px}
+
+#xLang{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+#xIdeaT{margin-top:2px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1 style="font-size:1.1rem;color:var(--mute)">❄️ Writing challenge winter</h1>
+  <div class="nav">
+    <button class="ghost" id="prev" aria-label="Previous month">‹</button>
+    <div class="month" id="monthLabel"></div>
+    <button class="ghost" id="next" aria-label="Next month">›</button>
+  </div>
+</header>
+<div class="themes" id="themes" role="group" aria-label="Theme"></div>
+
+<section class="panel">
+  <h2>My manuscripts</h2>
+  <div class="ms">
+    <div class="row">
+      <label>Manuscript<select id="msSel"></select></label>
+      <button class="ghost" id="msNew" style="width:auto;padding:0 16px;font-size:.9rem">New manuscript</button>
+    </div>
+    <div class="row">
+      <label>Title<input type="text" id="msName" style="padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit"></label>
+      <label>Words already in it before tracking<input type="number" id="msBase" min="0" step="100" placeholder="ex. 12000"></label>
+    </div>
+    <div class="mstotal"><div class="big" id="msTotal">0</div><div class="of" id="msDetail"></div></div>
+    <div id="msExtra"></div>
+  </div>
+</section>
+
+<div class="hero">
+  <input class="name" id="cname" aria-label="Challenge name">
+  <div class="row" style="margin-top:12px"><label>This challenge is for<select id="chMs"></select></label></div>
+  <div class="count">
+    <div class="big" id="total">0</div>
+    <div class="of">words out of <input type="number" id="goal" min="100" step="500" aria-label="Monthly goal"> to write this month</div>
+  </div>
+  <div class="plantbox"><div id="plant" aria-hidden="true">❄️</div><div class="plantlbl" id="plantLbl"></div></div>
+  <div class="bar"><i id="fill" style="width:0"></i></div>
+  <div class="pct" id="pct"></div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<section class="panel">
+  <h2>My writing session</h2>
+  <div class="entry">
+    <div class="row">
+      <label>Day<input type="date" id="date"></label>
+      <label>Words written that day<input type="number" id="words" min="0" step="50" placeholder="ex. 750"></label>
+    </div>
+    <div>
+      <div style="font-size:.88rem;color:var(--mute);margin-bottom:6px">My mood</div>
+      <div class="moods" id="moods" role="group" aria-label="Mood"></div>
+    </div>
+    <label>A note (optional)<textarea id="note" placeholder="Scene written, idea, writer’s block…"></textarea></label>
+    <div class="sprint">
+      <div style="font-size:.88rem;color:var(--mute)">Writing sprint</div>
+      <div class="row"><label>Minutes<select id="spMin"><option>5</option><option>10</option><option>15</option><option selected>25</option><option>45</option></select></label><div class="spt" id="spT">25:00</div><button class="save" id="spGo" type="button">Start</button><button class="ghost" id="spReset" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button></div>
+      <div id="spDone" hidden><div class="row"><label>Words written in the sprint<input type="number" id="spW" min="0" step="10"></label><button class="save" id="spAdd" type="button">Add to today</button></div></div>
+      <div class="toast" id="spMsg" role="status"></div>
+    </div>
+    <div class="row"><button class="save" id="save">Save session</button><button class="ghost" id="del" style="width:auto;padding:0 16px;font-size:.9rem">Clear this day</button><span class="toast" id="toast" role="status"></span></div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>My curve</h2>
+  <div class="chartwrap"><svg id="chart" viewBox="0 0 640 230" width="100%" role="img" aria-label="Cumulative words chart"></svg></div>
+  <div class="legend"><span><span style="color:var(--accent2)">━</span> my cumulative words</span><span><span style="color:var(--mute)">╌</span> ideal pace to reach the goal</span></div>
+</section>
+
+<section class="panel">
+  <h2>The month, day by day</h2>
+  <div class="cal" id="cal"></div>
+  <div class="legend" id="legend"></div>
+</section>
+
+<section class="panel">
+  <h2>All my challenges</h2>
+  <div class="hist" id="hist"></div>
+</section>
+<section class="panel"><h2>Chapters</h2><div id="xChBody"></div></section>
+<section class="panel"><h2>My year</h2><div id="xYear"></div></section>
+<section class="panel"><h2>Badges</h2><div class="badges" id="xBadges"></div></section>
+<section class="panel"><h2>Friend challenge</h2>
+  <p style="margin:0 0 10px;color:var(--mute);font-size:.9rem">Race a friend this month: send her your code and paste hers below, then you both see the two progress bars. Share a fresh code whenever you want to update.</p>
+  <label>My name<input type="text" id="xName" maxlength="30" placeholder="your first name"></label>
+  <label style="margin-top:10px">My code (this month)<div class="row" style="align-items:stretch"><input type="text" id="xFcode" readonly style="flex:1"><button class="save" id="xCopy" type="button">Copy</button></div></label>
+  <label style="margin-top:10px">My friend’s code<div class="row" style="align-items:stretch"><input type="text" id="xFin" placeholder="WT1:…" style="flex:1"><button class="ghost" id="xAdd" type="button" style="width:auto;padding:0 16px;font-size:.9rem">Add</button></div></label>
+  <div class="toast" id="xFmsg" role="status"></div><div id="xFr"></div>
+</section>
+<section class="panel">
+  <h2>Backup</h2>
+  <p style="margin:0 0 10px;color:var(--mute);font-size:.9rem">Export gives you a text with all your data: keep it somewhere safe, or paste it on another device with Import. Importing replaces what is currently on this page.</p>
+  <textarea id="bk" rows="4" placeholder="Your backup text appears here, or paste one to import"></textarea>
+  <div class="row" style="margin-top:10px"><button class="save" id="bkEx">Export</button><button class="ghost" id="bkIm" style="width:auto;padding:0 16px;font-size:.9rem">Import</button><span class="toast" id="bkMsg" role="status"></span></div>
+</section>
+</main>
+
+<script>
+var MOODS=[["😫","Drained"],["😕","Meh"],["😐","Neutral"],["🙂","Good"],["🤩","Inspired"]];
+var S={manuscripts:[],challenges:{},mood:3};
+try{var raw=localStorage.getItem("defi-ecriture");if(raw){var p=JSON.parse(raw);if(p){S.manuscripts=p.manuscripts||[];S.challenges=p.challenges||{};
+ if(p.entries){Object.keys(p.entries).forEach(function(d){var k=d.slice(0,7);S.challenges[k]=S.challenges[k]||{name:"Challenge",goal:20000};S.challenges[k].entries=S.challenges[k].entries||{};S.challenges[k].entries[d]=p.entries[d]})}}}}catch(e){}
+if(!S.manuscripts.length)S.manuscripts.push({id:"m1",name:"My book",base:0});
+Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(!c.entries)c.entries={};if(!c.ms)c.ms=S.manuscripts[0].id});
+function save(){try{localStorage.setItem("defi-ecriture",JSON.stringify({manuscripts:S.manuscripts,challenges:S.challenges}))}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+var pad=function(n){return(n<10?"0":"")+n};
+var now=new Date();
+var cur={y:now.getFullYear(),m:now.getMonth()};
+var todayKey=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+var sel=todayKey;
+var fmt=function(n){return Math.round(n).toLocaleString("en-US")};
+var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+function mk(){return cur.y+"-"+pad(cur.m+1)}
+function dim(){return new Date(cur.y,cur.m+1,0).getDate()}
+function dkey(d){return mk()+"-"+pad(d)}
+function ch(){var k=mk();if(!S.challenges[k]){var mn=new Date(cur.y,cur.m,1).toLocaleDateString("en-GB",{month:"long"});S.challenges[k]={name:mn+" challenge",goal:20000,ms:S.manuscripts[0].id,entries:{}}}return S.challenges[k]}
+function E(){return ch().entries}
+function msById(id){return S.manuscripts.filter(function(m){return m.id===id})[0]||S.manuscripts[0]}
+function sumC(c){var t=0;Object.keys(c.entries).forEach(function(d){t+=c.entries[d].words||0});return t}
+function elapsed(){var k=mk(),t=todayKey.slice(0,7);if(k<t)return dim();if(k>t)return 0;return now.getDate()}
+
+$("moods").innerHTML=MOODS.map(function(m,i){return '<button class="mood" data-m="'+(i+1)+'" aria-pressed="false" aria-label="'+m[1]+'" title="'+m[1]+'">'+m[0]+'</button>'}).join("");
+$("moods").addEventListener("click",function(e){var b=e.target.closest(".mood");if(!b)return;S.mood=+b.dataset.m;paintMood()});
+function paintMood(){document.querySelectorAll(".mood").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.m===S.mood))})}
+
+function loadForm(){
+  $("date").value=sel;
+  var e=E()[sel];
+  $("words").value=e?e.words:"";
+  $("note").value=e&&e.note?e.note:"";
+  S.mood=e?e.mood:3;paintMood();
+}
+
+function render(){
+  var c=ch(),n=dim(),el=elapsed(),ent=c.entries;
+  $("monthLabel").textContent=new Date(cur.y,cur.m,1).toLocaleDateString("en-GB",{month:"long",year:"numeric"});
+  $("cname").value=c.name;$("goal").value=c.goal;
+  var opts=S.manuscripts.map(function(m){return '<option value="'+m.id+'">'+esc(m.name)+'</option>'}).join("");
+  $("chMs").innerHTML=opts;$("chMs").value=msById(c.ms).id;
+  var ms=msById(S.msSel||c.ms);S.msSel=ms.id;
+  $("msSel").innerHTML=opts;$("msSel").value=ms.id;
+  $("msName").value=ms.name;$("msBase").value=ms.base||"";
+  var tracked=0;Object.keys(S.challenges).forEach(function(k){if(S.challenges[k].ms===ms.id)tracked+=sumC(S.challenges[k])});
+  $("msTotal").textContent=fmt((ms.base||0)+tracked);
+  $("msDetail").textContent="words in “"+ms.name+"” ("+fmt(ms.base||0)+" before tracking + "+fmt(tracked)+" written during challenges)";
+  var total=0,days=0,best=0,bestD=0,daily=[];
+  for(var d=1;d<=n;d++){var e=ent[dkey(d)];var w=e?e.words:0;daily.push(w);total+=w;if(w>0)days++;if(w>best){best=w;bestD=d}}
+  var pct=Math.min(100,total/c.goal*100);
+  $("total").textContent=fmt(total);
+  $("fill").style.width=pct+"%";
+  var pl=total>=c.goal?["🎅","Goal reached! Happy holidays!"]:pct>=75?["⭐","One last star to hang on the tree."]:pct>=50?["🎁","Presents are piling up under the tree."]:pct>=25?["🎄","The tree is up, time for the lights!"]:pct>0?["🌲","A little pine, dusted with snow."]:["❄️","A first snowflake, waiting for your first words."];
+  $("plant").textContent=pl[0];$("plantLbl").textContent=pl[1];
+  $("pct").textContent=total>=c.goal?"Goal reached, well done! 🎉":Math.round(pct)+"% of the goal reached";
+  var streak=0,start=el;
+  if(el>0){if(!daily[el-1])start=el-1;for(var i=start;i>=1;i--){if(daily[i-1]>0)streak++;else break}}
+  var remain=Math.max(0,c.goal-total),left=n-el+(el>0&&el<n?1:0);
+  if(el===0)left=n;if(el===n)left=0;
+  var need=left>0?Math.ceil(remain/left):0;
+  var avg=days?total/days:0;
+  var cards=[[fmt(remain),"words to go"],[left>0?fmt(need):"—","words per day to make it"],[fmt(avg),"average on writing days"],[streak+(streak===1?" day":" days"),"writing streak"],[best?fmt(best):"—","best day"+(best?" (the "+bestD+")":"")],[days+"/"+n,"days I wrote"]];
+  $("stats").innerHTML=cards.map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("");
+  drawChart(daily,c.goal,n,el);
+  drawCal(n,ent);
+  var keys=Object.keys(S.challenges).filter(function(k){return k===mk()||sumC(S.challenges[k])>0}).sort().reverse();
+  $("hist").innerHTML=keys.map(function(k){var q=S.challenges[k];return '<button class="hrow'+(k===mk()?' on':'')+'" data-k="'+k+'"><span>'+esc(q.name)+'<br><small>'+esc(msById(q.ms).name)+'</small></span><span>'+fmt(sumC(q))+' / '+fmt(q.goal)+'</span></button>'}).join("");
+}
+
+function drawChart(daily,goal,n,el){
+  var W=640,H=230,L=46,R=14,T=14,B=28,pw=W-L-R,ph=H-T-B;
+  var cum=[],s=0;for(var i=0;i<n;i++){s+=daily[i];cum.push(s)}
+  var maxY=Math.max(goal,s)*1.05;
+  var x=function(d){return L+(n>1?(d-1)/(n-1):0)*pw},y=function(v){return T+ph-v/maxY*ph};
+  var o='';
+  for(var g=0;g<=4;g++){var v=maxY/1.05*g/4,yy=y(v);o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(yy+4)+'" text-anchor="end">'+(v>=1000?(Math.round(v/100)/10)+"k":Math.round(v))+'</text>'}
+  for(var d=1;d<=n;d+=(n>20?5:1)){o+='<text x="'+x(d)+'" y="'+(H-8)+'" text-anchor="middle">'+d+'</text>'}
+  o+='<line x1="'+x(1)+'" y1="'+y(0)+'" x2="'+x(n)+'" y2="'+y(goal)+'" stroke="var(--mute)" stroke-width="2" stroke-dasharray="5 5"/>';
+  if(el>0){
+    var pts=[];for(var j=1;j<=el;j++)pts.push(x(j)+","+y(cum[j-1]));
+    o+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--accent2)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    o+='<circle cx="'+x(el)+'" cy="'+y(cum[el-1])+'" r="6" fill="var(--accent)"/>';
+  }
+  $("chart").innerHTML=o;
+}
+
+function drawCal(n,ent){
+  var first=(new Date(cur.y,cur.m,1).getDay()+6)%7,h='';
+  ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(function(w){h+='<div class="wd">'+w+'</div>'});
+  for(var i=0;i<first;i++)h+='<div class="day empty"></div>';
+  for(var d=1;d<=n;d++){
+    var k=dkey(d),e=ent[k],cls="day";
+    if(e&&e.words>0)cls+=" has";if(k===sel)cls+=" sel";if(k===todayKey)cls+=" today";
+    var st=e&&e.words>0?' style="background:var(--m'+e.mood+')"':'';
+    h+='<button class="'+cls+'" data-k="'+k+'"'+st+' aria-label="Day '+d+'"><span class="n">'+d+'</span><span class="e">'+(e&&e.words>0?MOODS[e.mood-1][0]:"")+'</span><span class="w">'+(e&&e.words>0?fmt(e.words):"")+'</span>'+(e&&e.note&&e.note.trim()?'<span class="t">'+esc(e.note)+'</span>':'')+'</button>';
+  }
+  $("cal").innerHTML=h;
+  $("legend").innerHTML=MOODS.map(function(m,i){return '<span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--m'+(i+1)+');vertical-align:-1px"></span> '+m[0]+' '+m[1]+'</span>'}).join("");
+}
+function drawNotes(n,ent){var h='';for(var d=1;d<=n;d++){var e=ent[dkey(d)];if(!e||!(e.words>0||(e.note&&e.note.trim())))continue;var lab=new Date(cur.y,cur.m,d).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});h+='<div class="nrow" style="border-left-color:var(--m'+e.mood+')"><b>'+lab+'</b><small>'+MOODS[e.mood-1][0]+' '+fmt(e.words||0)+' words</small>'+(e.note&&e.note.trim()?'<p>'+esc(e.note)+'</p>':'')+'</div>'}$("notes").innerHTML=h||'<div class="nempty">Your session notes will appear here, day by day.</div>'}
+function toast(t){$("toast").textContent=t;setTimeout(function(){$("toast").textContent=""},2500)}
+$("cal").addEventListener("click",function(e){var b=e.target.closest(".day[data-k]");if(!b)return;sel=b.dataset.k;loadForm();render();$("words").focus()});
+$("date").addEventListener("change",function(){if(!$("date").value)return;sel=$("date").value;cur={y:+sel.slice(0,4),m:+sel.slice(5,7)-1};loadForm();render()});
+$("save").addEventListener("click",function(){
+  var w=parseInt($("words").value,10);
+  if(isNaN(w)||w<0){toast("Enter a word count (0 or more).");return}
+  E()[sel]={words:w,mood:S.mood,note:$("note").value};save();render();toast(["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
+});
+$("del").addEventListener("click",function(){delete E()[sel];save();loadForm();render();toast("Day cleared.")});
+$("cname").addEventListener("input",function(){ch().name=$("cname").value;save()});
+$("goal").addEventListener("change",function(){var g=parseInt($("goal").value,10);if(g>0){ch().goal=g;save();render()}});
+$("chMs").addEventListener("change",function(){ch().ms=$("chMs").value;S.msSel=$("chMs").value;save();render()});
+$("msSel").addEventListener("change",function(){S.msSel=$("msSel").value;render()});
+$("msName").addEventListener("change",function(){var m=msById(S.msSel);m.name=$("msName").value||m.name;save();render()});
+$("msBase").addEventListener("change",function(){var m=msById(S.msSel);m.base=Math.max(0,parseInt($("msBase").value,10)||0);save();render()});
+$("msNew").addEventListener("click",function(){var m={id:"m"+Date.now(),name:"New manuscript",base:0};S.manuscripts.push(m);S.msSel=m.id;save();render();$("msName").focus();$("msName").select()});
+$("hist").addEventListener("click",function(e){var b=e.target.closest(".hrow");if(!b)return;var k=b.dataset.k;cur={y:+k.slice(0,4),m:+k.slice(5,7)-1};sel=mk()===todayKey.slice(0,7)?todayKey:dkey(1);S.msSel=null;loadForm();render();window.scrollTo({top:0})});
+function shift(d){cur.m+=d;if(cur.m<0){cur.m=11;cur.y--}if(cur.m>11){cur.m=0;cur.y++}sel=mk()===todayKey.slice(0,7)?todayKey:dkey(1);S.msSel=null;loadForm();render()}
+$("prev").addEventListener("click",function(){shift(-1)});
+$("next").addEventListener("click",function(){shift(1)});
+$("bkEx").addEventListener("click",function(){var t=JSON.stringify({manuscripts:S.manuscripts,challenges:S.challenges});$("bk").value=t;$("bk").focus();$("bk").select();var ok=false;try{navigator.clipboard.writeText(t).then(function(){$("bkMsg").textContent="Exported and copied."},function(){$("bkMsg").textContent="Exported: copy the text above."});ok=true}catch(e){}if(!ok)$("bkMsg").textContent="Exported: copy the text above."});
+$("bkIm").addEventListener("click",function(){try{var p=JSON.parse($("bk").value);if(!p||!Array.isArray(p.manuscripts)||!p.manuscripts.length||typeof p.challenges!=="object")throw 1;S.manuscripts=p.manuscripts;S.challenges=p.challenges;Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(!c.entries)c.entries={};if(!c.ms)c.ms=S.manuscripts[0].id});S.msSel=null;save();loadForm();render();$("bkMsg").textContent="Import done."}catch(e){$("bkMsg").textContent="This text is not a valid backup."}});
+loadForm();render();
+</script>
+<script>
+(function(){
+var X={theme:"winter",friends:[],sprints:[],me:""};
+try{var rw=localStorage.getItem("wt-extra");if(rw)Object.assign(X,JSON.parse(rw))}catch(e){}
+function saveX(){try{localStorage.setItem("wt-extra",JSON.stringify(X))}catch(e){}}
+var TH={
+winter:{n:"Winter",e:"❄️",st:["❄️","🌲","🎄","🎁","⭐","🎅"],lb:["A first snowflake, waiting for your first words.","A little pine, dusted with snow.","The tree is up, time for the lights!","Presents are piling up under the tree.","One last star to hang on the tree.","Goal reached! Happy holidays!"],ic:["🎁","✍️","❄️","🎄","⛄","📖","🗓️","🏅","👯","🔔"],pat:["❄️","🎄","⭐"]},
+garden:{n:"Garden",e:"🌿",st:["🌰","🌱","🌿","🪴","🌷","🌳"],lb:["A seed, waiting for your first words.","A tiny seedling.","Leaves are coming out.","A healthy little plant.","It’s blooming, almost there!","Your tree is fully grown. Goal reached!"],ic:["🪴","✍️","🌿","🌻","🍄","📖","🗓️","🏅","👯","🌰"],pat:["🌿","🍃","🌸"]},
+twilight:{n:"Twilight",e:"🌙",st:["🌑","✨","🕯️","📖","🌟","🐉"],lb:["A blank page under the moon.","The first sparks of a story.","A candle is lit, the story glows.","The pages are filling up.","A star is rising, almost there!","The dragon awakens. Goal reached!"],ic:["📚","✍️","🌙","🔮","🕯️","📖","🗓️","🏅","👯","🗝️"],pat:["✨","🌙","⭐"]},
+galaxy:{n:"Galaxy",e:"🪐",st:["🌑","🛰️","🚀","🪐","🌠","👽"],lb:["Empty space, waiting for your first words.","Your satellite is in orbit.","Rocket launched, full speed ahead!","Passing the rings of Saturn.","A shooting star, almost there!","Goal reached! Aliens say hello!"],ic:["🛸","✍️","🌠","🪐","🌌","📖","🗓️","🏅","👽","🔭"],pat:["⭐","🪐","✨"]},
+cafe:{n:"Café",e:"☕",st:["🫘","☕","🥐","🍰","📖","🏆"],lb:["Coffee beans, waiting to be ground.","The first cup is brewing.","A fresh croissant on the table.","Cake time, you’re on a roll!","One more chapter with your latte.","Goal reached! The next round is on the house!"],ic:["📚","✍️","☕","🥐","🍰","📖","🗓️","🏅","🤝","🧾"],pat:["☕","🥐","📖"]},
+arcade:{n:"Arcade",e:"🕹️",st:["💾","🎮","👾","🏎️","🏆","👑"],lb:["Insert coin to start.","Level 1 loaded.","Combo building, keep it up!","Boss fight incoming!","Final level, almost there!","You win! New high score!"],ic:["🕹️","✍️","👾","🎮","💎","📖","🗓️","🏅","🎯","💾"],pat:["👾","🕹️","⭐"]},
+ocean:{n:"Ocean",e:"🌊",st:["🫧","🐚","🐠","🐢","🐬","🐳"],lb:["A single bubble, waiting for your first words.","A shell washes ashore.","A little fish joins you.","A turtle glides by.","A dolphin is jumping, almost there!","Goal reached! The whale sings for you!"],ic:["🧭","✍️","🌊","🐚","⚓","📖","🗓️","🏅","🤝","🔔"],pat:["🫧","🐚","🌊"]},
+autumn:{n:"Autumn",e:"🍂",st:["🌰","🍂","🍁","🍄","🦊","🎃"],lb:["An acorn, waiting for your first words.","The first leaf falls.","The forest turns golden.","Mushrooms pop up after the rain.","A fox watches you write.","Goal reached! Pumpkin pie for everyone!"],ic:["🧺","✍️","🍂","🍁","🍄","📖","🗓️","🏅","🤝","🕯️"],pat:["🍂","🍁","🍄"]},
+sakura:{n:"Sakura",e:"🌸",st:["🌱","🌿","🌸","🌷","🦋","🌈"],lb:["A tiny shoot, waiting for your first words.","The buds are forming.","The first blossoms open.","The branches are in bloom.","A butterfly lands on a petal.","Goal reached! A rainbow over the blossoms!"],ic:["🎎","✍️","🌸","🍡","🦋","📖","🗓️","🏅","🤝","🔔"],pat:["🌸","✨","🦋"]}};
+if(!TH[X.theme])X.theme="winter";
+var _s=save;save=function(){_s();saveX()};
+function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function daily(id){var o={};Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(id&&c.ms!==id)return;Object.keys(c.entries).forEach(function(d){o[d]=(o[d]||0)+(c.entries[d].words||0)})});return o}
+function curMs(){return msById(S.msSel||ch().ms)}
+function applyTheme(){var t=TH[X.theme],r=document.documentElement;r.setAttribute("data-th",X.theme);
+var svg="<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='10' y='42' font-size='28'>"+t.pat[0]+"</text><text x='88' y='100' font-size='24'>"+t.pat[1]+"</text><text x='22' y='128' font-size='20'>"+t.pat[2]+"</text></svg>";
+r.style.setProperty("--pat",'url("data:image/svg+xml,'+encodeURIComponent(svg)+'")');
+document.querySelectorAll("section.panel h2").forEach(function(h,i){h.setAttribute("data-i",t.ic[i]||"")});
+$("themes").innerHTML=Object.keys(TH).map(function(k){return '<button class="ghost th" data-t="'+k+'" aria-pressed="'+(k===X.theme)+'">'+TH[k].e+' '+TH[k].n+'</button>'}).join("")}
+function setPlant(){var c=ch(),t=sumC(c),p=Math.min(100,t/c.goal*100),i=t>=c.goal?5:p>=75?4:p>=50?3:p>=25?2:p>0?1:0,th=TH[X.theme];$("plant").textContent=th.st[i];$("plantLbl").textContent=th.lb[i]}
+$("themes").addEventListener("click",function(e){var b=e.target.closest(".th");if(!b)return;X.theme=b.dataset.t;saveX();applyTheme();setPlant()});
+
+function msX(){var ms=curMs(),dd=daily(ms.id),tr=0,k,t=new Date();for(k in dd)tr+=dd[k];var tot=(ms.base||0)+tr,goal=ms.goal||80000,pace=0,i;
+for(i=0;i<30;i++)pace+=dd[dstr(new Date(t.getFullYear(),t.getMonth(),t.getDate()-i))]||0;pace/=30;
+function eta(v){if(tot>=v)return null;if(pace<=0)return "—";var n=Math.ceil((v-tot)/pace);if(n>1100)return "—";return new Date(t.getFullYear(),t.getMonth(),t.getDate()+n).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}
+var pc=Math.min(100,tot/goal*100),e=eta(goal);
+var h='<label>Goal for this manuscript (words)<input type="number" id="msGoal" min="1000" step="1000" value="'+goal+'"></label><div class="bar"><i style="width:'+pc+'%"></i></div><div class="pct">'+Math.round(pc)+'% of '+fmt(goal)+' words</div>';
+h+='<p style="margin:8px 0">'+(tot>=goal?'Goal reached! 🎉':pace<=0?'Write a few days and I’ll estimate when you’ll finish.':e==="—"?'Keep writing and the estimate will get closer.':'At your pace ('+fmt(pace)+' words/day over the last 30 days) you’ll finish around <b>'+e+'</b>.')+'</p><div class="chips">';
+h+=[10000,25000,50000,75000,100000,goal].filter(function(v,i,a){return a.indexOf(v)===i}).sort(function(a,b){return a-b}).map(function(v){var x=eta(v);return '<span class="chip'+(x===null?' ok':'')+'">'+(x===null?'✓ '+fmt(v):fmt(v)+' · '+x)+'</span>'}).join("")+'</div>';
+$("msExtra").innerHTML=h}
+$("msExtra").addEventListener("change",function(e){if(e.target.id!=="msGoal")return;var g=parseInt(e.target.value,10);if(g>0){curMs().goal=g;save();render()}});
+
+var ST=["Idea","Draft","Revised","Done"];
+function chap(){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]),w=0,dn=0;cs.forEach(function(c){w+=c.w||0;if(c.s==="Done")dn++});
+$("xChBody").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+esc(ms.name)+' · '+cs.length+' chapters · '+dn+' done · '+fmt(w)+' words in chapters</p>'+cs.map(function(c,i){return '<div class="chrow" data-i="'+i+'"><input class="chn" value="'+esc(c.n)+'" aria-label="Chapter title"><select class="chs" aria-label="Status">'+ST.map(function(s){return '<option'+(s===c.s?' selected':'')+'>'+s+'</option>'}).join("")+'</select><input class="chw" type="number" min="0" value="'+(c.w||0)+'" aria-label="Words"><button class="ghost chd" type="button" aria-label="Delete chapter">×</button></div>'}).join("")+'<button class="ghost" id="chAdd" type="button" style="width:auto;padding:0 16px;font-size:.9rem">+ Add chapter</button>'}
+$("xChBody").addEventListener("change",function(e){var row=e.target.closest(".chrow");if(!row)return;var c=curMs().chapters[+row.dataset.i],t=e.target;if(t.classList.contains("chn"))c.n=t.value;else if(t.classList.contains("chs"))c.s=t.value;else if(t.classList.contains("chw"))c.w=Math.max(0,parseInt(t.value,10)||0);save();chap()});
+$("xChBody").addEventListener("click",function(e){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]);if(e.target.id==="chAdd"){cs.push({n:"Chapter "+(cs.length+1),s:"Draft",w:0})}else if(e.target.classList.contains("chd")){cs.splice(+e.target.closest(".chrow").dataset.i,1)}else return;save();chap()});
+
+function yearV(){var y=cur.y,dd=daily(),first=(new Date(y,0,1).getDay()+6)%7,h='',mx=1,tot=0,dys=0,d=new Date(y,0,1),days=[],i;
+while(d.getFullYear()===y){var k=dstr(d),w=dd[k]||0;days.push([k,w]);if(w>mx)mx=w;tot+=w;if(w>0)dys++;d=new Date(y,d.getMonth(),d.getDate()+1)}
+for(i=0;i<first;i++)h+='<i style="background:none"></i>';
+days.forEach(function(x){var l=x[1]>0?Math.max(25,Math.ceil(x[1]/mx*4)*25):0;h+='<i title="'+x[0]+': '+fmt(x[1])+' words"'+(l?' style="background:color-mix(in srgb,var(--accent2) '+l+'%,var(--line))"':'')+'></i>'});
+$("xYear").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+y+' · '+fmt(tot)+' words · '+dys+' days written</p><div style="overflow-x:auto;padding-bottom:6px"><div class="yr">'+h+'</div></div>'}
+
+function badgesV(){var dd=daily(),ks=Object.keys(dd).filter(function(k){return dd[k]>0}).sort(),best=0,run=0,prev=null,mxd=0;
+ks.forEach(function(k){var p=k.split("-"),t=new Date(+p[0],+p[1]-1,+p[2]).getTime();run=prev!==null&&Math.round((t-prev)/864e5)===1?run+1:1;prev=t;if(run>best)best=run;if(dd[k]>mxd)mxd=dd[k]});
+var gh=Object.keys(S.challenges).some(function(k){var c=S.challenges[k],t=sumC(c);return t>0&&t>=c.goal}),big=0;
+S.manuscripts.forEach(function(m){var t=m.base||0,x=daily(m.id),k;for(k in x)t+=x[k];if(t>big)big=t});
+var L=[["✍️","First session",ks.length>=1],["🔥","3-day streak",best>=3],["🔥","7-day streak",best>=7],["🔥","14-day streak",best>=14],["🌟","30-day streak",best>=30],["⚡","1,000 words in a day",mxd>=1000],["📅","10 days written",ks.length>=10],["📆","50 days written",ks.length>=50],["🏆","Challenge goal reached",gh],["📚","10,000 words in a book",big>=10000],["📘","25,000 words in a book",big>=25000],["📕","50,000 words in a book",big>=50000],["🎉","80,000 words in a book",big>=80000],["⏱️","First sprint",X.sprints.length>=1],["🏃","10 sprints",X.sprints.length>=10],["👯","Friend added",X.friends.length>=1]];
+$("xBadges").innerHTML='<div class="pct" style="grid-column:1/-1">'+L.filter(function(b){return b[2]}).length+' / '+L.length+' badges earned</div>'+L.map(function(b){return '<div class="badge'+(b[2]?'':' off')+'"><b>'+b[0]+'</b>'+b[1]+'</div>'}).join("")}
+
+function code(){var c=ch(),d=0,k;for(k in c.entries)if(c.entries[k].words>0)d++;return "WT1:"+btoa(unescape(encodeURIComponent(JSON.stringify({n:X.me||"Me",m:mk(),w:sumC(c),g:c.goal,d:d,t:(function(){try{return String(JSON.parse(localStorage.getItem("wt-extra2")).msg||"").slice(0,80)}catch(e){return ""}})()}))))}
+function friendsV(){var c=ch(),rows=[{n:(X.me||"Me")+" (you)",w:sumC(c),g:c.goal}].concat(X.friends.filter(function(f){return f.m===mk()}));
+$("xName").value=X.me||"";$("xFcode").value=code();
+$("xFr").innerHTML=rows.map(function(f,i){return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(f.n)+'</span><span>'+fmt(f.w)+' / '+fmt(f.g)+(i?' <button class="ghost fdel" type="button" data-n="'+esc(f.n)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px">×</button>':'')+'</span></div><div class="fbar"><i style="width:'+Math.min(100,f.w/f.g*100)+'%"></i></div></div>'}).join("")}
+$("xName").addEventListener("change",function(){X.me=$("xName").value.trim();saveX();friendsV()});
+$("xCopy").addEventListener("click",function(){$("xFcode").select();try{navigator.clipboard.writeText($("xFcode").value).then(function(){$("xFmsg").textContent="Code copied."},function(){$("xFmsg").textContent="Copy the selected code."})}catch(e){$("xFmsg").textContent="Copy the selected code."}});
+$("xAdd").addEventListener("click",function(){var v=$("xFin").value.trim();try{if(v.indexOf("WT1:")!==0)throw 1;var o=JSON.parse(decodeURIComponent(escape(atob(v.slice(4)))));if(typeof o.n!=="string"||!isFinite(o.w)||!(o.g>0)||!/^\d{4}-\d{2}$/.test(o.m))throw 1;
+X.friends=X.friends.filter(function(f){return!(f.n===o.n&&f.m===o.m)});X.friends.push({n:o.n.slice(0,30),m:o.m,w:+o.w,g:+o.g,t:String(o.t||"").slice(0,80)});saveX();$("xFin").value="";$("xFmsg").textContent=o.m===mk()?"Friend added!":"Added for "+o.m+": go to that month to see it.";xr()}catch(e){$("xFmsg").textContent="This code is not valid."}});
+$("xFr").addEventListener("click",function(e){var b=e.target.closest(".fdel");if(!b)return;X.friends=X.friends.filter(function(f){return!(f.n===b.dataset.n&&f.m===mk())});saveX();xr()});
+
+var T={run:false,end:0,left:0,iv:null,m:25};
+function mmss(ms){var s=Math.max(0,Math.round(ms/1000));return pad(Math.floor(s/60))+":"+pad(s%60)}
+function spShow(){$("spT").textContent=mmss(T.run?T.end-Date.now():(T.left||(+$("spMin").value)*60000))}
+$("spMin").addEventListener("change",function(){if(!T.run){T.left=0;spShow()}});
+$("spGo").addEventListener("click",function(){
+if(T.run){T.left=T.end-Date.now();T.run=false;clearInterval(T.iv);$("spGo").textContent="Resume";spShow();return}
+if(!T.left)T.left=(+$("spMin").value)*60000;T.m=+$("spMin").value;T.end=Date.now()+T.left;T.run=true;$("spGo").textContent="Pause";$("spDone").hidden=true;$("spMsg").textContent="";
+T.iv=setInterval(function(){if(T.end-Date.now()<=0){clearInterval(T.iv);T.run=false;T.left=0;$("spGo").textContent="Start";$("spT").textContent="00:00";$("spDone").hidden=false;$("spMsg").textContent="Time’s up! 🎉 How many words did you write?";try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}$("spW").focus()}else spShow()},250)});
+$("spReset").addEventListener("click",function(){clearInterval(T.iv);T.run=false;T.left=0;$("spGo").textContent="Start";$("spDone").hidden=true;$("spMsg").textContent="";spShow()});
+$("spAdd").addEventListener("click",function(){var w=parseInt($("spW").value,10);if(isNaN(w)||w<0){$("spMsg").textContent="Enter the number of words.";return}
+cur={y:now.getFullYear(),m:now.getMonth()};sel=todayKey;var e=E()[todayKey]||{words:0,mood:3,note:""};e.words=(e.words||0)+w;E()[todayKey]=e;
+var m=T.m||25;X.sprints.push({d:todayKey,min:m,w:w});if(X.sprints.length>100)X.sprints.shift();save();loadForm();render();
+var best=0;X.sprints.forEach(function(s){best=Math.max(best,s.w/s.min)});$("spDone").hidden=true;$("spW").value="";
+$("spMsg").textContent=w+" words in "+m+" min = "+(Math.round(w/m*10)/10)+" words/min (best: "+(Math.round(best*10)/10)+"). Added to today!"});
+
+function xr(){setPlant();msX();chap();yearV();badgesV();friendsV()}
+var _r=render;render=function(){_r();xr()};
+applyTheme();render();
+})();
+</script>
+<script>
+(function(){
+var EM={winter:"🎄",garden:"🌿",twilight:"🌙",galaxy:"🪐",cafe:"☕",arcade:"🕹️",ocean:"🌊",autumn:"🍂",sakura:"🌸"};
+function draw(n,col,em){var c=document.createElement("canvas");c.width=c.height=n;var x=c.getContext("2d");x.fillStyle=col;x.fillRect(0,0,n,n);x.font=Math.round(n*.62)+"px sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(em,n/2,n*.54);return c.toDataURL("image/png")}
+function link(rel,href,extra){var l=document.querySelector('link[rel="'+rel+'"]');if(!l){l=document.createElement("link");l.rel=rel;document.head.appendChild(l)}l.href=href;if(extra)l.sizes=extra}
+function upd(){try{var r=document.documentElement,cs=getComputedStyle(r),bg=cs.getPropertyValue("--bg").trim()||"#ffffff",ac=cs.getPropertyValue("--accent").trim()||"#6a3de8",em=EM[r.getAttribute("data-th")]||"📖";
+var tm=document.querySelector('meta[name="theme-color"]');if(tm)tm.content=bg;
+var p180=draw(180,ac,em),p512=draw(512,ac,em);
+link("apple-touch-icon",p180);
+var mf={name:"My writing challenges",short_name:"Writing",start_url:location.href.split("#")[0],scope:location.href.split("#")[0],display:"standalone",background_color:bg,theme_color:bg,icons:[{src:p512,sizes:"512x512",type:"image/png"}]};
+link("manifest","data:application/manifest+json;charset=utf-8,"+encodeURIComponent(JSON.stringify(mf)))}catch(e){}}
+upd();
+try{new MutationObserver(function(){upd()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-th"]})}catch(e){}
+})();
+</script>
+<script>
+(function(){
+var Y={dg:500,tab:"today",cel:""};
+try{var rw=localStorage.getItem("wt-extra2");if(rw)Object.assign(Y,JSON.parse(rw))}catch(e){}
+function saveY(){try{localStorage.setItem("wt-extra2",JSON.stringify(Y))}catch(e){}}
+var PAL={garden:{s:"#6b7f3a",a:"#8fb35a",b:"#5f8a3c",v:"#e3efbd",c:"#c9d97a"},winter:{s:"#2f6b4a",a:"#2f8f57",b:"#1f6b3f",v:"#ffffff",c:"#d63a3a"},twilight:{s:"#8f78d8",a:"#f2d48a",b:"#b7a2f2",v:"#fff3c4",c:"#f2b45a"},galaxy:{s:"#6c8cff",a:"#ffd95a",b:"#8a6af2",v:"#bfe9ff",c:"#ff7ad9"},cafe:{s:"#6a8a4f",a:"#4f7a3c",b:"#7a4a2a",v:"#c9e0a8",c:"#c0392b"},arcade:{s:"#ff4fc3",a:"#3ef0ff",b:"#ffe14d",v:"#ffffff",c:"#ff4fc3"},ocean:{s:"#2a9d8f",a:"#ffb4a2",b:"#e76f51",v:"#ffffff",c:"#8ee3f0"},autumn:{s:"#8a5a2b",a:"#e07a2f",b:"#b5441b",v:"#f6d58e",c:"#7a4a21"},sakura:{s:"#7a5a4a",a:"#ffb7d1",b:"#f78fb3",v:"#ffe3ee",c:"#ffd166"}};
+var ITM={garden:["leaf"],winter:["pine","holly"],twilight:["moon","star"],galaxy:["planet","star"],cafe:["leaf","bean","cherry"],arcade:["pstar","pheart"],ocean:["shell","bubble"],autumn:["maple","acorn"],sakura:["blossom","petal"]};
+var STM={arcade:"stroke-dasharray='3 5' stroke-width='3'",galaxy:"stroke-dasharray='2 5' stroke-width='1.6'",sakura:"stroke-width='3.2'"};
+var CF={winter:["🎉","❄️","⭐","🎁"],garden:["🌸","🌿","🦋","🎉"],twilight:["✨","🌙","⭐","🎉"],galaxy:["⭐","🚀","✨","🪐"],cafe:["☕","🥐","🍰","🎉"],arcade:["👾","🕹️","⭐","🎉"],ocean:["🫧","🐚","🐠","🎉"],autumn:["🍂","🍁","🎃","🎉"],sakura:["🌸","🦋","✨","🎉"]};
+var PS={garden:["🍃","🌿"],autumn:["🍂","🍁"],sakura:["🌸"],ocean:["🫧"],twilight:["✨"]};
+function Gp(k,b){return "<g transform='scale("+k+")'>"+b+"</g>"}
+var IT={
+leaf:function(p,k,i){return Gp(k,"<path d='M0 0C-9-3-15 2-12 8C-11 11-8 13-5 15C-3 18-1 22 0 28C1 22 3 18 5 15C8 13 11 11 12 8C15 2 9-3 0 0Z' fill='"+(i%2?p.b:p.a)+"'/><path d='M0 2V25M0 10L-7 6M0 10L7 6M0 17L-5 13M0 17L5 13' stroke='"+p.v+"' stroke-width='.9' fill='none'/>")},
+pine:function(p,k){return Gp(k,"<path d='M0 0V26' stroke='"+p.s+"' stroke-width='1.6'/><path d='M0 5L-7 11M0 5L7 11M0 12L-8 19M0 12L8 19M0 19L-6 25M0 19L6 25' stroke='"+p.a+"' stroke-width='2' stroke-linecap='round' fill='none'/><circle cx='-7' cy='11' r='1.7' fill='#fff'/><circle cx='7' cy='11' r='1.7' fill='#fff'/><circle cx='-8' cy='19' r='1.7' fill='#fff'/><circle cx='8' cy='19' r='1.7' fill='#fff'/>")},
+holly:function(p,k){return Gp(k,"<path d='M0 0C7-5 12 0 14 6C8 5 3 3 0 0ZM0 0C-7-5-12 0-14 6C-8 5-3 3 0 0Z' fill='"+p.a+"'/><circle cx='-2' cy='3' r='3.4' fill='"+p.c+"'/><circle cx='3' cy='4' r='3.4' fill='"+p.c+"'/><circle cx='0' cy='8' r='3.4' fill='"+p.c+"'/>")},
+star:function(p,k){return Gp(k,"<polygon points='0,-9 2.6,-3.2 8.6,-2.8 4,1.6 5.3,7.3 0,4.2 -5.3,7.3 -4,1.6 -8.6,-2.8 -2.6,-3.2' fill='"+p.c+"'/>")},
+moon:function(p,k){return Gp(k,"<path d='M4-10A10 10 0 1 0 4 10A7.5 7.5 0 1 1 4-10Z' fill='"+p.a+"'/>")},
+planet:function(p,k,i){return Gp(k,"<circle r='6.5' fill='"+(i%2?p.c:p.b)+"'/><ellipse rx='12' ry='3.2' transform='rotate(-22)' fill='none' stroke='"+p.a+"' stroke-width='1.6'/>")},
+bean:function(p,k){return Gp(k,"<g transform='rotate(25)'><ellipse rx='5.5' ry='8.5' fill='"+p.b+"'/><path d='M-1.5-7C-5-2 2 2-1.5 7' stroke='"+p.v+"' stroke-width='1.3' fill='none'/></g>")},
+cherry:function(p,k){return Gp(k,"<path d='M0 0Q3 4 0 6' stroke='"+p.s+"' fill='none'/><circle cy='9' r='4.6' fill='"+p.c+"'/><circle cx='-1.4' cy='7.4' r='1.2' fill='#fff' fill-opacity='.6'/>")},
+pstar:function(p,k,i){var o="",s=2.6;[[0,-2],[-1,-1],[0,-1],[1,-1],[-2,0],[-1,0],[0,0],[1,0],[2,0],[-1,1],[0,1],[1,1],[0,2]].forEach(function(q){o+="<rect x='"+(q[0]*s-s/2)+"' y='"+(q[1]*s-s/2)+"' width='"+s+"' height='"+s+"' fill='"+(i%2?p.a:p.b)+"'/>"});return Gp(k,o)},
+pheart:function(p,k){var o="",s=2.6;[" XX XX ","XXXXXXX","XXXXXXX"," XXXXX ","  XXX  ","   X   "].forEach(function(r,y){for(var x=0;x<7;x++)if(r.charAt(x)==="X")o+="<rect x='"+((x-3.5)*s)+"' y='"+((y-3)*s)+"' width='"+s+"' height='"+s+"' fill='"+p.c+"'/>"});return Gp(k,o)},
+shell:function(p,k,i){return Gp(k,"<path d='M0 0L-9 14Q0 22 9 14Z' fill='"+(i%2?p.b:p.a)+"'/><path d='M0 0V18M0 0L-5 17M0 0L5 17' stroke='"+p.v+"' stroke-width='.9' fill='none'/>")},
+bubble:function(p,k){return Gp(k,"<circle r='7' fill='"+p.c+"' fill-opacity='.35' stroke='"+p.c+"' stroke-width='1.3'/><path d='M-3.5-2.5A4.5 4.5 0 0 1 0-5' stroke='#fff' stroke-width='1.5' fill='none' stroke-linecap='round'/>")},
+maple:function(p,k,i){return Gp(k,"<path d='M0 -10L2.5 -5L7 -7L5.5 -1L10 0L5 3L6 7L1 5L1 11L-1 11L-1 5L-6 7L-5 3L-10 0L-5.5 -1L-7 -7L-2.5 -5Z' fill='"+(i%2?p.b:p.a)+"'/>")},
+acorn:function(p,k){return Gp(k,"<ellipse cy='6' rx='4.6' ry='6' fill='"+p.c+"'/><path d='M-6 3Q0-4 6 3Z' fill='"+p.s+"'/><path d='M0-2V-5' stroke='"+p.s+"' stroke-width='1.4'/>")},
+blossom:function(p,k){var o="";for(var a=0;a<5;a++)o+="<circle cx='"+(5.2*Math.cos(a*1.2566))+"' cy='"+(5.2*Math.sin(a*1.2566))+"' r='4.4' fill='"+p.a+"'/>";return Gp(k,o+"<circle r='2.4' fill='"+p.c+"'/>")},
+petal:function(p,k){return Gp(k,"<path d='M0 0C6 3 6 10 0 14C-6 10-6 3 0 0Z' fill='"+p.b+"'/>")}
+};
+function uri(v){return 'url("data:image/svg+xml,'+encodeURIComponent(v)+'")'}
+function corner(t){var p=PAL[t]||PAL.winter,A=ITM[t]||ITM.winter,sx=STM[t]||"stroke-width='2'",o="<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'>",y,x,i,d1="M150 150",d2="M150 150";
+for(y=130;y>=20;y-=20)d1+=" Q"+(150+((y/20)%2?4:-4))+" "+(y+10)+" 150 "+y;
+for(x=130;x>=20;x-=20)d2+=" Q"+(x+10)+" "+(150+((x/20)%2?4:-4))+" "+x+" 150";
+o+="<path d='"+d1+"' fill='none' stroke='"+p.s+"' stroke-linecap='round' "+sx+"/><path d='"+d2+"' fill='none' stroke='"+p.s+"' stroke-linecap='round' "+sx+"/>";
+var J=[-18,12,-6,20,-12,8,-20];
+for(var arm=0;arm<2;arm++)for(i=0;i<7;i++){var px=arm?138-i*17:150,py=arm?150:138-i*17,k=1.15-i*.1,rot=(arm?0:-90)+(i%2?180:0)+J[i],f=IT[A[(i+arm)%A.length]];o+="<g transform='translate("+px+" "+py+") rotate("+rot+")'>"+f(p,k,i)+"</g>"}
+return o+"</svg>"}
+var TT={winter:"❄️ Writing challenge winter",garden:"🌿 Writing challenge garden",twilight:"🌙 Writing challenge twilight",galaxy:"🪐 Writing challenge galaxy",cafe:"☕ Writing challenge café",arcade:"🕹️ Writing challenge arcade",ocean:"🌊 Writing challenge summer",autumn:"🍂 Writing challenge autumn",sakura:"🌸 Writing challenge spring"};
+function vine(){var t=document.documentElement.getAttribute("data-th")||"winter";document.documentElement.style.setProperty("--corner",uri(corner(t)));var h=document.querySelector("main>header h1");if(h)h.textContent=TT[t]||TT.winter}
+var pc=document.createElement("div");pc.setAttribute("aria-hidden","true");pc.style.cssText="position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden";document.body.appendChild(pc);
+function parts(){pc.innerHTML="";var t=document.documentElement.getAttribute("data-th"),set=PS[t];if(!set||(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))return;
+var up=t==="ocean",H=window.innerHeight;for(var i=0;i<14;i++){var e=document.createElement("span");e.textContent=set[i%set.length];e.style.cssText="position:absolute;left:"+(Math.random()*100)+"vw;top:0;font-size:"+(14+Math.random()*14)+"px;opacity:.45";pc.appendChild(e);
+var dx=Math.random()*80-40;e.animate(up?[{transform:"translate(0,"+(H+30)+"px)"},{transform:"translate("+dx+"px,-40px)"}]:[{transform:"translate(0,-40px) rotate(0deg)"},{transform:"translate("+dx+"px,"+(H+30)+"px) rotate("+(Math.random()*360)+"deg)"}],{duration:14000+Math.random()*14000,iterations:Infinity,delay:-Math.random()*20000})}}
+try{new MutationObserver(function(){vine();parts()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-th"]})}catch(e){}
+
+var gc=document.createElement("div");gc.className="gcard";gc.id="xGoal";$("stats").parentNode.insertBefore(gc,$("stats"));
+var G=[["settings",$("themes")],["book",$("msSel").closest("section")],["today",document.querySelector(".hero")],["today",gc],["today",$("stats")],["today",$("save").closest("section")],["month",$("chart").closest("section")],["month",$("cal").closest("section")],["month",$("hist").closest("section")],["book",$("xChBody").closest("section")],["progress",$("xYear").closest("section")],["progress",$("xBadges").closest("section")],["friends",$("xFcode").closest("section")],["settings",$("bk").closest("section")]];
+var gi=document.createElement("div");gi.className="gcard";gi.id="xIns";var ys=$("xYear").closest("section");ys.parentNode.insertBefore(gi,ys);G.push(["progress",gi]);
+var gf=document.createElement("div");gf.className="gcard";gf.id="xCheer";var fs=$("xFcode").closest("section");fs.parentNode.insertBefore(gf,fs.nextSibling);G.push(["friends",gf]);
+var gq=document.createElement("div");gq.className="gcard";gq.id="xPrompt";var ss=$("save").closest("section");ss.parentNode.insertBefore(gq,ss);G.push(["today",gq]);
+var gn=document.createElement("div");gn.className="gcard";gn.id="xNotes";$("xChBody").closest("section").after(gn);G.push(["book",gn]);
+var gp=document.createElement("div");gp.className="gcard";gp.id="xPrefs";$("themes").after(gp);G.push(["settings",gp]);
+gp.innerHTML='<h2>⚙️ Preferences</h2><label>Language<select id="xLang"><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="sl">Slovenščina</option></select></label><label style="margin-top:12px;display:flex;gap:8px;align-items:center;color:var(--ink)"><input type="checkbox" id="xAuto"> Follow the seasons automatically</label><div class="pct" style="margin-top:6px">The theme and the title follow the season of the month you are viewing: winter (Dec–Mar), spring (Apr–May), summer (Jun–Sep), autumn (Oct–Nov).</div>';
+var TB=[["today","🏠","Today"],["month","📅","Month"],["book","📖","Book"],["progress","🏅","Progress"],["friends","👯","Friends"],["settings","⚙️","Settings"]];
+var nav=document.createElement("nav");nav.className="tabs";nav.setAttribute("aria-label","Sections");document.querySelector("main>header").after(nav);
+nav.innerHTML=TB.map(function(t){return '<button class="tab" type="button" data-t="'+t[0]+'">'+t[1]+' '+t[2]+'</button>'}).join("");
+function showTab(t){if(!TB.some(function(x){return x[0]===t}))t="today";G.forEach(function(g){g[1].classList.toggle("off",g[0]!==t)});nav.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.t===t))});Y.tab=t;saveY()}
+nav.addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;showTab(b.dataset.t);window.scrollTo({top:0})});
+
+function confetti(){if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;var set=CF[document.documentElement.getAttribute("data-th")]||CF.winter;
+for(var i=0;i<28;i++){var sp=document.createElement("span");sp.textContent=set[i%set.length];sp.style.cssText="position:fixed;left:"+(Math.random()*96)+"vw;top:-30px;font-size:"+(18+Math.random()*18)+"px;pointer-events:none;z-index:99";document.body.appendChild(sp);
+var a=sp.animate([{transform:"translate(0,0) rotate(0deg)",opacity:1},{transform:"translate("+(Math.random()*160-80)+"px,"+(window.innerHeight+60)+"px) rotate("+(Math.random()*720-360)+"deg)",opacity:.9}],{duration:1800+Math.random()*1600,easing:"ease-in"});
+a.onfinish=(function(el){return function(){el.remove()}})(sp)}}
+var first=true;
+function goalV(){var k=todayKey.slice(0,7),c=S.challenges[k],box=$("xGoal");
+if(!c){box.innerHTML='<h2>🎯 Today’s goal</h2><div class="pct">Open the current month to start your challenge, and your daily goal will appear here.</div>';first=false;return}
+var tw=(c.entries[todayKey]&&c.entries[todayKey].words)||0,total=sumC(c),left=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate()+1,remain=Math.max(0,c.goal-(total-tw)),g=Math.ceil(remain/left),already=remain===0,done=!already&&tw>=g;
+if(done){if(Y.cel!==todayKey){Y.cel=todayKey;saveY();if(!first)confetti()}}else if(Y.cel===todayKey){Y.cel="";saveY()}
+box.innerHTML='<h2>🎯 Today’s goal</h2>'+(already?'<div class="pct">🎉 You already reached this month’s goal of '+fmt(c.goal)+' words. Anything you write today is a bonus!</div>':'<div class="row" style="align-items:center"><div class="big" style="font-size:2.6rem;color:var(--accent)">'+fmt(tw)+'</div><div class="of">of <b>'+fmt(g)+'</b> words today</div></div><div class="bar"><i style="width:'+Math.min(100,tw/g*100)+'%"></i></div><div class="pct">'+(done?'🎉 Daily goal reached, well done!':fmt(g-tw)+' words to go today')+' · this is what you need to write each day to reach '+fmt(c.goal)+' words by the end of the month</div>');
+first=false}
+function bars(v,lb){var mx=Math.max.apply(null,v.concat([1]));return '<div class="mbars">'+v.map(function(x,i){return '<div class="mbar"><span>'+(x>=1000?(x/1000).toFixed(1)+"k":Math.round(x))+'</span><i style="height:'+Math.max(2,x/mx*64)+'px"></i><span>'+lb[i]+'</span></div>'}).join("")+'</div>'}
+function insV(){var wd=[0,0,0,0,0,0,0],wc=[0,0,0,0,0,0,0],md=[0,0,0,0,0],mc=[0,0,0,0,0],mo=[0,0,0,0,0,0,0,0,0,0,0,0],any=0;
+Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];Object.keys(c.entries).forEach(function(d){var e=c.entries[d],w=e.words||0;if(w<=0)return;any++;var p=d.split("-"),wi=(new Date(+p[0],+p[1]-1,+p[2]).getDay()+6)%7,m=(e.mood||3)-1;wd[wi]+=w;wc[wi]++;md[m]+=w;mc[m]++;if(+p[0]===cur.y)mo[+p[1]-1]+=w})});
+var DL=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],aw=wd.map(function(x,i){return wc[i]?x/wc[i]:0}),am=md.map(function(x,i){return mc[i]?x/mc[i]:0}),bw=aw.indexOf(Math.max.apply(null,aw)),bm=am.indexOf(Math.max.apply(null,am));
+$("xIns").innerHTML='<h2>📈 Insights</h2>'+(any<3?'<div class="pct">Write a few more days and I’ll show your patterns here.</div>':'<p style="margin:0 0 12px">You write the most on <b>'+["Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays","Sundays"][bw]+'</b> (about '+fmt(aw[bw])+' words) and when you feel <b>'+MOODS[bm][0]+' '+MOODS[bm][1].toLowerCase()+'</b> (about '+fmt(am[bm])+' words).</p>')+'<div class="pct" style="margin-top:8px">Average words by weekday</div>'+bars(aw,DL)+'<div class="pct" style="margin-top:14px">Average words by mood</div>'+bars(am,MOODS.map(function(m){return m[0]}))+'<div class="pct" style="margin-top:14px">Words per month in '+cur.y+'</div>'+bars(mo,["J","F","M","A","M","J","J","A","S","O","N","D"])}
+function cheerV(){var ex={};try{ex=JSON.parse(localStorage.getItem("wt-extra"))||{}}catch(e){}
+var rows=[{n:(ex.me||"Me")+" (you)",w:sumC(ch()),t:Y.msg||""}].concat((ex.friends||[]).filter(function(f){return f.m===mk()}).map(function(f){return{n:f.n,w:f.w,t:f.t||""}})),tot=0,md=["🥇","🥈","🥉"];
+rows.forEach(function(q){tot+=q.w});rows.sort(function(a,b){return b.w-a.w});
+$("xCheer").innerHTML='<h2>💌 Team &amp; cheers</h2><div class="row" style="align-items:center"><div class="big" style="font-size:2.4rem;color:var(--accent)">'+fmt(tot)+'</div><div class="of">words written together this month</div></div>'+rows.map(function(q,i){return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+(rows.length>1?(md[i]||"•")+" ":"")+esc(q.n)+'</span><span>'+fmt(q.w)+' words</span></div>'+(q.t?'<div class="pct">“'+esc(q.t)+'”</div>':'')+'</div>'}).join("")+'<label style="margin-top:12px">My cheer for my friends (shown next to my name when they add my code)<input type="text" id="xMsg" maxlength="80" value="'+esc(Y.msg||"")+'" placeholder="ex. You got this!" style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"></label>'}
+$("xCheer").addEventListener("change",function(e){if(e.target.id!=="xMsg")return;Y.msg=e.target.value.trim().slice(0,80);saveY();render()});
+var PR=["Your character finds a door that wasn’t there yesterday.","Write the scene from the point of view of the villain.","Two characters are stuck together during a storm.","Describe a place using only sounds and smells.","Someone returns home after many years. What has changed?","Write a conversation where nobody says what they really mean.","A letter arrives that should never have been sent.","Your hero loses the one thing they cannot live without."],pi=Math.floor(Math.random()*8);
+function promptV(){$("xPrompt").innerHTML='<h2>✨ Writing prompt</h2><p style="margin:0 0 12px;font-size:1.05rem;font-style:italic">'+PR[pi]+'</p><button class="ghost" id="xPNew" type="button" style="width:auto;padding:0 16px;font-size:.9rem">New prompt</button>'}
+$("xPrompt").addEventListener("click",function(e){if(e.target.id!=="xPNew")return;pi=(pi+1+Math.floor(Math.random()*7))%8;promptV()});
+function notesV(){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]),old=$("xIdeaT")?$("xIdeaT").value:"",h='',i;
+for(i=is.length-1;i>=0;i--)h+='<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(is[i].t)+'</span><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" style="width:26px;height:26px;font-size:14px">×</button></div><div class="pct">'+esc(is[i].d||"")+'</div></div>';
+$("xNotes").innerHTML='<h2>💡 Idea notebook</h2><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+' · '+is.length+(is.length===1?' idea':' ideas')+'</div><textarea id="xIdeaT" rows="2" placeholder="Scene idea, character name, plot twist…"></textarea><button class="save" id="xIdeaAdd" type="button" style="margin-top:8px">Add idea</button>'+h;$("xIdeaT").value=old}
+$("xNotes").addEventListener("click",function(e){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]);
+if(e.target.id==="xIdeaAdd"){var t=$("xIdeaT").value.trim();if(!t)return;is.push({t:t.slice(0,500),d:todayKey});$("xIdeaT").value=""}else if(e.target.classList.contains("xid")){is.splice(+e.target.dataset.i,1)}else return;save();notesV()});
+
+function wmHM(m){var q=Math.floor(m/60);return q?q+" h "+Math.round(m-q*60)+" min":Math.round(m)+" min"}
+function wmDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function wmAll(){var o={};Object.keys(S.challenges).forEach(function(k){var e=S.challenges[k].entries;Object.keys(e).forEach(function(d){o[d]=(o[d]||0)+(e[d].words||0)})});return o}
+function wmBars(v,lb,dec){var mx=Math.max.apply(null,v.concat([1]));return '<div class="mbars">'+v.map(function(x,i){return '<div class="mbar"><span>'+(dec?x.toFixed(1):Math.round(x))+'</span><i style="height:'+Math.max(2,x/mx*64)+'px"></i><span>'+lb[i]+'</span></div>'}).join("")+'</div>'}
+var gw=document.createElement("div");gw.className="gcard";gw.id="xWk";gi.parentNode.insertBefore(gw,gi);G.push(["progress",gw]);
+var gp=document.createElement("div");gp.className="gcard";gp.id="xSpd";gi.parentNode.insertBefore(gp,gi);G.push(["progress",gp]);
+function wkV(){var o=wmAll(),t=new Date(now.getFullYear(),now.getMonth(),now.getDate()),st=new Date(t.getFullYear(),t.getMonth(),t.getDate()-((t.getDay()+6)%7)),cw=[],lw=0,tw=0,dy=0,i;
+for(i=0;i<7;i++){var v=o[wmDay(new Date(st.getFullYear(),st.getMonth(),st.getDate()+i))]||0;cw.push(v);tw+=v;if(v>0)dy++;lw+=o[wmDay(new Date(st.getFullYear(),st.getMonth(),st.getDate()+i-7))]||0}
+var cp=lw>0?Math.round((tw-lw)/lw*100):null;
+$("xWk").innerHTML='<h2>📅 This week</h2><div class="row" style="align-items:center"><div class="big" style="font-size:2.4rem;color:var(--accent)">'+fmt(tw)+'</div><div class="of">words this week</div></div><div class="pct">'+dy+' days written this week</div><div class="pct" style="margin-top:4px">'+(cp===null?'No words last week to compare with.':(cp>=0?'▲ '+cp+'% more than last week':'▼ '+Math.abs(cp)+'% less than last week'))+'</div>'+wmBars(cw,["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])}
+function spdV(){var sp=[];try{sp=(JSON.parse(localStorage.getItem("wt-extra"))||{}).sprints||[]}catch(e){}
+var tw=0,tm=0,best=0;sp.forEach(function(q){tw+=q.w;tm+=q.min;if(q.w/q.min>best)best=q.w/q.min});
+var avg=tm?tw/tm:0,c=ch(),rem=Math.max(0,c.goal-sumC(c)),last=sp.slice(-10);
+$("xSpd").innerHTML='<h2>⏱️ Writing speed</h2>'+(!sp.length?'<div class="pct">Do a writing sprint in the Today tab and your speed will appear here.</div>':
+'<div class="stats" style="margin:0 0 12px"><div class="stat"><b>'+avg.toFixed(1)+'</b><span>words per minute on average</span></div><div class="stat"><b>'+best.toFixed(1)+'</b><span>words per minute, best sprint</span></div><div class="stat"><b>'+fmt(avg*60)+'</b><span>words per hour</span></div><div class="stat"><b>'+wmHM(tm)+'</b><span>spent in sprints ('+sp.length+')</span></div></div>'
++'<p style="margin:0 0 8px">A 25-minute sprint at your average speed gives about <b>'+fmt(avg*25)+'</b> words.</p><p style="margin:0 0 12px">'+(rem>0&&avg>0?'To reach this month’s goal you still need about <b>'+wmHM(rem/avg)+'</b> of writing at your sprint speed.':'This month’s goal is already reached 🎉')+'</p>'
++'<div class="pct">Words per minute, last sprints</div>'+wmBars(last.map(function(q){return q.w/q.min}),last.map(function(q,i){return i+1}),1))}
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV()};
+vine();parts();showTab(Y.tab);render();
+})();
+</script>
+<script>
+(function(){
+var LS="wt-lang",P={l:"",auto:false};
+try{Object.assign(P,JSON.parse(localStorage.getItem(LS))||{})}catch(e){}
+if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","es","sl"].indexOf(nl)>=0?nl:"en"}
+function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
+var IDX={fr:0,es:1,sl:2};
+var DL=[
+["Today","Aujourd’hui","Hoy","Danes"],["Month","Mois","Mes","Mesec"],["Book","Livre","Libro","Knjiga"],["Progress","Progrès","Progreso","Napredek"],["Friends","Amies","Amigas","Prijateljice"],["Settings","Réglages","Ajustes","Nastavitve"],
+["Previous month","Mois précédent","Mes anterior","Prejšnji mesec"],["Next month","Mois suivant","Mes siguiente","Naslednji mesec"],
+["My writing challenges","Mes défis d’écriture","Mis retos de escritura","Moji pisateljski izzivi"],
+["Writing challenge winter","Défi d’écriture : hiver","Reto de escritura: invierno","Pisateljski izziv: zima"],["Writing challenge spring","Défi d’écriture : printemps","Reto de escritura: primavera","Pisateljski izziv: pomlad"],["Writing challenge summer","Défi d’écriture : été","Reto de escritura: verano","Pisateljski izziv: poletje"],["Writing challenge autumn","Défi d’écriture : automne","Reto de escritura: otoño","Pisateljski izziv: jesen"],["Writing challenge garden","Défi d’écriture : jardin","Reto de escritura: jardín","Pisateljski izziv: vrt"],["Writing challenge twilight","Défi d’écriture : crépuscule","Reto de escritura: crepúsculo","Pisateljski izziv: somrak"],["Writing challenge galaxy","Défi d’écriture : galaxie","Reto de escritura: galaxia","Pisateljski izziv: galaksija"],["Writing challenge café","Défi d’écriture : café","Reto de escritura: café","Pisateljski izziv: kavarna"],["Writing challenge arcade","Défi d’écriture : arcade","Reto de escritura: arcade","Pisateljski izziv: arkada"],
+["My manuscripts","Mes manuscrits","Mis manuscritos","Moji rokopisi"],["My writing session","Ma séance d’écriture","Mi sesión de escritura","Moja pisalna seja"],["My curve","Ma courbe","Mi curva","Moja krivulja"],["The month, day by day","Le mois, jour après jour","El mes, día a día","Mesec, dan za dnem"],["All my challenges","Tous mes défis","Todos mis retos","Vsi moji izzivi"],["Chapters","Chapitres","Capítulos","Poglavja"],["My year","Mon année","Mi año","Moje leto"],["Badges","Badges","Insignias","Značke"],["Friend challenge","Défi entre amies","Reto con amigas","Izziv s prijateljicami"],["Backup","Sauvegarde","Copia de seguridad","Varnostna kopija"],["Today’s goal","Objectif du jour","Objetivo de hoy","Današnji cilj"],["Insights","Analyse","Análisis","Vpogled"],["Team & cheers","Équipe et encouragements","Equipo y ánimos","Ekipa in spodbude"],["Preferences","Préférences","Preferencias","Nastavitve"],["Writing prompt","Idée d’écriture","Idea para escribir","Navdih za pisanje"],["Idea notebook","Carnet d’idées","Cuaderno de ideas","Zvezek idej"],
+["Winter","Hiver","Invierno","Zima"],["Garden","Jardin","Jardín","Vrt"],["Twilight","Crépuscule","Crepúsculo","Somrak"],["Galaxy","Galaxie","Galaxia","Galaksija"],["Café","Café","Café","Kavarna"],["Arcade","Arcade","Arcade","Arkada"],["Ocean","Océan","Océano","Ocean"],["Autumn","Automne","Otoño","Jesen"],["Sakura","Sakura","Sakura","Sakura"],
+["Language","Langue","Idioma","Jezik"],["Follow the seasons automatically","Suivre les saisons automatiquement","Seguir las estaciones automáticamente","Samodejno sledi letnim časom"],["The theme and the title follow the season of the month you are viewing: winter (Dec–Mar), spring (Apr–May), summer (Jun–Sep), autumn (Oct–Nov).","Le thème et le titre suivent la saison du mois affiché : hiver (déc.–mars), printemps (avril–mai), été (juin–sept.), automne (oct.–nov.).","El tema y el título siguen la estación del mes que ves: invierno (dic.–mar.), primavera (abr.–may.), verano (jun.–sep.), otoño (oct.–nov.).","Tema in naslov sledita letnemu času mesca, ki ga gledaš: zima (dec.–mar.), pomlad (apr.–maj), poletje (jun.–sep.), jesen (okt.–nov.)."],
+["Manuscript","Manuscrit","Manuscrito","Rokopis"],["New manuscript","Nouveau manuscrit","Nuevo manuscrito","Nov rokopis"],["Title","Titre","Título","Naslov"],["Words already in it before tracking","Mots déjà écrits avant le suivi","Palabras ya escritas antes del seguimiento","Besede, napisane pred beleženjem"],["ex. 12000","ex. 12000","ej. 12000","npr. 12000"],["ex. 750","ex. 750","ej. 750","npr. 750"],["your first name","ton prénom","tu nombre","tvoje ime"],["ex. You got this!","ex. Tu vas y arriver !","ej. ¡Tú puedes!","npr. Zmoreš!"],
+["Goal for this manuscript (words)","Objectif pour ce manuscrit (mots)","Objetivo para este manuscrito (palabras)","Cilj za ta rokopis (besede)"],["Write a few days and I’ll estimate when you’ll finish.","Écris quelques jours et j’estimerai quand tu finiras.","Escribe unos días y estimaré cuándo terminarás.","Piši nekaj dni in ocenila bom, kdaj boš končala."],["Keep writing and the estimate will get closer.","Continue d’écrire et l’estimation sera plus précise.","Sigue escribiendo y la estimación será más precisa.","Piši naprej in ocena bo natančnejša."],["Goal reached!","Objectif atteint !","¡Objetivo alcanzado!","Cilj dosežen!"],
+["This challenge is for","Ce défi est pour","Este reto es para","Ta izziv je za"],["words out of","mots sur","palabras de","besed od"],["to write this month","à écrire ce mois-ci","para escribir este mes","za pisanje ta mesec"],["Challenge name","Nom du défi","Nombre del reto","Ime izziva"],["Monthly goal","Objectif du mois","Objetivo del mes","Mesečni cilj"],["Goal reached, well done!","Objectif atteint, bravo !","¡Objetivo alcanzado, bien hecho!","Cilj dosežen, bravo!"],
+["words to go","mots restants","palabras por escribir","besed do cilja"],["words per day to make it","mots par jour pour y arriver","palabras por día para lograrlo","besed na dan za dosego"],["average on writing days","moyenne les jours écrits","media los días que escribes","povprečje v dneh pisanja"],["writing streak","série de jours d’écriture","racha de escritura","pisalna serija"],["best day","meilleure journée","mejor día","najboljši dan"],["days I wrote","jours où j’ai écrit","días que escribí","dnevi, ko sem pisala"],
+["of","sur","de","od"],["words today","mots aujourd’hui","palabras hoy","besed danes"],["Open the current month to start your challenge, and your daily goal will appear here.","Ouvre le mois en cours pour commencer ton défi : ton objectif du jour apparaîtra ici.","Abre el mes actual para empezar tu reto y aquí aparecerá tu objetivo diario.","Odpri tekoči mesec, da začneš izziv, in tukaj se bo prikazal tvoj dnevni cilj."],["Daily goal in words","Objectif du jour en mots","Objetivo diario en palabras","Dnevni cilj v besedah"],
+["Day","Jour","Día","Dan"],["Words written that day","Mots écrits ce jour-là","Palabras escritas ese día","Besede, napisane ta dan"],["My mood","Mon humeur","Mi estado de ánimo","Moje razpoloženje"],["A note (optional)","Une note (facultatif)","Una nota (opcional)","Opomba (neobvezno)"],["Scene written, idea, writer’s block…","Scène écrite, idée, page blanche…","Escena escrita, idea, bloqueo…","Napisan prizor, ideja, pisateljska blokada…"],["Save session","Enregistrer la séance","Guardar sesión","Shrani sejo"],["Clear this day","Effacer ce jour","Borrar este día","Počisti ta dan"],
+["Writing sprint","Sprint d’écriture","Sprint de escritura","Pisalni šprint"],["Minutes","Minutes","Minutos","Minute"],["Start","Démarrer","Iniciar","Začni"],["Pause","Pause","Pausa","Pavza"],["Resume","Reprendre","Reanudar","Nadaljuj"],["Reset","Réinitialiser","Reiniciar","Ponastavi"],["Words written in the sprint","Mots écrits pendant le sprint","Palabras escritas en el sprint","Besede, napisane v šprintu"],["Add to today","Ajouter à aujourd’hui","Añadir a hoy","Dodaj današnjemu dnevu"],["Time’s up! 🎉 How many words did you write?","Temps écoulé ! 🎉 Combien de mots as-tu écrits ?","¡Se acabó el tiempo! 🎉 ¿Cuántas palabras escribiste?","Čas je potekel! 🎉 Koliko besed si napisala?"],["Enter a word count (0 or more).","Entre un nombre de mots (0 ou plus).","Introduce un número de palabras (0 o más).","Vnesi število besed (0 ali več)."],["Enter the number of words.","Entre le nombre de mots.","Introduce el número de palabras.","Vnesi število besed."],["Day cleared.","Jour effacé.","Día borrado.","Dan počiščen."],
+["Another snowflake on your tree","Un flocon de plus sur ton sapin","Otro copo de nieve en tu árbol","Še ena snežinka na tvoji jelki"],["Cozy words, warm cocoa","Des mots cosy, un chocolat chaud","Palabras acogedoras, chocolate caliente","Prijetne besede, topla čokolada"],["Ho ho, nice writing!","Ho ho, beau travail d’écriture !","¡Jo jo, buena escritura!","Ho ho, lepo pisanje!"],["A new ornament for your tree","Une nouvelle boule pour ton sapin","Un nuevo adorno para tu árbol","Nov okrasek za tvojo jelko"],
+["my cumulative words","mes mots cumulés","mis palabras acumuladas","moje skupne besede"],["ideal pace to reach the goal","rythme idéal pour atteindre l’objectif","ritmo ideal para alcanzar el objetivo","idealen tempo do cilja"],
+["Drained","Épuisée","Agotada","Izčrpana"],["Meh","Bof","Regular","Tako-tako"],["Neutral","Neutre","Neutral","Nevtralno"],["Good","Bien","Bien","Dobro"],["Inspired","Inspirée","Inspirada","Navdihnjena"],["drained","épuisée","agotada","izčrpana"],["meh","bof","regular","tako-tako"],["neutral","neutre","neutral","nevtralno"],["good","bien","bien","dobro"],["inspired","inspirée","inspirada","navdihnjena"],
+["Add chapter","Ajouter un chapitre","Añadir capítulo","Dodaj poglavje"],["Idea","Idée","Idea","Ideja"],["Draft","Brouillon","Borrador","Osnutek"],["Revised","Relu","Revisado","Pregledano"],["Done","Terminé","Terminado","Končano"],["Chapter title","Titre du chapitre","Título del capítulo","Naslov poglavja"],["Status","État","Estado","Stanje"],["Words","Mots","Palabras","Besede"],["Delete chapter","Supprimer le chapitre","Eliminar capítulo","Izbriši poglavje"],
+["First session","Première séance","Primera sesión","Prva seja"],["Challenge goal reached","Objectif du défi atteint","Reto cumplido","Cilj izziva dosežen"],["First sprint","Premier sprint","Primer sprint","Prvi šprint"],["Friend added","Amie ajoutée","Amiga añadida","Prijateljica dodana"],
+["Race a friend this month: send her your code and paste hers below, then you both see the two progress bars. Share a fresh code whenever you want to update.","Défie une amie ce mois-ci : envoie-lui ton code et colle le sien ci-dessous, puis vous voyez toutes les deux les deux barres de progression. Partage un nouveau code quand tu veux mettre à jour.","Reta a una amiga este mes: envíale tu código y pega el suyo abajo; así las dos veréis las dos barras de progreso. Comparte un código nuevo cuando quieras actualizar.","Izzovi prijateljico ta mesec: pošlji ji svojo kodo in spodaj prilepi njeno, nato obe vidita obe vrstici napredka. Deli novo kodo, kadar želiš osvežiti."],
+["My name","Mon prénom","Mi nombre","Moje ime"],["My code (this month)","Mon code (ce mois-ci)","Mi código (este mes)","Moja koda (ta mesec)"],["Copy","Copier","Copiar","Kopiraj"],["My friend’s code","Le code de mon amie","El código de mi amiga","Koda moje prijateljice"],["Add","Ajouter","Añadir","Dodaj"],["Code copied.","Code copié.","Código copiado.","Koda kopirana."],["Copy the selected code.","Copie le code sélectionné.","Copia el código seleccionado.","Kopiraj izbrano kodo."],["Friend added!","Amie ajoutée !","¡Amiga añadida!","Prijateljica dodana!"],["This code is not valid.","Ce code n’est pas valide.","Este código no es válido.","Ta koda ni veljavna."],["Remove friend","Retirer cette amie","Quitar amiga","Odstrani prijateljico"],
+["words written together this month","mots écrits ensemble ce mois-ci","palabras escritas juntas este mes","besed, napisanih skupaj ta mesec"],["My cheer for my friends (shown next to my name when they add my code)","Mon message d’encouragement (affiché à côté de mon nom quand elles ajoutent mon code)","Mi mensaje de ánimo (se muestra junto a mi nombre cuando añaden mi código)","Moja spodbuda (prikazana ob mojem imenu, ko dodajo mojo kodo)"],
+["Export gives you a text with all your data: keep it somewhere safe, or paste it on another device with Import. Importing replaces what is currently on this page.","Exporter te donne un texte avec toutes tes données : garde-le en lieu sûr, ou colle-le sur un autre appareil avec Importer. Importer remplace ce qui est actuellement sur cette page.","Exportar te da un texto con todos tus datos: guárdalo en un lugar seguro o pégalo en otro dispositivo con Importar. Importar reemplaza lo que hay ahora en esta página.","Izvoz ti da besedilo z vsemi podatki: shrani ga na varno ali ga prilepi na drugi napravi z uvozom. Uvoz nadomesti vse, kar je trenutno na tej strani."],
+["Your backup text appears here, or paste one to import","Ton texte de sauvegarde apparaît ici, ou colles-en un pour l’importer","Tu copia aparece aquí, o pega una para importar","Tvoje varnostno besedilo se prikaže tukaj, ali prilepi eno za uvoz"],["Export","Exporter","Exportar","Izvozi"],["Import","Importer","Importar","Uvozi"],["Exported and copied.","Exporté et copié.","Exportado y copiado.","Izvoženo in kopirano."],["Exported: copy the text above.","Exporté : copie le texte ci-dessus.","Exportado: copia el texto de arriba.","Izvoženo: kopiraj besedilo zgoraj."],["Import done.","Import terminé.","Importación hecha.","Uvoz končan."],["This text is not a valid backup.","Ce texte n’est pas une sauvegarde valide.","Este texto no es una copia válida.","To besedilo ni veljavna varnostna kopija."],
+["Write a few more days and I’ll show your patterns here.","Écris encore quelques jours et j’afficherai tes habitudes ici.","Escribe unos días más y mostraré aquí tus patrones.","Piši še nekaj dni in tukaj bom pokazala tvoje vzorce."],["You write the most on","Tu écris surtout les","Escribes más los","Največ pišeš ob"],["Average words by weekday","Moyenne de mots par jour de la semaine","Media de palabras por día de la semana","Povprečje besed po dnevih v tednu"],["Average words by mood","Moyenne de mots selon l’humeur","Media de palabras según el ánimo","Povprečje besed glede na razpoloženje"],
+["Mondays","lundis","lunes","ponedeljkih"],["Tuesdays","mardis","martes","torkih"],["Wednesdays","mercredis","miércoles","sredah"],["Thursdays","jeudis","jueves","četrtkih"],["Fridays","vendredis","viernes","petkih"],["Saturdays","samedis","sábados","sobotah"],["Sundays","dimanches","domingos","nedeljah"],
+["New prompt","Nouvelle idée","Otra idea","Nov navdih"],["Add idea","Ajouter l’idée","Añadir idea","Dodaj idejo"],["Delete idea","Supprimer l’idée","Eliminar idea","Izbriši idejo"],["Scene idea, character name, plot twist…","Idée de scène, nom de personnage, rebondissement…","Idea de escena, nombre de personaje, giro…","Ideja za prizor, ime lika, preobrat…"],
+["Your character finds a door that wasn’t there yesterday.","Ton personnage trouve une porte qui n’existait pas hier.","Tu personaje encuentra una puerta que ayer no estaba.","Tvoj lik najde vrata, ki jih včeraj ni bilo."],["Write the scene from the point of view of the villain.","Écris la scène du point de vue du méchant.","Escribe la escena desde el punto de vista del villano.","Napiši prizor z vidika zlobneža."],["Two characters are stuck together during a storm.","Deux personnages sont bloqués ensemble pendant une tempête.","Dos personajes quedan atrapados juntos durante una tormenta.","Dva lika obtičita skupaj med nevihto."],["Describe a place using only sounds and smells.","Décris un lieu uniquement avec des sons et des odeurs.","Describe un lugar usando solo sonidos y olores.","Opiši kraj samo z zvoki in vonjavami."],["Someone returns home after many years. What has changed?","Quelqu’un rentre chez lui après de longues années. Qu’est-ce qui a changé ?","Alguien vuelve a casa después de muchos años. ¿Qué ha cambiado?","Nekdo se po mnogih letih vrne domov. Kaj se je spremenilo?"],["Write a conversation where nobody says what they really mean.","Écris une conversation où personne ne dit ce qu’il pense vraiment.","Escribe una conversación donde nadie dice lo que realmente piensa.","Napiši pogovor, v katerem nihče ne reče tega, kar res misli."],["A letter arrives that should never have been sent.","Une lettre arrive, qui n’aurait jamais dû être envoyée.","Llega una carta que nunca debió enviarse.","Prispe pismo, ki ga ne bi smeli nikoli poslati."],["Your hero loses the one thing they cannot live without.","Ton héros perd la seule chose sans laquelle il ne peut pas vivre.","Tu héroe pierde lo único sin lo que no puede vivir.","Tvoj junak izgubi edino stvar, brez katere ne more živeti."],
+["A first snowflake, waiting for your first words.","Un premier flocon, qui attend tes premiers mots.","Un primer copo de nieve, esperando tus primeras palabras.","Prva snežinka, ki čaka na tvoje prve besede."],["A little pine, dusted with snow.","Un petit pin saupoudré de neige.","Un pequeño pino cubierto de nieve.","Majhna smreka, posuta s snegom."],["The tree is up, time for the lights!","Le sapin est dressé, place aux guirlandes !","¡El árbol está puesto, hora de las luces!","Jelka stoji, čas za lučke!"],["Presents are piling up under the tree.","Les cadeaux s’empilent sous le sapin.","Los regalos se amontonan bajo el árbol.","Darila se kopičijo pod jelko."],["One last star to hang on the tree.","Une dernière étoile à accrocher au sapin.","Una última estrella para colgar en el árbol.","Še ena zadnja zvezda za na jelko."],["Goal reached! Happy holidays!","Objectif atteint ! Joyeuses fêtes !","¡Objetivo alcanzado! ¡Felices fiestas!","Cilj dosežen! Vesele praznike!"],
+["A seed, waiting for your first words.","Une graine, qui attend tes premiers mots.","Una semilla, esperando tus primeras palabras.","Seme, ki čaka na tvoje prve besede."],["A tiny seedling.","Une minuscule pousse.","Un diminuto brote.","Drobna kalica."],["Leaves are coming out.","Les feuilles sortent.","Salen las hojas.","Listi poganjajo."],["A healthy little plant.","Une petite plante en pleine forme.","Una plantita sana.","Zdrava rastlinica."],["It’s blooming, almost there!","Elle fleurit, presque au but !","¡Está floreciendo, casi llegas!","Cveti, skoraj si na cilju!"],["Your tree is fully grown. Goal reached!","Ton arbre a fini de pousser. Objectif atteint !","Tu árbol ha crecido del todo. ¡Objetivo alcanzado!","Tvoje drevo je v polni rasti. Cilj dosežen!"],
+["A blank page under the moon.","Une page blanche sous la lune.","Una página en blanco bajo la luna.","Prazna stran pod luno."],["The first sparks of a story.","Les premières étincelles d’une histoire.","Las primeras chispas de una historia.","Prve iskre zgodbe."],["A candle is lit, the story glows.","Une bougie est allumée, l’histoire rayonne.","Una vela está encendida, la historia brilla.","Sveča gori, zgodba žari."],["The pages are filling up.","Les pages se remplissent.","Las páginas se van llenando.","Strani se polnijo."],["A star is rising, almost there!","Une étoile se lève, presque au but !","¡Una estrella se alza, casi llegas!","Zvezda vzhaja, skoraj si na cilju!"],["The dragon awakens. Goal reached!","Le dragon s’éveille. Objectif atteint !","El dragón despierta. ¡Objetivo alcanzado!","Zmaj se prebuja. Cilj dosežen!"],
+["Empty space, waiting for your first words.","L’espace vide, qui attend tes premiers mots.","Espacio vacío, esperando tus primeras palabras.","Prazno vesolje, ki čaka na tvoje prve besede."],["Your satellite is in orbit.","Ton satellite est en orbite.","Tu satélite está en órbita.","Tvoj satelit je v orbiti."],["Rocket launched, full speed ahead!","Fusée lancée, cap à toute vitesse !","¡Cohete lanzado, a toda velocidad!","Raketa je izstreljena, polna hitrost naprej!"],["Passing the rings of Saturn.","Tu passes les anneaux de Saturne.","Pasando por los anillos de Saturno.","Mimo Saturnovih obročev."],["A shooting star, almost there!","Une étoile filante, presque au but !","¡Una estrella fugaz, casi llegas!","Utrinek, skoraj si na cilju!"],["Goal reached! Aliens say hello!","Objectif atteint ! Les extraterrestres te saluent !","¡Objetivo alcanzado! ¡Los alienígenas te saludan!","Cilj dosežen! Nezemljani te pozdravljajo!"],
+["Coffee beans, waiting to be ground.","Des grains de café, prêts à être moulus.","Granos de café, esperando ser molidos.","Kavna zrna, ki čakajo na mletje."],["The first cup is brewing.","La première tasse infuse.","La primera taza se está preparando.","Prva skodelica se kuha."],["A fresh croissant on the table.","Un croissant tout frais sur la table.","Un croissant recién hecho en la mesa.","Svež rogljiček na mizi."],["Cake time, you’re on a roll!","L’heure du gâteau, tu es lancée !","¡Hora del pastel, vas genial!","Čas za torto, v ritmu si!"],["One more chapter with your latte.","Encore un chapitre avec ton latte.","Un capítulo más con tu latte.","Še eno poglavje ob tvojem latteju."],["Goal reached! The next round is on the house!","Objectif atteint ! La tournée est pour la maison !","¡Objetivo alcanzado! ¡La siguiente ronda invita la casa!","Cilj dosežen! Naslednji krog časti hiša!"],
+["Insert coin to start.","Insère une pièce pour commencer.","Inserta una moneda para empezar.","Vstavi kovanec za začetek."],["Level 1 loaded.","Niveau 1 chargé.","Nivel 1 cargado.","Raven 1 naložena."],["Combo building, keep it up!","Le combo monte, continue !","¡El combo sube, sigue así!","Kombo raste, kar tako naprej!"],["Boss fight incoming!","Combat de boss en approche !","¡Se acerca el jefe final!","Približuje se boj s šefom!"],["Final level, almost there!","Dernier niveau, presque au but !","¡Último nivel, casi llegas!","Zadnja raven, skoraj si na cilju!"],["You win! New high score!","Tu gagnes ! Nouveau record !","¡Ganaste! ¡Nuevo récord!","Zmagala si! Nov rekord!"],
+["A single bubble, waiting for your first words.","Une bulle, qui attend tes premiers mots.","Una burbuja, esperando tus primeras palabras.","Mehurček, ki čaka na tvoje prve besede."],["A shell washes ashore.","Un coquillage s’échoue sur la plage.","Una concha llega a la orilla.","Školjka je naplavljena na obalo."],["A little fish joins you.","Un petit poisson te rejoint.","Un pececito se une a ti.","Ribica se ti pridruži."],["A turtle glides by.","Une tortue glisse près de toi.","Una tortuga pasa deslizándose.","Mimo splava želva."],["A dolphin is jumping, almost there!","Un dauphin saute, presque au but !","¡Un delfín salta, casi llegas!","Delfin skače, skoraj si na cilju!"],["Goal reached! The whale sings for you!","Objectif atteint ! La baleine chante pour toi !","¡Objetivo alcanzado! ¡La ballena canta para ti!","Cilj dosežen! Kit poje zate!"],
+["An acorn, waiting for your first words.","Un gland, qui attend tes premiers mots.","Una bellota, esperando tus primeras palabras.","Želod, ki čaka na tvoje prve besede."],["The first leaf falls.","La première feuille tombe.","Cae la primera hoja.","Prvi list pade."],["The forest turns golden.","La forêt se dore.","El bosque se vuelve dorado.","Gozd postane zlat."],["Mushrooms pop up after the rain.","Les champignons sortent après la pluie.","Salen las setas después de la lluvia.","Po dežju pognaje gobe."],["A fox watches you write.","Un renard te regarde écrire.","Un zorro te mira escribir.","Lisica te opazuje pri pisanju."],["Goal reached! Pumpkin pie for everyone!","Objectif atteint ! Tarte à la citrouille pour tout le monde !","¡Objetivo alcanzado! ¡Pastel de calabaza para todos!","Cilj dosežen! Bučna pita za vse!"],
+["A tiny shoot, waiting for your first words.","Une minuscule pousse, qui attend tes premiers mots.","Un pequeño brote, esperando tus primeras palabras.","Droben poganjek, ki čaka na tvoje prve besede."],["The buds are forming.","Les bourgeons se forment.","Se forman los capullos.","Brsti nastajajo."],["The first blossoms open.","Les premières fleurs s’ouvrent.","Se abren las primeras flores.","Prvi cvetovi se odpirajo."],["The branches are in bloom.","Les branches sont en fleurs.","Las ramas están en flor.","Veje so v polnem cvetu."],["A butterfly lands on a petal.","Un papillon se pose sur un pétale.","Una mariposa se posa en un pétalo.","Metulj pristane na cvetnem listu."],["Goal reached! A rainbow over the blossoms!","Objectif atteint ! Un arc-en-ciel sur les fleurs !","¡Objetivo alcanzado! ¡Un arcoíris sobre las flores!","Cilj dosežen! Mavrica nad cvetovi!"],
+["Writing speed","Vitesse d’écriture","Velocidad de escritura","Hitrost pisanja"],
+["Do a writing sprint in the Today tab and your speed will appear here.","Fais un sprint d’écriture dans l’onglet Aujourd’hui et ta vitesse apparaîtra ici.","Haz un sprint de escritura en la pestaña Hoy y tu velocidad aparecerá aquí.","Opravi pisalni šprint v zavihku Danes in tu se bo prikazala tvoja hitrost."],
+["words per minute on average","mots par minute en moyenne","palabras por minuto de media","besed na minuto v povprečju"],
+["words per minute, best sprint","mots par minute, meilleur sprint","palabras por minuto, mejor sprint","besed na minuto, najboljši šprint"],
+["words per hour","mots par heure","palabras por hora","besed na uro"],
+["A 25-minute sprint at your average speed gives about","Un sprint de 25 minutes à ta vitesse moyenne donne environ","Un sprint de 25 minutos a tu velocidad media da unas","25-minutni šprint pri tvoji povprečni hitrosti prinese približno"],
+["words.","mots.","palabras.","besed."],
+["To reach this month’s goal you still need about","Pour atteindre l’objectif du mois, il te faut encore environ","Para alcanzar la meta del mes aún necesitas unas","Za mesečni cilj potrebuješ še približno"],
+["of writing at your sprint speed.","d’écriture à ta vitesse de sprint.","de escritura a tu velocidad de sprint.","pisanja pri tvoji hitrosti šprinta."],
+["This month’s goal is already reached","L’objectif du mois est déjà atteint","La meta del mes ya está alcanzada","Mesečni cilj je že dosežen"],
+["Words per minute, last sprints","Mots par minute, derniers sprints","Palabras por minuto, últimos sprints","Besede na minuto, zadnji šprinti"],
+["This week","Cette semaine","Esta semana","Ta teden"],
+["words this week","mots cette semaine","palabras esta semana","besed ta teden"],
+["No words last week to compare with.","Aucun mot la semaine dernière pour comparer.","Ninguna palabra la semana pasada para comparar.","Prejšnji teden ni bilo besed za primerjavo."]
+];
+var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
+var RX=[
+[/^spent in sprints \((\d+)\)$/,["passé en sprints ($1)","dedicado a sprints ($1)","v šprintih ($1)"]],
+[/^(\d+) days written this week$/,["$1 jours écrits cette semaine","$1 días escritos esta semana","$1 dni pisanja ta teden"]],
+[/^(\d+)% more than last week$/,["$1 % de plus que la semaine dernière","$1 % más que la semana pasada","$1 % več kot prejšnji teden"]],
+[/^(\d+)% less than last week$/,["$1 % de moins que la semaine dernière","$1 % menos que la semana pasada","$1 % manj kot prejšnji teden"]],
+[/^(\d[\d,]*)% of the goal reached$/,["$1 % de l’objectif atteint","$1 % del objetivo alcanzado","$1 % cilja doseženo"]],
+[/^(\d[\d,]*)% of ([\d,]+) words$/,["$1 % de $2 mots","$1 % de $2 palabras","$1 % od $2 besed"]],
+[/^words in “(.*)” \(([\d,]+) before tracking \+ ([\d,]+) written during challenges\)$/,["mots dans « $1 » ($2 avant le suivi + $3 écrits pendant les défis)","palabras en «$1» ($2 antes del seguimiento + $3 escritas durante los retos)","besed v »$1« ($2 pred beleženjem + $3 napisanih med izzivi)"]],
+[/^At your pace \(([\d,]+) words\/day over the last 30 days\) you’ll finish around$/,["À ton rythme ($1 mots/jour sur les 30 derniers jours), tu finiras vers le","A tu ritmo ($1 palabras/día en los últimos 30 días), terminarás hacia el","S tem tempom ($1 besed/dan v zadnjih 30 dneh) boš končala okoli"]],
+[/^(\d+) day$/,["$1 jour","$1 día","$1 dan"]],[/^(\d+) days$/,["$1 jours","$1 días","$1 dni"]],
+[/^best day \(the (\d+)\)$/,["meilleure journée (le $1)","mejor día (el $1)","najboljši dan ($1.)"]],
+[/^Day (\d+)$/,["Jour $1","Día $1","Dan $1"]],
+[/^(\d+) words in (\d+) min = ([\d.]+) words\/min \(best: ([\d.]+)\)\. Added to today!$/,["$1 mots en $2 min = $3 mots/min (record : $4). Ajouté à aujourd’hui !","$1 palabras en $2 min = $3 palabras/min (mejor: $4). ¡Añadido a hoy!","$1 besed v $2 min = $3 besed/min (najboljše: $4). Dodano današnjemu dnevu!"]],
+[/^(.*) · (\d+) chapters · (\d+) done · ([\d,]+) words in chapters$/,["$1 · $2 chapitres · $3 terminés · $4 mots dans les chapitres","$1 · $2 capítulos · $3 terminados · $4 palabras en capítulos","$1 · $2 poglavij · $3 končanih · $4 besed v poglavjih"]],
+[/^(\d{4}) · ([\d,]+) words · (\d+) days written$/,["$1 · $2 mots · $3 jours écrits","$1 · $2 palabras · $3 días escritos","$1 · $2 besed · $3 dni pisanja"]],
+[/^(\d+) \/ (\d+) badges earned$/,["$1 / $2 badges obtenus","$1 / $2 insignias conseguidas","$1 / $2 značk osvojenih"]],
+[/^(\d+)-day streak$/,["Série de $1 jours","Racha de $1 días","Serija $1 dni"]],
+[/^(\d+) days written$/,["$1 jours écrits","$1 días escritos","$1 dni pisanja"]],
+[/^([\d,]+) words in a day$/,["$1 mots en un jour","$1 palabras en un día","$1 besed v enem dnevu"]],
+[/^([\d,]+) words in a book$/,["$1 mots dans un livre","$1 palabras en un libro","$1 besed v knjigi"]],
+[/^(\d+) sprints$/,["$1 sprints","$1 sprints","$1 šprintov"]],
+[/^Added for (\d{4}-\d{2}): go to that month to see it\.$/,["Ajouté pour $1 : va sur ce mois pour le voir.","Añadido para $1: ve a ese mes para verlo.","Dodano za $1: pojdi na ta mesec, da ga vidiš."]],
+[/^(.*) \(you\)$/,["$1 (toi)","$1 (tú)","$1 (ti)"]],
+[/^([\d,]+) words$/,["$1 mots","$1 palabras","$1 besed"]],
+[/^([\d,]+) words to go today · this is what you need to write each day to reach ([\d,]+) words by the end of the month$/,["$1 mots à écrire aujourd’hui · c’est ce qu’il te faut écrire chaque jour pour atteindre $2 mots d’ici la fin du mois","$1 palabras por escribir hoy · es lo que necesitas escribir cada día para llegar a $2 palabras a fin de mes","še $1 besed danes · toliko moraš pisati vsak dan, da do konca meseca dosežeš $2 besed"]],
+[/^Daily goal reached, well done! · this is what you need to write each day to reach ([\d,]+) words by the end of the month$/,["Objectif du jour atteint, bravo ! · c’est ce qu’il te faut écrire chaque jour pour atteindre $1 mots d’ici la fin du mois","¡Objetivo del día alcanzado, bien hecho! · es lo que necesitas escribir cada día para llegar a $1 palabras a fin de mes","Današnji cilj dosežen, bravo! · toliko moraš pisati vsak dan, da do konca meseca dosežeš $1 besed"]],
+[/^You already reached this month’s goal of ([\d,]+) words\. Anything you write today is a bonus!$/,["Tu as déjà atteint l’objectif du mois de $1 mots. Tout ce que tu écris aujourd’hui est un bonus !","Ya alcanzaste el objetivo del mes de $1 palabras. ¡Todo lo que escribas hoy es un extra!","Mesečni cilj $1 besed si že dosegla. Vse, kar danes napišeš, je bonus!"]],
+[/^Words per month in (\d{4})$/,["Mots par mois en $1","Palabras por mes en $1","Besede po mesecih v $1"]],
+[/^\(about ([\d,]+) words\) and when you feel$/,["(environ $1 mots) et quand tu te sens","(unas $1 palabras) y cuando te sientes","(približno $1 besed) in ko se počutiš"]],
+[/^\(about ([\d,]+) words\)\.$/,["(environ $1 mots).","(unas $1 palabras).","(približno $1 besed)."]],
+[/^(.*) · (\d+) ideas?$/,["$1 · $2 idée(s)","$1 · $2 idea(s)","$1 · $2 idej"]]
+];
+
+var TK=[["January","janvier","enero","januar"],["February","février","febrero","februar"],["March","mars","marzo","marec"],["April","avril","abril","april"],["May","mai","mayo","maj"],["June","juin","junio","junij"],["July","juillet","julio","julij"],["August","août","agosto","avgust"],["September","septembre","septiembre","september"],["October","octobre","octubre","oktober"],["November","novembre","noviembre","november"],["December","décembre","diciembre","december"],
+["Jan","janv.","ene","jan"],["Feb","févr.","feb","feb"],["Apr","avr.","abr","apr"],["Jun","juin","jun","jun"],["Jul","juil.","jul","jul"],["Aug","août","ago","avg"],["Sept","sept.","sept","sept"],["Sep","sept.","sep","sep"],["Oct","oct.","oct","okt"],["Nov","nov.","nov","nov"],["Dec","déc.","dic","dec"],
+["Mon","lun.","lun","pon"],["Tue","mar.","mar","tor"],["Wed","mer.","mié","sre"],["Thu","jeu.","jue","čet"],["Fri","ven.","vie","pet"],["Sat","sam.","sáb","sob"],["Sun","dim.","dom","ned"]];
+
+var TOK={};TK.forEach(function(r){TOK[r[0]]=[r[1],r[2],r[3]]});
+var TOKRE=new RegExp("\\b("+Object.keys(TOK).sort(function(a,b){return b.length-a.length}).join("|")+")\\b","g");
+var PRE=/^(?:[\s·+✓•\u2190-\u2BFF\uFE0F\u200D]|[\uD83C-\uD83F][\uDC00-\uDFFF])+/,SUF=/(?:[\s\u2190-\u2BFF\uFE0F\u200D]|[\uD83C-\uD83F][\uDC00-\uDFFF])+$/;
+function lookup(c,li){if(Object.prototype.hasOwnProperty.call(DICT,c)&&DICT[c][li])return DICT[c][li];
+for(var i=0;i<RX.length;i++){var m=c.match(RX[i][0]);if(m)return RX[i][1][li].replace(/\$(\d)/g,function(_,n){return m[+n]})}
+return c.replace(TOKRE,function(w){return TOK[w][li]})}
+function tx(str,li){var pm=str.match(PRE),pre=pm?pm[0]:"",rest=str.slice(pre.length),sm=rest.match(SUF),suf=sm?sm[0]:"",core=rest.slice(0,rest.length-suf.length);if(!core)return str;
+var out=lookup(core,li);return out===core?str:pre+out+suf}
+var O=new WeakMap(),OA=new WeakMap(),AT=["placeholder","aria-label","title"],TB=null;
+function run(){var li=IDX[P.l],w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,arr=[];document.documentElement.lang=P.l;
+while(n=w.nextNode())arr.push(n);
+arr.forEach(function(n){var p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName))return;var base=O.has(n)?O.get(n):n.nodeValue,out=li===undefined?base:tx(base,li);if(!O.has(n)&&out===base)return;if(!O.has(n))O.set(n,base);if(n.nodeValue!==out)n.nodeValue=out});
+document.querySelectorAll("[placeholder],[aria-label],[title]").forEach(function(el){var o=OA.get(el)||{};AT.forEach(function(a){if(!el.hasAttribute(a))return;var cu=el.getAttribute(a),base=(a in o)?o[a]:cu,out=li===undefined?base:tx(base,li);if(!(a in o)&&out===base)return;o[a]=base;if(cu!==out)el.setAttribute(a,out)});OA.set(el,o)});
+if(TB===null)TB=document.title;var dt=li===undefined?TB:tx(TB,li);if(document.title!==dt)document.title=dt}
+var sched=0;try{new MutationObserver(function(){if(sched)return;sched=requestAnimationFrame(function(){sched=0;run()})}).observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}
+
+function seasonOf(m){return m===11||m<=2?"winter":m<=4?"spring":m<=8?"summer":"autumn"}
+var SMAP={winter:"winter",spring:"sakura",summer:"ocean",autumn:"autumn"},NT={garden:"🌿 Writing challenge garden",twilight:"🌙 Writing challenge twilight",galaxy:"🪐 Writing challenge galaxy",cafe:"☕ Writing challenge café",arcade:"🕹️ Writing challenge arcade"},EMT={winter:"❄️",sakura:"🌸",ocean:"🌊",autumn:"🍂"},lastT="";
+function seasonTheme(){if(!P.auto)return;var want=SMAP[seasonOf(cur.m)];if(document.documentElement.getAttribute("data-th")!==want){var b=document.querySelector('#themes [data-t="'+want+'"]');if(b)b.click()}}
+function setTitle(){var t=document.documentElement.getAttribute("data-th")||"winter",h=document.querySelector("main>header h1");if(!h)return;var txt=NT[t]||((EMT[t]||"❄️")+" Writing challenge "+seasonOf(cur.m));if(txt!==lastT){lastT=txt;h.textContent=txt}}
+try{new MutationObserver(function(){seasonTheme();setTitle()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-th"]})}catch(e){}
+var L=document.getElementById("xLang"),A=document.getElementById("xAuto");
+if(L){L.value=P.l;L.addEventListener("change",function(){P.l=L.value;saveP();run()})}
+if(A){A.checked=!!P.auto;A.addEventListener("change",function(){P.auto=A.checked;saveP();seasonTheme();setTitle()})}
+var _r3=render;render=function(){_r3();seasonTheme();setTitle();run()};
+seasonTheme();setTitle();run();
+})();
+</script>
+</body>
+</html>
