@@ -159,6 +159,19 @@ section.panel::before,.gcard::before{transform-origin:50% 50%}
 
 #xLang{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
 #xIdeaT{margin-top:2px}
+
+html[data-mode="editor"] .wonly{display:none!important}
+html:not([data-mode="editor"]) .eonly{display:none!important}
+.modes{display:flex;gap:6px;margin:10px 0 0}.mbtn{width:auto;padding:0 16px;font-size:.92rem;height:36px}.mbtn[aria-pressed=true]{background:var(--accent);color:var(--onacc);border-color:transparent;font-weight:700}
+.gchips{display:flex;flex-wrap:wrap;gap:8px}.gchip{width:auto;padding:0 14px;font-size:.9rem}.gchip[aria-pressed=true]{border-color:var(--accent);background:var(--card)}
+.gsubs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:14px}.gsubs[hidden]{display:none}
+.eform{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.eform input,#xEn,#xEg,#xTsel,#xTnew,.tw{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+#xEn{width:100%;resize:vertical;min-height:44px}
+.ehist{margin-top:14px;display:grid;gap:6px}.erow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.88rem}.erow .en{flex-basis:100%;color:var(--mute)}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bcell{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:10px 6px;min-height:64px;font-size:.88rem;font-family:inherit}.bcell.on{background:var(--accent2);color:var(--onacc);border-color:transparent;font-weight:700}
+.trow{display:grid;grid-template-columns:1fr 1fr 38px;gap:8px;align-items:center;margin-bottom:8px}
+@media (max-width:520px){.trow{grid-template-columns:1fr 38px}.trow b{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -217,7 +230,7 @@ section.panel::before,.gcard::before{transform-origin:50% 50%}
     <label>A note (optional)<textarea id="note" placeholder="Scene written, idea, writer’s block…"></textarea></label>
     <div class="sprint">
       <div style="font-size:.88rem;color:var(--mute)">Writing sprint</div>
-      <div class="row"><label>Minutes<select id="spMin"><option>5</option><option>10</option><option>15</option><option selected>25</option><option>45</option></select></label><div class="spt" id="spT">25:00</div><button class="save" id="spGo" type="button">Start</button><button class="ghost" id="spReset" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button></div>
+      <div class="row"><label>Minutes<select id="spMin"><option>5</option><option>10</option><option>15</option><option selected>25</option><option>45</option></select></label><label>Custom (min)<input type="number" id="spCustom" min="1" max="240" step="1" style="width:5.2rem"></label><button class="ghost" id="spSet" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Set</button><div class="spt" id="spT">25:00</div><button class="save" id="spGo" type="button">Start</button><button class="ghost" id="spReset" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button></div>
       <div id="spDone" hidden><div class="row"><label>Words written in the sprint<input type="number" id="spW" min="0" step="10"></label><button class="save" id="spAdd" type="button">Add to today</button></div></div>
       <div class="toast" id="spMsg" role="status"></div>
     </div>
@@ -387,6 +400,64 @@ loadForm();render();
 </script>
 <script>
 (function(){
+var F={cz:"Cinzel",pf:"Playfair Display",fr:"Fraunces",or:"Orbitron",ds:"DM Serif Display",qs:"Quicksand",lb:"Libre Baskerville",cg:"Cormorant Garamond"};
+var SH=["24px","30px 8px 30px 8px","46px 46px 14px 14px","10px","34px 34px 34px 8px","4px"],DH=["22px","4px 20px 4px 20px","20px 20px 6px 6px","6px","22px 22px 22px 6px","3px"];
+var R=[
+["fe","Epic fantasy","⚔️",30,12,50,"cz","🏰 ⚔️ 🛡️ 🐴 🐉 👑","sword,crown",0,"","fantasy"],
+["fd","Dark fantasy","🌑",270,350,40,"cz","🌑 🕯️ 🗡️ 🦇 🐉 👑","flame,skull",5,"🦇","fantasy"],
+["fc","Cozy fantasy","🍵",28,100,55,"qs","🫖 🍵 🧶 🏡 🐉 🏆","mushroom,book",1,"🍃","fantasy"],
+["fu","Urban fantasy","🌃",230,300,50,"ds","🌃 🔮 🗝️ 🐈 🌙 ✨","key,moon",3,"","fantasy"],
+["ft","Fairy-tale retelling","👑",330,50,55,"cg","📖 🌹 👠 🏰 🕰️ 👑","crown,feather",2,"✨","fantasy"],
+["fw","Whimsical","🧚",175,320,60,"fr","🫧 🍄 🦋 🌈 🧚 ✨","butterfly,star",1,"^🫧","fantasy"],
+["rc","Contemporary romance","💞",340,350,55,"cg","💌 ☕ 🌹 💞 💍 💖","heart,blossom",4,"🌸","romance"],
+["rh","Historical romance","🎻",15,340,45,"lb","🕯️ 🪶 💌 🎻 👑 💍","feather,heart",2,"","romance"],
+["rd","Dark romance","🥀",350,0,35,"cz","🥀 🗝️ 🔥 🖤 ⛓️ 👑","heart,key",5,"","romance"],
+["rf","Romantasy","🔥",285,170,55,"cg","🌙 🗡️ 🐉 🔥 💞 👑","heart,moon",1,"✨","romance"],
+["rr","Rom-com","😂",320,45,60,"qs","☕ 🍿 💌 😂 💞 💍","heart,star",4,"","romance"],
+["rs","Slow burn","🕯️",20,350,50,"ds","🕯️ 👀 🤝 🔥 💋 💍","flame,heart",3,"","romance"],
+["so","Space opera","🛸",250,190,55,"or","🌌 🛰️ 🚀 🪐 ☄️ 🛸","rocket,planet",3,"✨","scifi"],
+["sc","Cyberpunk","🕶️",290,160,60,"or","🌆 💾 🤖 🧠 ⚡ 🕶️","pstar,pheart",5,"","scifi"],
+["sp","Post-apocalyptic","☢️",60,25,40,"lb","🏜️ ☢️ 🔦 🚗 🌱 🌅","key,flame",5,"","scifi"],
+["sd","Dystopian","👁️",210,5,35,"or","🧱 👁️ 📡 🔓 🕊️ 🌅","lens,clock",5,"","scifi"],
+["st","Time travel","⏳",200,40,55,"fr","⏳ 🕰️ 🌀 ⏪ ♾️ 🏆","clock,planet",2,"","scifi"],
+["ss","Solarpunk","☀️",120,50,55,"qs","🌱 ☀️ 🔋 🌳 🚲 🌍","leaf,star",1,"🍃","scifi"],
+["td","Detective","🔎",215,40,40,"ds","🔎 👣 🗝️ 🕵️ 📰 ⚖️","lens,key",3,"","thriller"],
+["tp","Psychological thriller","🧠",200,350,30,"cz","🧠 🪞 🎭 🕳️ 🔦 🧩","lens,ghost",5,"","thriller"],
+["tc","Cozy mystery","🫖",140,20,45,"qs","🫖 🔍 🐈 🧁 📚 🕵️","lens,book",4,"","thriller"],
+["tn","Noir","🎷",220,0,12,"ds","🌧️ 🎷 🕵️ 🥃 🌃 🏆","moon,key",5,"🌧️","thriller"],
+["ts","Spy thriller","🕶️",210,190,35,"or","📻 🕶️ 🔐 ✈️ 🗺️ 🎯","key,lens",5,"","thriller"],
+["hg","Gothic","🦇",270,320,40,"cz","🕯️ 🦇 🏚️ 🕸️ 🌹 🖤","bat,moon",2,"🦇","horror"],
+["hs","Supernatural","👻",240,150,40,"cg","🌫️ 🕯️ 👻 🪞 🔮 🏚️","ghost,star",2,"","horror"],
+["hl","Slasher","🔦",0,0,30,"ds","🌲 🔦 🏚️ 🎃 🕸️ 💀","skull,flame",5,"","horror"],
+["hc","Cosmic horror","🐙",160,300,45,"or","🌌 🐙 👁️ 🌀 🪐 🌑","planet,skull",3,"","horror"],
+["hf","Folk horror","🌾",90,25,40,"lb","🌾 🕯️ 🦌 🍄 🔥 🌙","mushroom,moon",1,"","horror"],
+["ya","Ancient world","🏺",40,15,50,"cz","🏺 🏛️ 🗿 ⚔️ 🔱 👑","crown,flame",0,"","historical"],
+["ym","Medieval","🏰",10,40,40,"lb","🏰 🏹 🛡️ 🐴 ⛪ 👑","sword,crown",5,"","historical"],
+["yv","Victorian","🎩",310,140,35,"pf","🕯️ 🎩 ☂️ 🚂 🌹 🗝️","key,feather",2,"","historical"],
+["yw","Wartime","🕊️",90,0,25,"ds","✉️ 📻 🚂 🎖️ 🕊️ 🌅","star,feather",3,"","historical"],
+["yr","Renaissance","🎨",45,330,45,"cg","📜 🪶 🎨 🎭 🏛️ 👑","feather,book",0,"","historical"],
+["ac","Coming-of-age","🎒",190,45,55,"qs","🌱 🎒 🚲 🌅 🦋 🎓","butterfly,star",4,"","ya"],
+["as","School drama","🏫",220,350,50,"ds","📚 ✏️ 🎒 🏫 🎤 🏆","book,feather",3,"","ya"],
+["af","YA fantasy","🐲",260,170,55,"fr","✨ 📜 🗡️ 🐲 🔮 👑","star,moon",1,"✨","ya"],
+["ad","YA dystopia","✊",0,200,45,"or","🧱 🔥 ✊ 🕊️ 🌅 🏆","lens,flame",5,"","ya"],
+["ar","Summer romance","🏖️",35,190,60,"qs","☀️ 🍦 🏖️ 🌊 💞 🌅","heart,star",4,"","ya"]
+];
+function H(h,s,l){return "hsl("+h+","+Math.round(s)+"%,"+l+"%)"}
+var css="",L=[],E={},UP={};
+R.forEach(function(r){var id=r[0],h=r[3],h2=r[4],sa=r[5],f=F[r[6]],st=r[7].split(" "),sh=r[9],pt=r[10],up=pt.charAt(0)==="^",q=':root[data-th="'+id+'"]';if(up)pt=pt.slice(1);
+css+=q+'{--bg:'+H(h,sa,95)+';--card:'+H(h,sa*.5,99)+';--ink:'+H(h,sa*.8,14)+';--mute:'+H(h,sa*.35,38)+';--line:'+H(h,sa*.6,86)+';--accent:'+H(h2,70,38)+';--accent2:'+H(h,sa*.9,32)+';--onacc:#fff;--hf:"'+f+'"}';
+css+='@media (prefers-color-scheme:dark){'+q+':not([data-theme="light"]){--bg:'+H(h,sa*.8,8)+';--card:'+H(h,sa*.7,13)+';--ink:'+H(h,60,94)+';--mute:'+H(h,25,68)+';--line:'+H(h,sa*.7,24)+';--accent:'+H(h2,85,68)+';--accent2:'+H(h,65,64)+';--onacc:'+H(h,45,8)+'}}';
+css+=q+' section.panel,'+q+' .gcard{border-radius:'+SH[sh]+'}'+q+' .day{border-radius:'+DH[sh]+'}';
+E[id]=r[2];if(up)UP[id]=1;
+L.push({id:id,n:r[1],e:r[2],st:st,pat:[st[1],st[3],st[4]],items:r[8].split(","),pal:{s:H(h,35,35),a:H(h2,70,58),b:H(h,55,45),v:H(h2,60,92),c:H(h2,80,52)},pt:pt,cf:[st[1],st[3],st[4],"🎉"],group:r[11]})});
+var st=document.createElement("style");st.textContent=css;document.head.appendChild(st);
+window.WTGL=L;window.WTGE=E;window.WTGUP=UP;
+window.WTGROUPS=[["fantasy","Fantasy","🐉"],["romance","Romance","💕"],["scifi","Science fiction","🚀"],["thriller","Thriller & mystery","🔍"],["horror","Horror","👻"],["historical","Historical","🏛️"],["ya","Young adult","📚"]];
+window.WTGLB=["A blank page, waiting for your first words.","The story takes its first steps.","The world is taking shape.","The plot thickens!","The ending is in sight, almost there!","Goal reached! The story shines!"];
+window.WTGIC=["📚","✍️","🌟","🔮","🕯️","📖","🗓️","🏅","🤝","🗝️"]})();
+</script>
+<script>
+(function(){
 var X={theme:"winter",friends:[],sprints:[],me:""};
 try{var rw=localStorage.getItem("wt-extra");if(rw)Object.assign(X,JSON.parse(rw))}catch(e){}
 function saveX(){try{localStorage.setItem("wt-extra",JSON.stringify(X))}catch(e){}}
@@ -400,7 +471,13 @@ arcade:{n:"Arcade",e:"🕹️",st:["💾","🎮","👾","🏎️","🏆","👑"]
 ocean:{n:"Ocean",e:"🌊",st:["🫧","🐚","🐠","🐢","🐬","🐳"],lb:["A single bubble, waiting for your first words.","A shell washes ashore.","A little fish joins you.","A turtle glides by.","A dolphin is jumping, almost there!","Goal reached! The whale sings for you!"],ic:["🧭","✍️","🌊","🐚","⚓","📖","🗓️","🏅","🤝","🔔"],pat:["🫧","🐚","🌊"]},
 autumn:{n:"Autumn",e:"🍂",st:["🌰","🍂","🍁","🍄","🦊","🎃"],lb:["An acorn, waiting for your first words.","The first leaf falls.","The forest turns golden.","Mushrooms pop up after the rain.","A fox watches you write.","Goal reached! Pumpkin pie for everyone!"],ic:["🧺","✍️","🍂","🍁","🍄","📖","🗓️","🏅","🤝","🕯️"],pat:["🍂","🍁","🍄"]},
 sakura:{n:"Sakura",e:"🌸",st:["🌱","🌿","🌸","🌷","🦋","🌈"],lb:["A tiny shoot, waiting for your first words.","The buds are forming.","The first blossoms open.","The branches are in bloom.","A butterfly lands on a petal.","Goal reached! A rainbow over the blossoms!"],ic:["🎎","✍️","🌸","🍡","🦋","📖","🗓️","🏅","🤝","🔔"],pat:["🌸","✨","🦋"]}};
+var ORIG=Object.keys(TH);
+(window.WTGL||[]).forEach(function(g){TH[g.id]={n:g.n,e:g.e,st:g.st,lb:window.WTGLB,ic:window.WTGIC,pat:g.pat}});
+var GROUPS=(window.WTGROUPS||[]).map(function(q){return{id:q[0],n:q[1],e:q[2],items:window.WTGL.filter(function(g){return g.group===q[0]}).map(function(g){return g.id})}}).concat([{id:"others",n:"Others",e:"🎨",items:ORIG}]);
+var GOPEN=null;
+function themesHTML(){return '<div class="gchips">'+GROUPS.map(function(q){return '<button class="ghost gchip" type="button" data-g="'+q.id+'" aria-pressed="'+(GOPEN===q.id)+'">'+q.e+' '+q.n+'</button>'}).join("")+'</div>'+GROUPS.map(function(q){return '<div class="gsubs" data-gs="'+q.id+'"'+(GOPEN===q.id?'':' hidden')+'>'+q.items.map(function(k){return '<button class="ghost th" type="button" data-t="'+k+'" aria-pressed="'+(k===X.theme)+'">'+TH[k].e+' '+TH[k].n+'</button>'}).join("")+'</div>'}).join("")}
 if(!TH[X.theme])X.theme="winter";
+GROUPS.forEach(function(q){if(q.items.indexOf(X.theme)>=0)GOPEN=q.id});
 var _s=save;save=function(){_s();saveX()};
 function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 function daily(id){var o={};Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(id&&c.ms!==id)return;Object.keys(c.entries).forEach(function(d){o[d]=(o[d]||0)+(c.entries[d].words||0)})});return o}
@@ -409,9 +486,9 @@ function applyTheme(){var t=TH[X.theme],r=document.documentElement;r.setAttribut
 var svg="<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='10' y='42' font-size='28'>"+t.pat[0]+"</text><text x='88' y='100' font-size='24'>"+t.pat[1]+"</text><text x='22' y='128' font-size='20'>"+t.pat[2]+"</text></svg>";
 r.style.setProperty("--pat",'url("data:image/svg+xml,'+encodeURIComponent(svg)+'")');
 document.querySelectorAll("section.panel h2").forEach(function(h,i){h.setAttribute("data-i",t.ic[i]||"")});
-$("themes").innerHTML=Object.keys(TH).map(function(k){return '<button class="ghost th" data-t="'+k+'" aria-pressed="'+(k===X.theme)+'">'+TH[k].e+' '+TH[k].n+'</button>'}).join("")}
+$("themes").innerHTML=themesHTML()}
 function setPlant(){var c=ch(),t=sumC(c),p=Math.min(100,t/c.goal*100),i=t>=c.goal?5:p>=75?4:p>=50?3:p>=25?2:p>0?1:0,th=TH[X.theme];$("plant").textContent=th.st[i];$("plantLbl").textContent=th.lb[i]}
-$("themes").addEventListener("click",function(e){var b=e.target.closest(".th");if(!b)return;X.theme=b.dataset.t;saveX();applyTheme();setPlant()});
+$("themes").addEventListener("click",function(e){var gq=e.target.closest(".gchip");if(gq){GOPEN=GOPEN===gq.dataset.g?null:gq.dataset.g;$("themes").innerHTML=themesHTML();return}var b=e.target.closest(".th");if(!b)return;X.theme=b.dataset.t;saveX();applyTheme();setPlant()});
 
 function msX(){var ms=curMs(),dd=daily(ms.id),tr=0,k,t=new Date();for(k in dd)tr+=dd[k];var tot=(ms.base||0)+tr,goal=ms.goal||80000,pace=0,i;
 for(i=0;i<30;i++)pace+=dd[dstr(new Date(t.getFullYear(),t.getMonth(),t.getDate()-i))]||0;pace/=30;
@@ -528,7 +605,7 @@ var TT={winter:"❄️ Writing challenge winter",garden:"🌿 Writing challenge 
 function vine(){var t=document.documentElement.getAttribute("data-th")||"winter";document.documentElement.style.setProperty("--corner",uri(corner(t)));var h=document.querySelector("main>header h1");if(h)h.textContent=TT[t]||TT.winter}
 var pc=document.createElement("div");pc.setAttribute("aria-hidden","true");pc.style.cssText="position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden";document.body.appendChild(pc);
 function parts(){pc.innerHTML="";var t=document.documentElement.getAttribute("data-th"),set=PS[t];if(!set||(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))return;
-var up=t==="ocean",H=window.innerHeight;for(var i=0;i<14;i++){var e=document.createElement("span");e.textContent=set[i%set.length];e.style.cssText="position:absolute;left:"+(Math.random()*100)+"vw;top:0;font-size:"+(14+Math.random()*14)+"px;opacity:.45";pc.appendChild(e);
+var up=t==="ocean"||(window.WTGUP&&window.WTGUP[t]),H=window.innerHeight;for(var i=0;i<14;i++){var e=document.createElement("span");e.textContent=set[i%set.length];e.style.cssText="position:absolute;left:"+(Math.random()*100)+"vw;top:0;font-size:"+(14+Math.random()*14)+"px;opacity:.45";pc.appendChild(e);
 var dx=Math.random()*80-40;e.animate(up?[{transform:"translate(0,"+(H+30)+"px)"},{transform:"translate("+dx+"px,-40px)"}]:[{transform:"translate(0,-40px) rotate(0deg)"},{transform:"translate("+dx+"px,"+(H+30)+"px) rotate("+(Math.random()*360)+"deg)"}],{duration:14000+Math.random()*14000,iterations:Infinity,delay:-Math.random()*20000})}}
 try{new MutationObserver(function(){vine();parts()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-th"]})}catch(e){}
 
@@ -593,7 +670,85 @@ $("xSpd").innerHTML='<h2>⏱️ Writing speed</h2>'+(!sp.length?'<div class="pct
 '<div class="stats" style="margin:0 0 12px"><div class="stat"><b>'+avg.toFixed(1)+'</b><span>words per minute on average</span></div><div class="stat"><b>'+best.toFixed(1)+'</b><span>words per minute, best sprint</span></div><div class="stat"><b>'+fmt(avg*60)+'</b><span>words per hour</span></div><div class="stat"><b>'+wmHM(tm)+'</b><span>spent in sprints ('+sp.length+')</span></div></div>'
 +'<p style="margin:0 0 8px">A 25-minute sprint at your average speed gives about <b>'+fmt(avg*25)+'</b> words.</p><p style="margin:0 0 12px">'+(rem>0&&avg>0?'To reach this month’s goal you still need about <b>'+wmHM(rem/avg)+'</b> of writing at your sprint speed.':'This month’s goal is already reached 🎉')+'</p>'
 +'<div class="pct">Words per minute, last sprints</div>'+wmBars(last.map(function(q){return q.w/q.min}),last.map(function(q,i){return i+1}),1))}
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV()};
+
+function spApply(n){var sel=$("spMin"),ex=null;Array.prototype.forEach.call(sel.options,function(o){if(+o.value===n)ex=o});
+if(!ex){sel.add(new Option(n,n));Array.prototype.slice.call(sel.options).sort(function(a,b){return a.value-b.value}).forEach(function(o){sel.add(o)})}
+sel.value=String(n);sel.dispatchEvent(new Event("change"))}
+$("spSet").addEventListener("click",function(){var n=parseInt($("spCustom").value,10);if(!(n>=1&&n<=240))return;Y.spc=n;saveY();spApply(n)});
+$("spCustom").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("spSet").click()}});
+if(Y.spc>=1&&Y.spc<=240){$("spCustom").value=Y.spc;spApply(Y.spc)}
+
+Object.assign(IT,{
+heart:function(p,k){return Gp(k,"<path d='M0 8C-12-2-8-12 0-5C8-12 12-2 0 8Z' fill='"+p.c+"'/>")},
+skull:function(p,k){return Gp(k,"<circle cy='-1' r='7' fill='"+p.v+"'/><rect x='-4' y='5' width='8' height='5' rx='1' fill='"+p.v+"'/><circle cx='-2.6' cy='-1' r='1.9' fill='"+p.s+"'/><circle cx='2.6' cy='-1' r='1.9' fill='"+p.s+"'/>")},
+bat:function(p,k){return Gp(k,"<path d='M0 0C-4-6-12-6-16 0C-12-1-10 2-8 5C-5 2-3 3 0 7C3 3 5 2 8 5C10 2 12-1 16 0C12-6 4-6 0 0Z' fill='"+p.s+"'/>")},
+key:function(p,k){return Gp(k,"<circle cy='-6' r='4' fill='none' stroke='"+p.a+"' stroke-width='2'/><path d='M0-2V12M0 8H4M0 11H3' stroke='"+p.a+"' stroke-width='2' fill='none'/>")},
+crown:function(p,k){return Gp(k,"<path d='M-9 6L-10-4L-4 1L0-7L4 1L10-4L9 6Z' fill='"+p.a+"'/><rect x='-9' y='6' width='18' height='3' fill='"+p.b+"'/>")},
+sword:function(p,k){return Gp(k,"<path d='M0-11V5M-4 5H4M0 5V10' stroke='"+p.a+"' stroke-width='2.2' fill='none' stroke-linecap='round'/><path d='M0-12L2-8H-2Z' fill='"+p.a+"'/>")},
+rocket:function(p,k){return Gp(k,"<path d='M0-11C6-5 6 3 3 8H-3C-6 3-6-5 0-11Z' fill='"+p.a+"'/><circle cy='-3' r='2.2' fill='"+p.v+"'/><path d='M-3 8L-7 12L-3 10ZM3 8L7 12L3 10Z' fill='"+p.c+"'/>")},
+lens:function(p,k){return Gp(k,"<circle cx='-2' cy='-2' r='6' fill='none' stroke='"+p.a+"' stroke-width='2'/><path d='M3 3L9 9' stroke='"+p.b+"' stroke-width='2.6' stroke-linecap='round'/>")},
+feather:function(p,k){return Gp(k,"<path d='M0 10C-8 0-6-8 4-11C6-3 4 4 0 10Z' fill='"+p.a+"'/><path d='M0 10C0 2 2-4 4-9' stroke='"+p.v+"' stroke-width='.9' fill='none'/>")},
+flame:function(p,k){return Gp(k,"<path d='M0-11C6-4 8 2 3 8C1 10-3 10-5 7C-8 2-3-3 0-11Z' fill='"+p.c+"'/><path d='M0-2C3 1 3 5 0 7C-3 5-2 1 0-2Z' fill='"+p.a+"'/>")},
+ghost:function(p,k){return Gp(k,"<path d='M-7 9V-2C-7-10 7-10 7-2V9L4 6L1 9L-2 6Z' fill='"+p.v+"'/><circle cx='-2.5' cy='-2' r='1.3' fill='"+p.s+"'/><circle cx='2.5' cy='-2' r='1.3' fill='"+p.s+"'/>")},
+clock:function(p,k){return Gp(k,"<circle r='8' fill='none' stroke='"+p.a+"' stroke-width='2'/><path d='M0-4V0L4 2' stroke='"+p.b+"' stroke-width='1.8' fill='none' stroke-linecap='round'/>")},
+book:function(p,k){return Gp(k,"<path d='M-9-6H0V8H-9ZM9-6H0V8H9Z' fill='"+p.a+"'/><path d='M0-6V8' stroke='"+p.b+"' stroke-width='1.2'/>")},
+butterfly:function(p,k){return Gp(k,"<path d='M0 0C-4-8-12-6-9 0C-12 6-4 8 0 2C4 8 12 6 9 0C12-6 4-8 0 0Z' fill='"+p.a+"'/><path d='M0-4V6' stroke='"+p.s+"' stroke-width='1.2'/>")},
+mushroom:function(p,k){return Gp(k,"<path d='M-8 0C-8-9 8-9 8 0Z' fill='"+p.c+"'/><rect x='-2.5' y='0' width='5' height='8' fill='"+p.v+"'/><circle cx='-3' cy='-3' r='1.3' fill='"+p.v+"'/><circle cx='3' cy='-4' r='1.1' fill='"+p.v+"'/>")}
+});
+(window.WTGL||[]).forEach(function(g){PAL[g.id]=g.pal;ITM[g.id]=g.items;CF[g.id]=g.cf;if(g.pt)PS[g.id]=[g.pt]});
+
+/* ---- Writer / Editor mode ---- */
+if(!Y.mode)Y.mode="writer";
+[document.querySelector(".hero"),gc,$("stats"),$("save").closest("section")].forEach(function(e){e.classList.add("wonly")});
+var md=document.createElement("div");md.className="modes";md.setAttribute("role","group");
+md.innerHTML='<button class="ghost mbtn" type="button" data-m="writer" title="First draft: count the words you write">✍️ Writer</button><button class="ghost mbtn" type="button" data-m="editor" title="Revision: track your editing work">🔍 Editor</button>';
+nav.parentNode.insertBefore(md,nav);
+function setMode(m){Y.mode=m;saveY();document.documentElement.setAttribute("data-mode",m);md.querySelectorAll(".mbtn").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===m))})}
+md.addEventListener("click",function(e){var b=e.target.closest(".mbtn");if(b){setMode(b.dataset.m);render()}});
+setMode(Y.mode);
+var ge=document.createElement("div");ge.className="gcard eonly";ge.id="xEdit";gc.parentNode.insertBefore(ge,gc);G.push(["today",ge]);
+function wkStart(){var t=new Date(now.getFullYear(),now.getMonth(),now.getDate());return wmDay(new Date(t.getFullYear(),t.getMonth(),t.getDate()-((t.getDay()+6)%7)))}
+function curMsE(){return msById(S.msSel||ch().ms)}
+function editV(){var ms=curMsE(),ed=ms.edits||(ms.edits=[]),tm=0,tc=0,cut=0,add=0,ps=1,wk=0,st=wkStart(),g=Y.eg||3;
+ed.forEach(function(e){tm+=e.min||0;tc+=e.ch||0;cut+=e.cut||0;add+=e.add||0;if((e.pass||1)>ps)ps=e.pass||1;if(e.d>=st)wk+=e.ch||0});
+var h='<h2>🔍 Editing session</h2><div class="pct">'+esc(ms.name)+'</div><div class="stats" style="margin:12px 0">'+[[wmHM(tm),"editing time"],[tc,"chapters revised"],["−"+fmt(cut),"words cut"],["+"+fmt(add),"words added"],[ps,"current pass"]].map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div>';
+h+='<label>Weekly goal (chapters revised)<input type="number" id="xEg" min="1" value="'+g+'" style="width:6rem"></label><div class="bar"><i style="width:'+Math.min(100,wk/g*100)+'%"></i></div><div class="pct" style="margin-bottom:14px">'+wk+' of '+g+' chapters revised this week</div>';
+h+='<div class="eform"><label>Day<input type="date" id="xEd" value="'+todayKey+'"></label><label>Minutes edited<input type="number" id="xEm" min="0" step="5"></label><label>Chapters revised<input type="number" id="xEc" min="0"></label><label>Words cut<input type="number" id="xEx" min="0" step="10"></label><label>Words added<input type="number" id="xEa" min="0" step="10"></label><label>Pass<input type="number" id="xEp" min="1" value="'+ps+'"></label></div><label style="margin-top:10px">Note (optional)<textarea id="xEn" maxlength="200"></textarea></label><div class="row" style="margin-top:10px"><button class="save" id="xEs" type="button">Save editing session</button><span class="toast" id="xEmsg" role="status"></span></div>';
+var rows=ed.map(function(e,i){return [e,i]}).reverse().slice(0,8);
+h+=rows.length?'<div class="ehist">'+rows.map(function(q){var e=q[0];return '<div class="erow"><span>'+esc(e.d)+'</span><span>'+(e.min||0)+' min</span><span>'+(e.ch===1?'1 chapter':(e.ch||0)+' chapters')+'</span><span>−'+(e.cut||0)+' / +'+(e.add||0)+' words</span><span>Pass '+(e.pass||1)+'</span><button class="ghost edel" type="button" data-i="'+q[1]+'" aria-label="Delete session" style="width:26px;height:26px;font-size:14px">×</button>'+(e.note?'<div class="en">'+esc(e.note)+'</div>':'')+'</div>'}).join("")+'</div>':'<div class="pct" style="margin-top:12px">No editing sessions yet.</div>';
+$("xEdit").innerHTML=h}
+ge.addEventListener("click",function(e){var ms=curMsE(),ed=ms.edits||(ms.edits=[]);
+if(e.target.id==="xEs"){var v=function(i){return Math.max(0,parseInt($(i).value,10)||0)},d=$("xEd").value||todayKey,m=v("xEm"),c=v("xEc"),x=v("xEx"),a=v("xEa"),pp=Math.max(1,parseInt($("xEp").value,10)||1),nt=$("xEn").value.trim().slice(0,200);
+if(!m&&!c&&!x&&!a){$("xEmsg").textContent="Add at least one number to save.";return}
+ed.push({d:d,min:m,ch:c,cut:x,add:a,pass:pp,note:nt});ed.sort(function(q,w){return q.d<w.d?-1:q.d>w.d?1:0});save();render();$("xEmsg").textContent="Editing session saved."}
+else if(e.target.classList.contains("edel")){ed.splice(+e.target.dataset.i,1);save();render()}});
+ge.addEventListener("change",function(e){if(e.target.id==="xEg"){Y.eg=Math.max(1,parseInt(e.target.value,10)||3);saveY();render()}});
+
+/* ---- Tropes: bingo, tracker, trope of the day ---- */
+var TR=["Enemies to lovers","Friends to lovers","Fake dating","Forced proximity","Only one bed","Slow burn","Love triangle","Second chance","Grumpy x sunshine","Forbidden love","Marriage of convenience","Secret identity","The chosen one","Mentor’s death","Found family","Reluctant hero","Hidden heir","Prophecy","Quest","Dark lord","Training montage","Betrayal","Redemption arc","Unreliable narrator","Locked room","Red herring","Amnesia","Time loop","Fish out of water","Rags to riches","Heist","Whodunit","Chekhov’s gun","Villain monologue","Plot twist","Morally grey","Love letter","Road trip","Ticking clock","Mistaken identity","Tournament","Magic school","Haunted house","Last stand"];
+function shuf(a,sd){var b=a.slice(),r0=sd;function rnd(){r0=(r0*1664525+1013904223)%4294967296;return r0/4294967296}for(var i=b.length-1;i>0;i--){var j=Math.floor(rnd()*(i+1)),t=b[i];b[i]=b[j];b[j]=t}return b}
+function newBingo(sd){return{t:shuf(TR,sd).slice(0,9),x:[0,0,0,0,0,0,0,0,0]}}
+function bingoOf(c){if(!c.bingo||!c.bingo.t||c.bingo.t.length!==9){var sd=0,k=mk();for(var i=0;i<k.length;i++)sd=(sd*31+k.charCodeAt(i))>>>0;c.bingo=newBingo(sd)}return c.bingo}
+var LN=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function lines(b){return LN.filter(function(l){return l.every(function(i){return b.x[i]})}).length}
+var gb=document.createElement("div");gb.className="gcard";gb.id="xBingo";var hs=$("hist").closest("section");hs.parentNode.insertBefore(gb,hs);G.push(["month",gb]);
+function bingoV(){var c=ch(),b=bingoOf(c),n=b.x.filter(Boolean).length,ln=lines(b);
+$("xBingo").innerHTML='<h2>🎲 Trope bingo</h2><div class="pct" style="margin-bottom:10px">Tick the tropes you write this month. Complete a line for a bingo!</div><div class="bgrid">'+b.t.map(function(t,i){return '<button class="bcell'+(b.x[i]?' on':'')+'" type="button" data-i="'+i+'" aria-pressed="'+(b.x[i]?"true":"false")+'">'+esc(t)+'</button>'}).join("")+'</div><div class="row" style="margin-top:12px;align-items:center"><button class="ghost" id="xBsh" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Shuffle card</button><span class="pct">'+n+' / 9 tropes this month</span>'+(ln?'<span class="pct"><b>'+(n===9?'Full card!':'Bingo!')+' 🎉</b></span>':'')+'</div>'}
+gb.addEventListener("click",function(e){var c=ch(),b=bingoOf(c);
+if(e.target.id==="xBsh"){c.bingo=newBingo(Math.floor(Math.random()*4e9));save();render();return}
+var cell=e.target.closest(".bcell");if(!cell)return;var i=+cell.dataset.i,before=lines(b);b.x[i]=b.x[i]?0:1;if(lines(b)>before)confetti();save();render()});
+var gt=document.createElement("div");gt.className="gcard";gt.id="xTropes";var chs=$("xChBody").closest("section");chs.parentNode.insertBefore(gt,chs.nextSibling);G.push(["book",gt]);
+function tropeV(){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
+$("xTropes").innerHTML='<h2>🎭 Tropes in my book</h2><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+'</div>'+(tp.length?tp.map(function(t,i){return '<div class="trow" data-i="'+i+'"><b>'+esc(t.n)+'</b><input class="tw" type="text" maxlength="60" value="'+esc(t.w||"")+'" placeholder="Which chapters? e.g. 3, 7" aria-label="Chapters"><button class="ghost td" type="button" aria-label="Delete trope">×</button></div>'}).join(""):'<div class="pct">No tropes yet. Add the tropes of your story.</div>')+'<div class="row" style="margin-top:10px"><label>Pick a trope<select id="xTsel"><option value="">—</option>'+TR.map(function(t){return '<option>'+esc(t)+'</option>'}).join("")+'</select></label><label>or type your own<input type="text" id="xTnew" maxlength="40"></label><button class="ghost" id="xTadd" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div>'}
+gt.addEventListener("click",function(e){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
+if(e.target.id==="xTadd"){var n=($("xTnew").value.trim()||$("xTsel").value).slice(0,40);if(!n||tp.some(function(t){return t.n===n}))return;tp.push({n:n,w:""});save();render()}
+else if(e.target.classList.contains("td")){tp.splice(+e.target.closest(".trow").dataset.i,1);save();render()}});
+gt.addEventListener("change",function(e){if(!e.target.classList.contains("tw"))return;var ms=curMsE();ms.tropes[+e.target.closest(".trow").dataset.i].w=e.target.value.slice(0,60);save()});
+var gd=document.createElement("div");gd.className="gcard wonly";gd.id="xTod";gc.parentNode.insertBefore(gd,gc.nextSibling);G.push(["today",gd]);
+function todI(){if(Y.tod&&Y.tod.d===todayKey)return Y.tod.i;var d=new Date(now.getFullYear(),now.getMonth(),now.getDate());return (Math.floor((d-new Date(d.getFullYear(),0,0))/864e5)*7)%TR.length}
+function todV(){$("xTod").innerHTML='<h2>🎭 Trope of the day</h2><div class="pct">Write a scene with this trope:</div><div class="big" style="font-size:1.7rem;margin:6px 0 10px">'+esc(TR[todI()])+'</div><button class="ghost" id="xTnew2" type="button" style="width:auto;padding:0 14px;font-size:.9rem">New trope</button>'}
+gd.addEventListener("click",function(e){if(e.target.id==="xTnew2"){Y.tod={d:todayKey,i:Math.floor(Math.random()*TR.length)};saveY();todV()}});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -642,6 +797,8 @@ var DL=[
 ["A single bubble, waiting for your first words.","Une bulle, qui attend tes premiers mots.","Una burbuja, esperando tus primeras palabras.","Mehurček, ki čaka na tvoje prve besede."],["A shell washes ashore.","Un coquillage s’échoue sur la plage.","Una concha llega a la orilla.","Školjka je naplavljena na obalo."],["A little fish joins you.","Un petit poisson te rejoint.","Un pececito se une a ti.","Ribica se ti pridruži."],["A turtle glides by.","Une tortue glisse près de toi.","Una tortuga pasa deslizándose.","Mimo splava želva."],["A dolphin is jumping, almost there!","Un dauphin saute, presque au but !","¡Un delfín salta, casi llegas!","Delfin skače, skoraj si na cilju!"],["Goal reached! The whale sings for you!","Objectif atteint ! La baleine chante pour toi !","¡Objetivo alcanzado! ¡La ballena canta para ti!","Cilj dosežen! Kit poje zate!"],
 ["An acorn, waiting for your first words.","Un gland, qui attend tes premiers mots.","Una bellota, esperando tus primeras palabras.","Želod, ki čaka na tvoje prve besede."],["The first leaf falls.","La première feuille tombe.","Cae la primera hoja.","Prvi list pade."],["The forest turns golden.","La forêt se dore.","El bosque se vuelve dorado.","Gozd postane zlat."],["Mushrooms pop up after the rain.","Les champignons sortent après la pluie.","Salen las setas después de la lluvia.","Po dežju pognaje gobe."],["A fox watches you write.","Un renard te regarde écrire.","Un zorro te mira escribir.","Lisica te opazuje pri pisanju."],["Goal reached! Pumpkin pie for everyone!","Objectif atteint ! Tarte à la citrouille pour tout le monde !","¡Objetivo alcanzado! ¡Pastel de calabaza para todos!","Cilj dosežen! Bučna pita za vse!"],
 ["A tiny shoot, waiting for your first words.","Une minuscule pousse, qui attend tes premiers mots.","Un pequeño brote, esperando tus primeras palabras.","Droben poganjek, ki čaka na tvoje prve besede."],["The buds are forming.","Les bourgeons se forment.","Se forman los capullos.","Brsti nastajajo."],["The first blossoms open.","Les premières fleurs s’ouvrent.","Se abren las primeras flores.","Prvi cvetovi se odpirajo."],["The branches are in bloom.","Les branches sont en fleurs.","Las ramas están en flor.","Veje so v polnem cvetu."],["A butterfly lands on a petal.","Un papillon se pose sur un pétale.","Una mariposa se posa en un pétalo.","Metulj pristane na cvetnem listu."],["Goal reached! A rainbow over the blossoms!","Objectif atteint ! Un arc-en-ciel sur les fleurs !","¡Objetivo alcanzado! ¡Un arcoíris sobre las flores!","Cilj dosežen! Mavrica nad cvetovi!"],
+["Custom (min)","Perso (min)","Personalizado (min)","Poljubno (min)"],
+["Set","Valider","Aplicar","Nastavi"],
 ["Writing speed","Vitesse d’écriture","Velocidad de escritura","Hitrost pisanja"],
 ["Do a writing sprint in the Today tab and your speed will appear here.","Fais un sprint d’écriture dans l’onglet Aujourd’hui et ta vitesse apparaîtra ici.","Haz un sprint de escritura en la pestaña Hoy y tu velocidad aparecerá aquí.","Opravi pisalni šprint v zavihku Danes in tu se bo prikazala tvoja hitrost."],
 ["words per minute on average","mots par minute en moyenne","palabras por minuto de media","besed na minuto v povprečju"],
@@ -655,10 +812,30 @@ var DL=[
 ["Words per minute, last sprints","Mots par minute, derniers sprints","Palabras por minuto, últimos sprints","Besede na minuto, zadnji šprinti"],
 ["This week","Cette semaine","Esta semana","Ta teden"],
 ["words this week","mots cette semaine","palabras esta semana","besed ta teden"],
-["No words last week to compare with.","Aucun mot la semaine dernière pour comparer.","Ninguna palabra la semana pasada para comparar.","Prejšnji teden ni bilo besed za primerjavo."]
+["No words last week to compare with.","Aucun mot la semaine dernière pour comparer.","Ninguna palabra la semana pasada para comparar.","Prejšnji teden ni bilo besed za primerjavo."],
+["Others","Autres","Otros","Drugo"],["Fantasy","Fantasy","Fantasía","Fantazija"],["Romance","Romance","Romance","Romanca"],["Science fiction","Science-fiction","Ciencia ficción","Znanstvena fantastika"],["Thriller & mystery","Thriller et mystère","Thriller y misterio","Triler in skrivnost"],["Horror","Horreur","Terror","Grozljivka"],["Historical","Historique","Histórica","Zgodovinska"],["Young adult","Jeunesse (young adult)","Juvenil (young adult)","Mladinska (young adult)"],
+["Epic fantasy","Fantasy épique","Fantasía épica","Epska fantazija"],["Dark fantasy","Dark fantasy","Fantasía oscura","Temna fantazija"],["Cozy fantasy","Fantasy cosy","Fantasía acogedora","Prijetna fantazija"],["Urban fantasy","Fantasy urbaine","Fantasía urbana","Urbana fantazija"],["Fairy-tale retelling","Contes revisités","Cuentos reinterpretados","Predelane pravljice"],
+["Contemporary romance","Romance contemporaine","Romance contemporáneo","Sodobna romanca"],["Historical romance","Romance historique","Romance histórico","Zgodovinska romanca"],["Dark romance","Dark romance","Romance oscuro","Temna romanca"],["Rom-com","Comédie romantique","Comedia romántica","Romantična komedija"],["Slow burn","Slow burn","Slow burn","Počasen ogenj"],
+["Space opera","Space opera","Ópera espacial","Vesoljska opera"],["Post-apocalyptic","Post-apocalyptique","Postapocalíptico","Postapokaliptika"],["Dystopian","Dystopie","Distopía","Distopija"],["Time travel","Voyage dans le temps","Viajes en el tiempo","Potovanje v času"],
+["Detective","Policier","Detectivesco","Detektivka"],["Psychological thriller","Thriller psychologique","Thriller psicológico","Psihološki triler"],["Cozy mystery","Enquête cosy","Misterio acogedor","Prijetna skrivnost"],["Spy thriller","Espionnage","Espionaje","Vohunski triler"],
+["Gothic","Gothique","Gótico","Gotska"],["Supernatural","Surnaturel","Sobrenatural","Nadnaravno"],["Cosmic horror","Horreur cosmique","Horror cósmico","Kozmična grozljivka"],["Folk horror","Horreur folklorique","Terror folclórico","Ljudska grozljivka"],
+["Ancient world","Antiquité","Mundo antiguo","Antika"],["Medieval","Médiéval","Medieval","Srednji vek"],["Victorian","Victorien","Victoriano","Viktorijansko"],["Wartime","Temps de guerre","Tiempos de guerra","Vojni čas"],["Renaissance","Renaissance","Renacimiento","Renesansa"],
+["Coming-of-age","Passage à l’âge adulte","Crecer","Odraščanje"],["School drama","Drame scolaire","Drama escolar","Šolska drama"],["YA fantasy","Fantasy young adult","Fantasía juvenil","Mladinska fantazija"],["YA dystopia","Dystopie young adult","Distopía juvenil","Mladinska distopija"],["Summer romance","Amourette d’été","Romance de verano","Poletna romanca"],
+["A blank page, waiting for your first words.","Une page blanche, qui attend tes premiers mots.","Una página en blanco, esperando tus primeras palabras.","Prazna stran, ki čaka na tvoje prve besede."],["The story takes its first steps.","L’histoire fait ses premiers pas.","La historia da sus primeros pasos.","Zgodba naredi prve korake."],["The world is taking shape.","Le monde prend forme.","El mundo va tomando forma.","Svet dobiva obliko."],["The plot thickens!","L’intrigue se corse !","¡La trama se complica!","Zaplet se zaostruje!"],["The ending is in sight, almost there!","La fin est en vue, tu y es presque !","El final está a la vista, ¡casi lo logras!","Konec je na vidiku, skoraj si na cilju!"],["Goal reached! The story shines!","Objectif atteint ! L’histoire brille !","¡Meta alcanzada! ¡La historia brilla!","Cilj dosežen! Zgodba žari!"],
+["Writer","Auteur","Escritor","Pisec"],["Editor","Relecteur","Editor","Urednik"],["First draft: count the words you write","Premier jet : compte les mots que tu écris","Primer borrador: cuenta las palabras que escribes","Prvi osnutek: štej besede, ki jih napišeš"],["Revision: track your editing work","Révision : suis ton travail de relecture","Revisión: sigue tu trabajo de edición","Pregled: spremljaj svoje urejanje"],
+["Editing session","Séance de relecture","Sesión de edición","Seja urejanja"],["editing time","temps de relecture","tiempo de edición","čas urejanja"],["chapters revised","chapitres relus","capítulos revisados","pregledana poglavja"],["words cut","mots coupés","palabras cortadas","izbrisane besede"],["words added","mots ajoutés","palabras añadidas","dodane besede"],["current pass","passe en cours","pasada actual","trenutni prehod"],
+["Weekly goal (chapters revised)","Objectif de la semaine (chapitres relus)","Meta semanal (capítulos revisados)","Tedenski cilj (pregledana poglavja)"],["Minutes edited","Minutes de relecture","Minutos de edición","Minute urejanja"],["Chapters revised","Chapitres relus","Capítulos revisados","Pregledana poglavja"],["Words cut","Mots coupés","Palabras cortadas","Izbrisane besede"],["Words added","Mots ajoutés","Palabras añadidas","Dodane besede"],["Pass","Passe","Pasada","Prehod"],
+["Save editing session","Enregistrer la séance de relecture","Guardar sesión de edición","Shrani sejo urejanja"],["Editing session saved.","Séance de relecture enregistrée.","Sesión de edición guardada.","Seja urejanja shranjena."],["Add at least one number to save.","Ajoute au moins un nombre pour enregistrer.","Añade al menos un número para guardar.","Za shranjevanje vnesi vsaj eno številko."],["No editing sessions yet.","Pas encore de séance de relecture.","Aún no hay sesiones de edición.","Sej urejanja še ni."],["Delete session","Supprimer la séance","Eliminar sesión","Izbriši sejo"],
+["Trope bingo","Bingo des tropes","Bingo de tropos","Bingo trope"],["Tick the tropes you write this month. Complete a line for a bingo!","Coche les tropes que tu écris ce mois-ci. Complète une ligne pour un bingo !","Marca los tropos que escribes este mes. ¡Completa una línea para un bingo!","Označi tropes, ki jih ta mesec napišeš. Dokončaj vrstico za bingo!"],["Shuffle card","Mélanger la grille","Mezclar tarjeta","Premešaj kartico"],["Bingo!","Bingo !","¡Bingo!","Bingo!"],["Full card!","Grille complète !","¡Tarjeta completa!","Polna kartica!"],
+["Trope of the day","Trope du jour","Trope del día","Trope dneva"],["Write a scene with this trope:","Écris une scène avec ce trope :","Escribe una escena con este tropo:","Napiši prizor s tem tropom:"],["New trope","Nouveau trope","Nuevo tropo","Nov trope"],["Tropes in my book","Tropes de mon livre","Tropos de mi libro","Tropes v moji knjigi"],["Which chapters? e.g. 3, 7","Quels chapitres ? ex. 3, 7","¿Qué capítulos? p. ej. 3, 7","Katera poglavja? npr. 3, 7"],["Delete trope","Supprimer le trope","Eliminar tropo","Izbriši trope"],["Pick a trope","Choisis un trope","Elige un tropo","Izberi trope"],["or type your own","ou écris le tien","o escribe el tuyo","ali vpiši svojega"],["No tropes yet. Add the tropes of your story.","Pas encore de tropes. Ajoute ceux de ton histoire.","Aún no hay tropos. Añade los de tu historia.","Tropes še ni. Dodaj tiste iz svoje zgodbe."]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
+[/^(\d+) of (\d+) chapters revised this week$/,["$1 sur $2 chapitres relus cette semaine","$1 de $2 capítulos revisados esta semana","$1 od $2 pregledanih poglavij ta teden"]],
+[/^(\d+) \/ 9 tropes this month$/,["$1 / 9 tropes ce mois-ci","$1 / 9 tropos este mes","$1 / 9 tropov ta mesec"]],
+[/^(\d+) chapters$/,["$1 chapitres","$1 capítulos","$1 poglavij"]],[/^1 chapter$/,["1 chapitre","1 capítulo","1 poglavje"]],
+[/^Pass (\d+)$/,["Passe $1","Pasada $1","Prehod $1"]],
+[/^−(\d+) \/ \+(\d+) words$/,["−$1 / +$2 mots","−$1 / +$2 palabras","−$1 / +$2 besed"]],
 [/^spent in sprints \((\d+)\)$/,["passé en sprints ($1)","dedicado a sprints ($1)","v šprintih ($1)"]],
 [/^(\d+) days written this week$/,["$1 jours écrits cette semaine","$1 días escritos esta semana","$1 dni pisanja ta teden"]],
 [/^(\d+)% more than last week$/,["$1 % de plus que la semaine dernière","$1 % más que la semana pasada","$1 % več kot prejšnji teden"]],
@@ -714,7 +891,7 @@ var sched=0;try{new MutationObserver(function(){if(sched)return;sched=requestAni
 function seasonOf(m){return m===11||m<=2?"winter":m<=4?"spring":m<=8?"summer":"autumn"}
 var SMAP={winter:"winter",spring:"sakura",summer:"ocean",autumn:"autumn"},NT={garden:"🌿 Writing challenge garden",twilight:"🌙 Writing challenge twilight",galaxy:"🪐 Writing challenge galaxy",cafe:"☕ Writing challenge café",arcade:"🕹️ Writing challenge arcade"},EMT={winter:"❄️",sakura:"🌸",ocean:"🌊",autumn:"🍂"},lastT="";
 function seasonTheme(){if(!P.auto)return;var want=SMAP[seasonOf(cur.m)];if(document.documentElement.getAttribute("data-th")!==want){var b=document.querySelector('#themes [data-t="'+want+'"]');if(b)b.click()}}
-function setTitle(){var t=document.documentElement.getAttribute("data-th")||"winter",h=document.querySelector("main>header h1");if(!h)return;var txt=NT[t]||((EMT[t]||"❄️")+" Writing challenge "+seasonOf(cur.m));if(txt!==lastT){lastT=txt;h.textContent=txt}}
+function setTitle(){var t=document.documentElement.getAttribute("data-th")||"winter",h=document.querySelector("main>header h1");if(!h)return;var txt=NT[t]||((EMT[t]||(window.WTGE&&window.WTGE[t])||"❄️")+" Writing challenge "+seasonOf(cur.m));if(txt!==lastT){lastT=txt;h.textContent=txt}}
 try{new MutationObserver(function(){seasonTheme();setTitle()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-th"]})}catch(e){}
 var L=document.getElementById("xLang"),A=document.getElementById("xAuto");
 if(L){L.value=P.l;L.addEventListener("change",function(){P.l=L.value;saveP();run()})}
