@@ -170,8 +170,18 @@ html:not([data-mode="editor"]) .eonly{display:none!important}
 #xEn{width:100%;resize:vertical;min-height:44px}
 .ehist{margin-top:14px;display:grid;gap:6px}.erow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.88rem}.erow .en{flex-basis:100%;color:var(--mute)}
 .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bcell{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:10px 6px;min-height:64px;font-size:.88rem;font-family:inherit}.bcell.on{background:var(--accent2);color:var(--onacc);border-color:transparent;font-weight:700}
-.trow{display:grid;grid-template-columns:1fr 1fr 38px;gap:8px;align-items:center;margin-bottom:8px}
-@media (max-width:520px){.trow{grid-template-columns:1fr 38px}.trow b{grid-column:1/-1}}
+.trow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px}
+@media (max-width:520px){.trow{grid-template-columns:1fr auto}.trow b{grid-column:1/-1}}
+
+.quote::before{content:"“"}.quote::after{content:"”"}
+.mv{display:inline-flex;gap:4px;flex-shrink:0}.mv .ghost{width:26px;height:26px;font-size:12px;padding:0}
+.modes{display:inline-flex;align-items:center;gap:2px;margin:12px 0 0;padding:3px 4px 3px 12px;border:2px solid var(--accent2);border-radius:12px;background:var(--card)}
+.mlabel{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-right:6px}
+.mbtn{border-radius:9px;border:0;height:32px;padding:0 14px;width:auto;background:transparent}
+.mbtn[aria-pressed=true]{background:var(--accent2);color:var(--onacc);border:0}
+.snd{display:inline-flex;flex-direction:row;align-items:center;gap:6px;font-size:.88rem;color:var(--mute)}
+.rleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.88rem}.rl i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.sw{margin-bottom:14px;padding:10px 12px;border:1px dashed var(--line);border-radius:14px}
 </style>
 </head>
 <body>
@@ -519,14 +529,14 @@ S.manuscripts.forEach(function(m){var t=m.base||0,x=daily(m.id),k;for(k in x)t+=
 var L=[["✍️","First session",ks.length>=1],["🔥","3-day streak",best>=3],["🔥","7-day streak",best>=7],["🔥","14-day streak",best>=14],["🌟","30-day streak",best>=30],["⚡","1,000 words in a day",mxd>=1000],["📅","10 days written",ks.length>=10],["📆","50 days written",ks.length>=50],["🏆","Challenge goal reached",gh],["📚","10,000 words in a book",big>=10000],["📘","25,000 words in a book",big>=25000],["📕","50,000 words in a book",big>=50000],["🎉","80,000 words in a book",big>=80000],["⏱️","First sprint",X.sprints.length>=1],["🏃","10 sprints",X.sprints.length>=10],["👯","Friend added",X.friends.length>=1]];
 $("xBadges").innerHTML='<div class="pct" style="grid-column:1/-1">'+L.filter(function(b){return b[2]}).length+' / '+L.length+' badges earned</div>'+L.map(function(b){return '<div class="badge'+(b[2]?'':' off')+'"><b>'+b[0]+'</b>'+b[1]+'</div>'}).join("")}
 
-function code(){var c=ch(),d=0,k;for(k in c.entries)if(c.entries[k].words>0)d++;return "WT1:"+btoa(unescape(encodeURIComponent(JSON.stringify({n:X.me||"Me",m:mk(),w:sumC(c),g:c.goal,d:d,t:(function(){try{return String(JSON.parse(localStorage.getItem("wt-extra2")).msg||"").slice(0,80)}catch(e){return ""}})()}))))}
+function code(){var c=ch(),d=0,k;for(k in c.entries)if(c.entries[k].words>0)d++;return "WT1:"+btoa(unescape(encodeURIComponent(JSON.stringify({n:X.me||"Me",m:mk(),w:sumC(c),g:c.goal,d:d,s:(function(){var y0=+mk().slice(0,4),m0=+mk().slice(5,7),n0=new Date(y0,m0,0).getDate(),lim=mk()===todayKey.slice(0,7)?now.getDate():n0,cm=0,o=[];for(var i=1;i<=lim;i++){var e=c.entries[mk()+"-"+pad(i)];cm+=(e&&e.words)||0;o.push(cm)}return o})(),t:(function(){try{return String(JSON.parse(localStorage.getItem("wt-extra2")).msg||"").slice(0,80)}catch(e){return ""}})()}))))}
 function friendsV(){var c=ch(),rows=[{n:(X.me||"Me")+" (you)",w:sumC(c),g:c.goal}].concat(X.friends.filter(function(f){return f.m===mk()}));
 $("xName").value=X.me||"";$("xFcode").value=code();
 $("xFr").innerHTML=rows.map(function(f,i){return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(f.n)+'</span><span>'+fmt(f.w)+' / '+fmt(f.g)+(i?' <button class="ghost fdel" type="button" data-n="'+esc(f.n)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px">×</button>':'')+'</span></div><div class="fbar"><i style="width:'+Math.min(100,f.w/f.g*100)+'%"></i></div></div>'}).join("")}
 $("xName").addEventListener("change",function(){X.me=$("xName").value.trim();saveX();friendsV()});
 $("xCopy").addEventListener("click",function(){$("xFcode").select();try{navigator.clipboard.writeText($("xFcode").value).then(function(){$("xFmsg").textContent="Code copied."},function(){$("xFmsg").textContent="Copy the selected code."})}catch(e){$("xFmsg").textContent="Copy the selected code."}});
 $("xAdd").addEventListener("click",function(){var v=$("xFin").value.trim();try{if(v.indexOf("WT1:")!==0)throw 1;var o=JSON.parse(decodeURIComponent(escape(atob(v.slice(4)))));if(typeof o.n!=="string"||!isFinite(o.w)||!(o.g>0)||!/^\d{4}-\d{2}$/.test(o.m))throw 1;
-X.friends=X.friends.filter(function(f){return!(f.n===o.n&&f.m===o.m)});X.friends.push({n:o.n.slice(0,30),m:o.m,w:+o.w,g:+o.g,t:String(o.t||"").slice(0,80)});saveX();$("xFin").value="";$("xFmsg").textContent=o.m===mk()?"Friend added!":"Added for "+o.m+": go to that month to see it.";xr()}catch(e){$("xFmsg").textContent="This code is not valid."}});
+X.friends=X.friends.filter(function(f){return!(f.n===o.n&&f.m===o.m)});X.friends.push({n:o.n.slice(0,30),m:o.m,w:+o.w,g:+o.g,t:String(o.t||"").slice(0,80),s:Array.isArray(o.s)?o.s.slice(0,31).map(function(v){return+v||0}):null});saveX();$("xFin").value="";$("xFmsg").textContent=o.m===mk()?"Friend added!":"Added for "+o.m+": go to that month to see it.";xr()}catch(e){$("xFmsg").textContent="This code is not valid."}});
 $("xFr").addEventListener("click",function(e){var b=e.target.closest(".fdel");if(!b)return;X.friends=X.friends.filter(function(f){return!(f.n===b.dataset.n&&f.m===mk())});saveX();xr()});
 
 var T={run:false,end:0,left:0,iv:null,m:25};
@@ -644,14 +654,24 @@ var rows=[{n:(ex.me||"Me")+" (you)",w:sumC(ch()),t:Y.msg||""}].concat((ex.friend
 rows.forEach(function(q){tot+=q.w});rows.sort(function(a,b){return b.w-a.w});
 $("xCheer").innerHTML='<h2>💌 Team &amp; cheers</h2><div class="row" style="align-items:center"><div class="big" style="font-size:2.4rem;color:var(--accent)">'+fmt(tot)+'</div><div class="of">words written together this month</div></div>'+rows.map(function(q,i){return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+(rows.length>1?(md[i]||"•")+" ":"")+esc(q.n)+'</span><span>'+fmt(q.w)+' words</span></div>'+(q.t?'<div class="pct">“'+esc(q.t)+'”</div>':'')+'</div>'}).join("")+'<label style="margin-top:12px">My cheer for my friends (shown next to my name when they add my code)<input type="text" id="xMsg" maxlength="80" value="'+esc(Y.msg||"")+'" placeholder="ex. You got this!" style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"></label>'}
 $("xCheer").addEventListener("change",function(e){if(e.target.id!=="xMsg")return;Y.msg=e.target.value.trim().slice(0,80);saveY();render()});
-var PR=["Your character finds a door that wasn’t there yesterday.","Write the scene from the point of view of the villain.","Two characters are stuck together during a storm.","Describe a place using only sounds and smells.","Someone returns home after many years. What has changed?","Write a conversation where nobody says what they really mean.","A letter arrives that should never have been sent.","Your hero loses the one thing they cannot live without."],pi=Math.floor(Math.random()*8);
-function promptV(){$("xPrompt").innerHTML='<h2>✨ Writing prompt</h2><p style="margin:0 0 12px;font-size:1.05rem;font-style:italic">'+PR[pi]+'</p><button class="ghost" id="xPNew" type="button" style="width:auto;padding:0 16px;font-size:.9rem">New prompt</button>'}
-$("xPrompt").addEventListener("click",function(e){if(e.target.id!=="xPNew")return;pi=(pi+1+Math.floor(Math.random()*7))%8;promptV()});
-function notesV(){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]),old=$("xIdeaT")?$("xIdeaT").value:"",h='',i;
-for(i=is.length-1;i>=0;i--)h+='<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(is[i].t)+'</span><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" style="width:26px;height:26px;font-size:14px">×</button></div><div class="pct">'+esc(is[i].d||"")+'</div></div>';
+var PR=["Every page you write is a page you didn’t have yesterday.","You can’t edit a blank page, so let the first draft be messy.","Small words, written daily, become a whole book.","Your story doesn’t need to be perfect, it needs to be written.","Write the scene you’re afraid of; that’s usually the one that matters.","A little progress every day beats a big plan for someday.","The only way to finish a book is to keep starting the next page.","Your voice is the one thing no one else can write for you.","Doubt is just a noisy reader; keep writing anyway.","Ten minutes of writing is still writing.","Today’s rough words are tomorrow’s polished chapters.","Characters wait patiently, but they love it when you show up."],pi=Math.floor(Math.random()*PR.length);
+function promptV(){$("xPrompt").innerHTML='<h2>💬 Writing motivation</h2><p class="quote" style="margin:0 0 12px;font-size:1.05rem;font-style:italic">'+PR[pi]+'</p><button class="ghost" id="xPNew" type="button" style="width:auto;padding:0 16px;font-size:.9rem">New quote</button>'}
+$("xPrompt").addEventListener("click",function(e){if(e.target.id!=="xPNew")return;pi=(pi+1+Math.floor(Math.random()*(PR.length-1)))%PR.length;promptV()});
+
+var ideaEdit=-1;
+function notesV(){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]);if(!ms.ideasV2){is.reverse();ms.ideasV2=1;save()}
+var old=$("xIdeaT")?$("xIdeaT").value:"",h='',i,bt='style="width:26px;height:26px;font-size:12px;padding:0"';
+for(i=0;i<is.length;i++){h+=ideaEdit===i?'<div class="fr"><textarea id="xIdeaE" rows="3" maxlength="500" style="width:100%">'+esc(is[i].t)+'</textarea><div class="row"><button class="save xis" type="button" data-i="'+i+'">Save</button><button class="ghost xic" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div></div>':'<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(is[i].t)+'</span><span class="mv"><button class="ghost xiu" type="button" data-i="'+i+'" aria-label="Move up" '+bt+'>▲</button><button class="ghost xidn" type="button" data-i="'+i+'" aria-label="Move down" '+bt+'>▼</button><button class="ghost xie" type="button" data-i="'+i+'" aria-label="Edit idea" '+bt+'>✎</button><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" '+bt+'>×</button></span></div><div class="pct">'+esc(is[i].d||"")+'</div></div>'}
 $("xNotes").innerHTML='<h2>💡 Idea notebook</h2><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+' · '+is.length+(is.length===1?' idea':' ideas')+'</div><textarea id="xIdeaT" rows="2" placeholder="Scene idea, character name, plot twist…"></textarea><button class="save" id="xIdeaAdd" type="button" style="margin-top:8px">Add idea</button>'+h;$("xIdeaT").value=old}
-$("xNotes").addEventListener("click",function(e){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]);
-if(e.target.id==="xIdeaAdd"){var t=$("xIdeaT").value.trim();if(!t)return;is.push({t:t.slice(0,500),d:todayKey});$("xIdeaT").value=""}else if(e.target.classList.contains("xid")){is.splice(+e.target.dataset.i,1)}else return;save();notesV()});
+$("xNotes").addEventListener("click",function(e){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]),c=e.target.classList,i=+e.target.dataset.i,t;
+if(e.target.id==="xIdeaAdd"){var tx=$("xIdeaT").value.trim();if(!tx)return;is.unshift({t:tx.slice(0,500),d:todayKey});$("xIdeaT").value=""}
+else if(c.contains("xid")){is.splice(i,1);ideaEdit=-1}
+else if(c.contains("xiu")&&i>0){t=is[i];is[i]=is[i-1];is[i-1]=t}
+else if(c.contains("xidn")&&i<is.length-1){t=is[i];is[i]=is[i+1];is[i+1]=t}
+else if(c.contains("xie")){ideaEdit=i;notesV();$("xIdeaE").focus();return}
+else if(c.contains("xis")){var v=$("xIdeaE").value.trim();if(v)is[i].t=v.slice(0,500);ideaEdit=-1}
+else if(c.contains("xic")){ideaEdit=-1}
+else return;save();notesV()});
 
 function wmHM(m){var q=Math.floor(m/60);return q?q+" h "+Math.round(m-q*60)+" min":Math.round(m)+" min"}
 function wmDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
@@ -701,7 +721,7 @@ mushroom:function(p,k){return Gp(k,"<path d='M-8 0C-8-9 8-9 8 0Z' fill='"+p.c+"'
 if(!Y.mode)Y.mode="writer";
 [document.querySelector(".hero"),gc,$("stats"),$("save").closest("section")].forEach(function(e){e.classList.add("wonly")});
 var md=document.createElement("div");md.className="modes";md.setAttribute("role","group");
-md.innerHTML='<button class="ghost mbtn" type="button" data-m="writer" title="First draft: count the words you write">✍️ Writer</button><button class="ghost mbtn" type="button" data-m="editor" title="Revision: track your editing work">🔍 Editor</button>';
+md.innerHTML='<span class="mlabel">Mode</span><button class="ghost mbtn" type="button" data-m="writer" title="First draft: count the words you write">✍️ Writer</button><button class="ghost mbtn" type="button" data-m="editor" title="Revision: track your editing work">🔍 Editor</button>';
 nav.parentNode.insertBefore(md,nav);
 function setMode(m){Y.mode=m;saveY();document.documentElement.setAttribute("data-mode",m);md.querySelectorAll(".mbtn").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===m))})}
 md.addEventListener("click",function(e){var b=e.target.closest(".mbtn");if(b){setMode(b.dataset.m);render()}});
@@ -709,18 +729,18 @@ setMode(Y.mode);
 var ge=document.createElement("div");ge.className="gcard eonly";ge.id="xEdit";gc.parentNode.insertBefore(ge,gc);G.push(["today",ge]);
 function wkStart(){var t=new Date(now.getFullYear(),now.getMonth(),now.getDate());return wmDay(new Date(t.getFullYear(),t.getMonth(),t.getDate()-((t.getDay()+6)%7)))}
 function curMsE(){return msById(S.msSel||ch().ms)}
-function editV(){var ms=curMsE(),ed=ms.edits||(ms.edits=[]),tm=0,tc=0,cut=0,add=0,ps=1,wk=0,st=wkStart(),g=Y.eg||3;
+function editV(){var keep={};if(!noKeep)["xEd","xEm","xEc","xEx","xEa","xEp","xEn"].forEach(function(i){if($(i))keep[i]=$(i).value});noKeep=false;var ms=curMsE(),ed=ms.edits||(ms.edits=[]),tm=0,tc=0,cut=0,add=0,ps=1,wk=0,st=wkStart(),g=Y.eg||3;
 ed.forEach(function(e){tm+=e.min||0;tc+=e.ch||0;cut+=e.cut||0;add+=e.add||0;if((e.pass||1)>ps)ps=e.pass||1;if(e.d>=st)wk+=e.ch||0});
 var h='<h2>🔍 Editing session</h2><div class="pct">'+esc(ms.name)+'</div><div class="stats" style="margin:12px 0">'+[[wmHM(tm),"editing time"],[tc,"chapters revised"],["−"+fmt(cut),"words cut"],["+"+fmt(add),"words added"],[ps,"current pass"]].map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div>';
 h+='<label>Weekly goal (chapters revised)<input type="number" id="xEg" min="1" value="'+g+'" style="width:6rem"></label><div class="bar"><i style="width:'+Math.min(100,wk/g*100)+'%"></i></div><div class="pct" style="margin-bottom:14px">'+wk+' of '+g+' chapters revised this week</div>';
-h+='<div class="eform"><label>Day<input type="date" id="xEd" value="'+todayKey+'"></label><label>Minutes edited<input type="number" id="xEm" min="0" step="5"></label><label>Chapters revised<input type="number" id="xEc" min="0"></label><label>Words cut<input type="number" id="xEx" min="0" step="10"></label><label>Words added<input type="number" id="xEa" min="0" step="10"></label><label>Pass<input type="number" id="xEp" min="1" value="'+ps+'"></label></div><label style="margin-top:10px">Note (optional)<textarea id="xEn" maxlength="200"></textarea></label><div class="row" style="margin-top:10px"><button class="save" id="xEs" type="button">Save editing session</button><span class="toast" id="xEmsg" role="status"></span></div>';
+h+=swHTML()+'<div class="eform"><label>Day<input type="date" id="xEd" value="'+todayKey+'"></label><label>Minutes edited<input type="number" id="xEm" min="0" step="5"></label><label>Chapters revised<input type="number" id="xEc" min="0"></label><label>Words cut<input type="number" id="xEx" min="0" step="10"></label><label>Words added<input type="number" id="xEa" min="0" step="10"></label><label>Pass<input type="number" id="xEp" min="1" value="'+ps+'"></label></div><label style="margin-top:10px">Note (optional)<textarea id="xEn" maxlength="200"></textarea></label><div class="row" style="margin-top:10px"><button class="save" id="xEs" type="button">Save editing session</button><span class="toast" id="xEmsg" role="status"></span></div>';
 var rows=ed.map(function(e,i){return [e,i]}).reverse().slice(0,8);
 h+=rows.length?'<div class="ehist">'+rows.map(function(q){var e=q[0];return '<div class="erow"><span>'+esc(e.d)+'</span><span>'+(e.min||0)+' min</span><span>'+(e.ch===1?'1 chapter':(e.ch||0)+' chapters')+'</span><span>−'+(e.cut||0)+' / +'+(e.add||0)+' words</span><span>Pass '+(e.pass||1)+'</span><button class="ghost edel" type="button" data-i="'+q[1]+'" aria-label="Delete session" style="width:26px;height:26px;font-size:14px">×</button>'+(e.note?'<div class="en">'+esc(e.note)+'</div>':'')+'</div>'}).join("")+'</div>':'<div class="pct" style="margin-top:12px">No editing sessions yet.</div>';
-$("xEdit").innerHTML=h}
-ge.addEventListener("click",function(e){var ms=curMsE(),ed=ms.edits||(ms.edits=[]);
+$("xEdit").innerHTML=h;Object.keys(keep).forEach(function(i){if($(i)&&keep[i]!=="")$(i).value=keep[i]})}
+ge.addEventListener("click",function(e){var ms=curMsE(),ed=ms.edits||(ms.edits=[]);if(swClick(e))return;
 if(e.target.id==="xEs"){var v=function(i){return Math.max(0,parseInt($(i).value,10)||0)},d=$("xEd").value||todayKey,m=v("xEm"),c=v("xEc"),x=v("xEx"),a=v("xEa"),pp=Math.max(1,parseInt($("xEp").value,10)||1),nt=$("xEn").value.trim().slice(0,200);
 if(!m&&!c&&!x&&!a){$("xEmsg").textContent="Add at least one number to save.";return}
-ed.push({d:d,min:m,ch:c,cut:x,add:a,pass:pp,note:nt});ed.sort(function(q,w){return q.d<w.d?-1:q.d>w.d?1:0});save();render();$("xEmsg").textContent="Editing session saved."}
+ed.push({d:d,min:m,ch:c,cut:x,add:a,pass:pp,note:nt});ed.sort(function(q,w){return q.d<w.d?-1:q.d>w.d?1:0});save();noKeep=true;swReset();render();$("xEmsg").textContent="Editing session saved."}
 else if(e.target.classList.contains("edel")){ed.splice(+e.target.dataset.i,1);save();render()}});
 ge.addEventListener("change",function(e){if(e.target.id==="xEg"){Y.eg=Math.max(1,parseInt(e.target.value,10)||3);saveY();render()}});
 
@@ -739,16 +759,66 @@ if(e.target.id==="xBsh"){c.bingo=newBingo(Math.floor(Math.random()*4e9));save();
 var cell=e.target.closest(".bcell");if(!cell)return;var i=+cell.dataset.i,before=lines(b);b.x[i]=b.x[i]?0:1;if(lines(b)>before)confetti();save();render()});
 var gt=document.createElement("div");gt.className="gcard";gt.id="xTropes";var chs=$("xChBody").closest("section");chs.parentNode.insertBefore(gt,chs.nextSibling);G.push(["book",gt]);
 function tropeV(){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
-$("xTropes").innerHTML='<h2>🎭 Tropes in my book</h2><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+'</div>'+(tp.length?tp.map(function(t,i){return '<div class="trow" data-i="'+i+'"><b>'+esc(t.n)+'</b><input class="tw" type="text" maxlength="60" value="'+esc(t.w||"")+'" placeholder="Which chapters? e.g. 3, 7" aria-label="Chapters"><button class="ghost td" type="button" aria-label="Delete trope">×</button></div>'}).join(""):'<div class="pct">No tropes yet. Add the tropes of your story.</div>')+'<div class="row" style="margin-top:10px"><label>Pick a trope<select id="xTsel"><option value="">—</option>'+TR.map(function(t){return '<option>'+esc(t)+'</option>'}).join("")+'</select></label><label>or type your own<input type="text" id="xTnew" maxlength="40"></label><button class="ghost" id="xTadd" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div>'}
+$("xTropes").innerHTML='<h2>🎭 Tropes in my book</h2><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+'</div>'+(tp.length?tp.map(function(t,i){return '<div class="trow" data-i="'+i+'"><b>'+esc(t.n)+'</b><input class="tw" type="text" maxlength="60" value="'+esc(t.w||"")+'" placeholder="Which chapters? e.g. 3, 7" aria-label="Chapters"><span class="mv"><button class="ghost tu" type="button" aria-label="Move up">▲</button><button class="ghost tdn" type="button" aria-label="Move down">▼</button><button class="ghost td" type="button" aria-label="Delete trope">×</button></span></div>'}).join(""):'<div class="pct">No tropes yet. Add the tropes of your story.</div>')+'<div class="row" style="margin-top:10px"><label>Pick a trope<select id="xTsel"><option value="">—</option>'+TR.map(function(t){return '<option>'+esc(t)+'</option>'}).join("")+'</select></label><label>or type your own<input type="text" id="xTnew" maxlength="40"></label><button class="ghost" id="xTadd" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div>'}
 gt.addEventListener("click",function(e){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
 if(e.target.id==="xTadd"){var n=($("xTnew").value.trim()||$("xTsel").value).slice(0,40);if(!n||tp.some(function(t){return t.n===n}))return;tp.push({n:n,w:""});save();render()}
-else if(e.target.classList.contains("td")){tp.splice(+e.target.closest(".trow").dataset.i,1);save();render()}});
+else{var row=e.target.closest(".trow");if(!row)return;var ti=+row.dataset.i,cl=e.target.classList,tt;if(cl.contains("td"))tp.splice(ti,1);else if(cl.contains("tu")&&ti>0){tt=tp[ti];tp[ti]=tp[ti-1];tp[ti-1]=tt}else if(cl.contains("tdn")&&ti<tp.length-1){tt=tp[ti];tp[ti]=tp[ti+1];tp[ti+1]=tt}else return;save();render()}});
 gt.addEventListener("change",function(e){if(!e.target.classList.contains("tw"))return;var ms=curMsE();ms.tropes[+e.target.closest(".trow").dataset.i].w=e.target.value.slice(0,60);save()});
 var gd=document.createElement("div");gd.className="gcard wonly";gd.id="xTod";gc.parentNode.insertBefore(gd,gc.nextSibling);G.push(["today",gd]);
 function todI(){if(Y.tod&&Y.tod.d===todayKey)return Y.tod.i;var d=new Date(now.getFullYear(),now.getMonth(),now.getDate());return (Math.floor((d-new Date(d.getFullYear(),0,0))/864e5)*7)%TR.length}
 function todV(){$("xTod").innerHTML='<h2>🎭 Trope of the day</h2><div class="pct">Write a scene with this trope:</div><div class="big" style="font-size:1.7rem;margin:6px 0 10px">'+esc(TR[todI()])+'</div><button class="ghost" id="xTnew2" type="button" style="width:auto;padding:0 14px;font-size:.9rem">New trope</button>'}
 gd.addEventListener("click",function(e){if(e.target.id==="xTnew2"){Y.tod={d:todayKey,i:Math.floor(Math.random()*TR.length)};saveY();todV()}});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV()};
+
+var noKeep=false,SW={run:false,t0:0,acc:0,iv:null};
+function swMs(){return SW.acc+(SW.run?Date.now()-SW.t0:0)}
+function swHMS(ms){var q=Math.floor(ms/1000);return pad(Math.floor(q/3600))+":"+pad(Math.floor(q%3600/60))+":"+pad(q%60)}
+function swShow(){var el=$("xSw");if(el)el.textContent=swHMS(swMs())}
+function swHTML(){return '<div class="sw"><div class="pct" style="margin-bottom:4px">Stopwatch</div><div class="row" style="align-items:center"><div class="spt" id="xSw">'+swHMS(swMs())+'</div><button class="save" id="xSwGo" type="button">'+(SW.run?'Pause':(SW.acc?'Resume':'Start'))+'</button><button class="ghost" id="xSwRs" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button><button class="ghost" id="xSwUse" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Use as minutes</button></div></div>'}
+function swReset(){clearInterval(SW.iv);SW.run=false;SW.acc=0}
+function swClick(e){var id=e.target.id;
+if(id==="xSwGo"){if(SW.run){SW.acc+=Date.now()-SW.t0;SW.run=false;clearInterval(SW.iv)}else{SW.t0=Date.now();SW.run=true;SW.iv=setInterval(swShow,500)}render();return true}
+if(id==="xSwRs"){swReset();render();return true}
+if(id==="xSwUse"){$("xEm").value=Math.max(1,Math.round(swMs()/60000));return true}return false}
+
+function readEx(){try{return JSON.parse(localStorage.getItem("wt-extra"))||{}}catch(e){return {}}}
+var gr=document.createElement("div");gr.className="gcard";gr.id="xRace";gf.parentNode.insertBefore(gr,gf);G.push(["friends",gr]);
+var RC=["hsl(150,55%,38%)","hsl(215,70%,50%)","hsl(300,50%,48%)","hsl(40,85%,42%)","hsl(185,70%,38%)","hsl(0,65%,50%)"];
+function raceV(){var ex=readEx(),c=ch(),y0=+mk().slice(0,4),m0=+mk().slice(5,7),n=new Date(y0,m0,0).getDate(),lim=mk()===todayKey.slice(0,7)?now.getDate():n,cm=0,me=[],i;
+for(i=1;i<=lim;i++){var e=c.entries[mk()+"-"+pad(i)];cm+=(e&&e.words)||0;me.push(cm)}
+var L=[{n:(ex.me||"Me")+" (you)",s:me,col:"var(--accent)",est:false,w:cm}];
+(ex.friends||[]).filter(function(f){return f.m===mk()}).forEach(function(f,j){var has=f.s&&f.s.length,sr=has?f.s.slice(0,n):[];if(!has)for(i=1;i<=lim;i++)sr.push(f.w*i/lim);L.push({n:f.n,s:sr,col:RC[j%RC.length],est:!has,w:f.w})});
+var mx=c.goal;L.forEach(function(q){q.s.forEach(function(v){if(v>mx)mx=v})});mx*=1.05;
+var W=640,Hh=230,Lm=46,Rm=14,Tm=14,Bm=26,pw=W-Lm-Rm,ph=Hh-Tm-Bm,xx=function(d){return Lm+(n>1?(d-1)/(n-1):0)*pw},yy=function(v){return Tm+ph-v/mx*ph},o='';
+for(i=0;i<=4;i++){var v=mx/1.05*i/4,y2=yy(v);o+='<line x1="'+Lm+'" x2="'+(W-Rm)+'" y1="'+y2+'" y2="'+y2+'" style="stroke:var(--line)"/><text x="'+(Lm-6)+'" y="'+(y2+4)+'" text-anchor="end">'+(v>=1000?(Math.round(v/100)/10)+"k":Math.round(v))+'</text>'}
+for(i=1;i<=n;i+=(n>20?5:2))o+='<text x="'+xx(i)+'" y="'+(Hh-8)+'" text-anchor="middle">'+i+'</text>';
+o+='<line x1="'+xx(1)+'" y1="'+yy(0)+'" x2="'+xx(n)+'" y2="'+yy(c.goal)+'" style="stroke:var(--mute)" stroke-width="1.5" stroke-dasharray="4 5"/>';
+L.forEach(function(q){var pts=q.s.map(function(v,k){return xx(k+1)+","+yy(v)}).join(" "),k=q.s.length;o+='<polyline points="'+pts+'" fill="none" style="stroke:'+q.col+'" stroke-width="'+(q.col==="var(--accent)"?3.6:2.6)+'" stroke-linecap="round" stroke-linejoin="round"'+(q.est?' stroke-dasharray="6 5"':'')+'/><circle cx="'+xx(k)+'" cy="'+yy(q.s[k-1]||0)+'" r="4.5" style="fill:'+q.col+'"/>'});
+$("xRace").innerHTML='<h2>📈 Progress race</h2><div class="pct" style="margin-bottom:8px">Everyone’s progress this month. Friends’ lines update when they share a fresh code.</div><div class="chartwrap"><svg viewBox="0 0 '+W+' '+Hh+'" width="100%" role="img" aria-label="Progress race chart">'+o+'</svg></div><div class="rleg">'+L.map(function(q){return '<span class="rl"><i style="background:'+q.col+'"></i><b>'+esc(q.n)+'</b>'+(q.est?' <small>(estimated)</small>':'')+'<span> · '+fmt(q.w)+'</span></span>'}).join("")+'</div>'}
+
+var AC=null;
+function acUnlock(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}}
+function tn(f,t0,d,ty,g,to){try{var o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime+t0;o.type=ty||"sine";o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+d);gn.gain.setValueAtTime(.0001,t);gn.gain.exponentialRampToValueAtTime(g||.14,t+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(gn);gn.connect(AC.destination);o.start(t);o.stop(t+d+.05)}catch(e){}}
+var FAM={
+bells:function(){[880,1320,1760,1320].forEach(function(f,i){tn(f,i*.18,1.1,"sine",.12)})},
+chime:function(){[784,988,1175,1568,1175,988].forEach(function(f,i){tn(f,i*.14,.9,"triangle",.1)})},
+gong:function(){tn(110,0,2.4,"sine",.25);tn(165,0,2.2,"triangle",.1);tn(220,.02,1.8,"sine",.08)},
+laser:function(){tn(1400,0,.35,"square",.07,200);tn(1100,.4,.35,"square",.07,160);tn(1700,.8,.5,"sawtooth",.05,300)},
+ding:function(){tn(1319,0,.5,"sine",.15);tn(1568,.28,.9,"sine",.13)},
+coin:function(){tn(988,0,.09,"square",.08);tn(1319,.09,.45,"square",.08)},
+bubble:function(){[0,.2,.4].forEach(function(t,i){tn(420+i*120,t,.16,"sine",.14,900+i*150)})},
+wood:function(){[220,330,262].forEach(function(f,i){tn(f,i*.22,.18,"triangle",.2,f*.7)})},
+harp:function(){[523,659,784,1047,1319].forEach(function(f,i){tn(f,i*.12,1.2,"triangle",.1)})},
+sting:function(){tn(196,0,.6,"sawtooth",.1,185);tn(147,.5,.9,"sawtooth",.1,140);tn(1175,1.1,.7,"sine",.08)},
+drone:function(){tn(82,0,2.4,"sawtooth",.1,70);tn(123,.1,2.2,"sine",.08)},
+pop:function(){tn(520,0,.12,"sine",.14,880);tn(780,.14,.18,"sine",.14,1180);tn(1040,.34,.3,"sine",.12)}};
+var FM={winter:"bells",garden:"chime",twilight:"gong",galaxy:"laser",cafe:"ding",arcade:"coin",ocean:"bubble",autumn:"wood",sakura:"chime",fe:"gong",fd:"drone",fc:"chime",fu:"gong",ft:"harp",fw:"chime",rc:"harp",rh:"bells",rd:"gong",rf:"harp",rr:"pop",rs:"harp",so:"laser",sc:"coin",sp:"drone",sd:"sting",st:"bells",ss:"chime",td:"sting",tp:"sting",tc:"ding",tn:"sting",ts:"sting",hg:"gong",hs:"drone",hl:"sting",hc:"drone",hf:"wood",ya:"bells",ym:"bells",yv:"ding",yw:"bells",yr:"harp",ac:"pop",as:"ding",af:"chime",ad:"coin",ar:"pop"};
+function playEnd(){if(Y.snd===false)return;acUnlock();if(!AC)return;(FAM[FM[document.documentElement.getAttribute("data-th")]||"bells"])()}
+$("spGo").addEventListener("click",acUnlock);
+$("spSet").insertAdjacentHTML("afterend",'<label class="snd" title="Play a sound when the time is up"><input type="checkbox" id="spSnd"> 🔔 Sound</label>');
+$("spSnd").checked=Y.snd!==false;
+$("spSnd").addEventListener("change",function(){Y.snd=$("spSnd").checked;saveY();if(Y.snd)playEnd()});
+try{new MutationObserver(function(){if(!$("spDone").hidden)playEnd()}).observe($("spDone"),{attributes:true,attributeFilter:["hidden"]})}catch(e){}
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -827,7 +897,23 @@ var DL=[
 ["Weekly goal (chapters revised)","Objectif de la semaine (chapitres relus)","Meta semanal (capítulos revisados)","Tedenski cilj (pregledana poglavja)"],["Minutes edited","Minutes de relecture","Minutos de edición","Minute urejanja"],["Chapters revised","Chapitres relus","Capítulos revisados","Pregledana poglavja"],["Words cut","Mots coupés","Palabras cortadas","Izbrisane besede"],["Words added","Mots ajoutés","Palabras añadidas","Dodane besede"],["Pass","Passe","Pasada","Prehod"],
 ["Save editing session","Enregistrer la séance de relecture","Guardar sesión de edición","Shrani sejo urejanja"],["Editing session saved.","Séance de relecture enregistrée.","Sesión de edición guardada.","Seja urejanja shranjena."],["Add at least one number to save.","Ajoute au moins un nombre pour enregistrer.","Añade al menos un número para guardar.","Za shranjevanje vnesi vsaj eno številko."],["No editing sessions yet.","Pas encore de séance de relecture.","Aún no hay sesiones de edición.","Sej urejanja še ni."],["Delete session","Supprimer la séance","Eliminar sesión","Izbriši sejo"],
 ["Trope bingo","Bingo des tropes","Bingo de tropos","Bingo trope"],["Tick the tropes you write this month. Complete a line for a bingo!","Coche les tropes que tu écris ce mois-ci. Complète une ligne pour un bingo !","Marca los tropos que escribes este mes. ¡Completa una línea para un bingo!","Označi tropes, ki jih ta mesec napišeš. Dokončaj vrstico za bingo!"],["Shuffle card","Mélanger la grille","Mezclar tarjeta","Premešaj kartico"],["Bingo!","Bingo !","¡Bingo!","Bingo!"],["Full card!","Grille complète !","¡Tarjeta completa!","Polna kartica!"],
-["Trope of the day","Trope du jour","Trope del día","Trope dneva"],["Write a scene with this trope:","Écris une scène avec ce trope :","Escribe una escena con este tropo:","Napiši prizor s tem tropom:"],["New trope","Nouveau trope","Nuevo tropo","Nov trope"],["Tropes in my book","Tropes de mon livre","Tropos de mi libro","Tropes v moji knjigi"],["Which chapters? e.g. 3, 7","Quels chapitres ? ex. 3, 7","¿Qué capítulos? p. ej. 3, 7","Katera poglavja? npr. 3, 7"],["Delete trope","Supprimer le trope","Eliminar tropo","Izbriši trope"],["Pick a trope","Choisis un trope","Elige un tropo","Izberi trope"],["or type your own","ou écris le tien","o escribe el tuyo","ali vpiši svojega"],["No tropes yet. Add the tropes of your story.","Pas encore de tropes. Ajoute ceux de ton histoire.","Aún no hay tropos. Añade los de tu historia.","Tropes še ni. Dodaj tiste iz svoje zgodbe."]
+["Trope of the day","Trope du jour","Trope del día","Trope dneva"],["Write a scene with this trope:","Écris une scène avec ce trope :","Escribe una escena con este tropo:","Napiši prizor s tem tropom:"],["New trope","Nouveau trope","Nuevo tropo","Nov trope"],["Tropes in my book","Tropes de mon livre","Tropos de mi libro","Tropes v moji knjigi"],["Which chapters? e.g. 3, 7","Quels chapitres ? ex. 3, 7","¿Qué capítulos? p. ej. 3, 7","Katera poglavja? npr. 3, 7"],["Delete trope","Supprimer le trope","Eliminar tropo","Izbriši trope"],["Pick a trope","Choisis un trope","Elige un tropo","Izberi trope"],["or type your own","ou écris le tien","o escribe el tuyo","ali vpiši svojega"],["No tropes yet. Add the tropes of your story.","Pas encore de tropes. Ajoute ceux de ton histoire.","Aún no hay tropos. Añade los de tu historia.","Tropes še ni. Dodaj tiste iz svoje zgodbe."],
+["Writing motivation","Motivation d’écriture","Motivación para escribir","Motivacija za pisanje"],["New quote","Nouvelle citation","Nueva cita","Nov citat"],
+["Every page you write is a page you didn’t have yesterday.","Chaque page que tu écris est une page que tu n’avais pas hier.","Cada página que escribes es una página que ayer no tenías.","Vsaka napisana stran je stran, ki je včeraj še ni bilo."],
+["You can’t edit a blank page, so let the first draft be messy.","On ne peut pas corriger une page blanche : laisse ton premier jet être brouillon.","No se puede editar una página en blanco, así que deja que el primer borrador sea un desastre.","Prazne strani ni mogoče urejati, zato naj bo prvi osnutek neurejen."],
+["Small words, written daily, become a whole book.","De petits mots écrits chaque jour deviennent un livre entier.","Pequeñas palabras escritas cada día se convierten en un libro entero.","Majhne besede, napisane vsak dan, postanejo cela knjiga."],
+["Your story doesn’t need to be perfect, it needs to be written.","Ton histoire n’a pas besoin d’être parfaite, elle a besoin d’être écrite.","Tu historia no necesita ser perfecta, necesita ser escrita.","Tvoja zgodba ne rabi biti popolna, mora biti napisana."],
+["Write the scene you’re afraid of; that’s usually the one that matters.","Écris la scène qui te fait peur : c’est souvent celle qui compte.","Escribe la escena que te da miedo: suele ser la que importa.","Napiši prizor, ki se ga bojiš: običajno je prav ta pomemben."],
+["A little progress every day beats a big plan for someday.","Un peu de progrès chaque jour vaut mieux qu’un grand projet pour un jour.","Un poco de progreso cada día vale más que un gran plan para algún día.","Malo napredka vsak dan je več vredno kot velik načrt za nekoč."],
+["The only way to finish a book is to keep starting the next page.","La seule façon de finir un livre, c’est de continuer à commencer la page suivante.","La única forma de terminar un libro es seguir empezando la siguiente página.","Knjigo končaš tako, da vedno znova začneš naslednjo stran."],
+["Your voice is the one thing no one else can write for you.","Ta voix est la seule chose que personne d’autre ne peut écrire à ta place.","Tu voz es lo único que nadie más puede escribir por ti.","Tvojega glasu ne more napisati nihče drug namesto tebe."],
+["Doubt is just a noisy reader; keep writing anyway.","Le doute n’est qu’un lecteur bruyant : continue d’écrire quand même.","La duda es solo un lector ruidoso: sigue escribiendo igualmente.","Dvom je le glasen bralec: vseeno piši naprej."],
+["Ten minutes of writing is still writing.","Dix minutes d’écriture, c’est quand même de l’écriture.","Diez minutos de escritura siguen siendo escritura.","Deset minut pisanja je še vedno pisanje."],
+["Today’s rough words are tomorrow’s polished chapters.","Les mots bruts d’aujourd’hui sont les chapitres polis de demain.","Las palabras toscas de hoy son los capítulos pulidos de mañana.","Današnje surove besede so jutrišnja izpiljena poglavja."],
+["Characters wait patiently, but they love it when you show up.","Les personnages attendent patiemment, mais ils adorent quand tu arrives.","Los personajes esperan con paciencia, pero les encanta que aparezcas.","Liki potrpežljivo čakajo, a obožujejo, ko prideš."],
+["Save","Enregistrer","Guardar","Shrani"],["Cancel","Annuler","Cancelar","Prekliči"],["Edit idea","Modifier l’idée","Editar idea","Uredi idejo"],["Move up","Monter","Subir","Premakni gor"],["Move down","Descendre","Bajar","Premakni dol"],
+["Mode","Mode","Modo","Način"],["Stopwatch","Chronomètre","Cronómetro","Štoparica"],["Use as minutes","Utiliser comme minutes","Usar como minutos","Uporabi kot minute"],["Sound","Son","Sonido","Zvok"],["Play a sound when the time is up","Jouer un son quand le temps est écoulé","Reproducir un sonido cuando se acabe el tiempo","Predvajaj zvok, ko čas poteče"],
+["Progress race","Course de progression","Carrera de progreso","Tekma napredka"],["Everyone’s progress this month. Friends’ lines update when they share a fresh code.","La progression de tout le monde ce mois-ci. Les courbes de tes amis se mettent à jour quand ils partagent un nouveau code.","El progreso de todos este mes. Las líneas de tus amigos se actualizan cuando comparten un código nuevo.","Napredek vseh ta mesec. Črte prijateljev se osvežijo, ko delijo novo kodo."],["(estimated)","(estimé)","(estimado)","(ocenjeno)"],["Progress race chart","Graphique de la course de progression","Gráfico de la carrera de progreso","Graf tekme napredka"]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
