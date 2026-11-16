@@ -877,6 +877,7 @@ var chs0=$("xChBody").closest("section");chs0.parentNode.insertBefore(gcs,chs0);
 [[gph,"-","edesk"],[ge,"-","edesk"],[gwg,"today","edesk"],[gcs,"-","echap"],[gtd,"-","etodo"],[ges,"-","estats"]].forEach(function(q){G.push([q[1],q[0]]);EG.set(q[0],q[2])});
 EG.set(gq,"edesk");EG.set(chs0,"echap");EG.set(gt,"etodo");EG.set(gn,"etodo");
 G.forEach(function(g){if(g[0]==="settings")EG.set(g[1],"settings")});
+var gacc=document.createElement("div");gacc.className="gcard acct";gacc.id="xAcct";$("xPrefs").after(gacc);G.push(["settings",gacc]);EG.set(gacc,"settings");
 
 /* stopwatch */
 var SW={run:false,t0:0,acc:0,iv:null},noKeep=false;
@@ -976,6 +977,83 @@ $("xRemTest").addEventListener("click",function(){askPerm(function(ok){if(ok){va
 applyAp();buildNav();
 var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync()};
 vine();parts();showTab(Y.tab);render();
+})();
+</script>
+<script>
+(function(){
+var SB="https://ccnlirdzqwiwdqibltqi.supabase.co",KEY="sb_publishable_mb98hSa0-u-BGhHnvOt9KQ_fKQf26kt";
+var AK="wt-auth",SK="wt-sync",KEYS=["defi-ecriture","wt-extra","wt-extra2"],VOL=["tab","tb","mode","col","cel","tod","ap","lx","snd","sndf","rem"];
+var box=document.getElementById("xAcct");if(!box)return;
+var origSet=Storage.prototype.setItem;
+function lg(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lset(k,v){try{origSet.call(localStorage,k,v)}catch(e){}}
+function jp(s,d){try{var v=JSON.parse(s);return v==null?d:v}catch(e){return d}}
+function hs(p){var s=(p.a||"")+"|"+(p.b||"")+"|"+(p.c||""),h=5381,i;for(i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)+":"+s.length}
+function payload(){var y=jp(lg("wt-extra2"),{}),o={};Object.keys(y).forEach(function(k){if(VOL.indexOf(k)<0)o[k]=y[k]});return{a:lg("defi-ecriture"),b:lg("wt-extra"),c:JSON.stringify(o)}}
+function hasData(p){var d=jp(p.a,{}),cs=d.challenges||{},ms=d.manuscripts||[];return Object.keys(cs).some(function(k){return cs[k]&&cs[k].entries&&Object.keys(cs[k].entries).length>0})||ms.some(function(m){return m.base||(m.chapters&&m.chapters.length)||(m.ideas&&m.ideas.length)||(m.tropes&&m.tropes.length)||(m.name&&m.name!=="My book")})}
+var sess=jp(lg(AK),null),ready=false,tm=0,rt=0,lastTs=null,st={s:"idle",conflict:null,msg:"",busy:false,del:false};
+function setSess(s){sess=s;if(s)lset(AK,JSON.stringify(s));else{try{localStorage.removeItem(AK)}catch(e){}}}
+function mkSess(j,u){var us=j.user||u||{};return{access_token:j.access_token,refresh_token:j.refresh_token,expires_at:+j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:us.id,email:us.email}}}
+function setH(h){lset(SK,JSON.stringify({h:h,ts:Date.now()}))}
+function api(path,opt){opt=opt||{};var h=Object.assign({apikey:KEY,"Content-Type":"application/json"},opt.headers||{});return fetch(SB+path,Object.assign({},opt,{headers:h})).then(function(r){return r.text().then(function(t){var j=null;try{j=t?JSON.parse(t):null}catch(e){}return{ok:r.ok,status:r.status,j:j}})})}
+function token(){if(!sess)return Promise.resolve(null);if(sess.expires_at-Date.now()/1000>90)return Promise.resolve(sess.access_token);
+return api("/auth/v1/token?grant_type=refresh_token",{method:"POST",body:JSON.stringify({refresh_token:sess.refresh_token})}).then(function(r){if(r.ok&&r.j&&r.j.access_token){setSess(mkSess(r.j,sess.user));return sess.access_token}if(r.status===400||r.status===401){setSess(null);ready=false;ui();return null}return sess.access_token},function(){return sess&&sess.access_token})}
+function authed(path,opt){return token().then(function(t){if(!t)throw new Error("auth");opt=opt||{};opt.headers=Object.assign({Authorization:"Bearer "+t},opt.headers||{});return api(path,opt)})}
+function pull(){return authed("/rest/v1/backups?select=data,updated_at&limit=1").then(function(r){if(!r.ok)throw new Error("pull");return(r.j&&r.j[0])||null})}
+function push(){var p=payload();return authed("/rest/v1/backups",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({user_id:sess.user.id,data:{v:1,a:p.a,b:p.b,c:p.c},updated_at:new Date().toISOString()})}).then(function(r){if(!r.ok)throw new Error("push");setH(hs(p));lastTs=Date.now()})}
+function apply(rp){if(rp.a!=null)lset("defi-ecriture",rp.a);if(rp.b!=null)lset("wt-extra",rp.b);var loc=jp(lg("wt-extra2"),{}),rem=jp(rp.c,{});lset("wt-extra2",JSON.stringify(Object.assign({},loc,rem)));setH(hs(rp));location.reload()}
+function reconcile(){if(!sess)return;st.s="syncing";ui();
+return pull().then(function(rem){var lp=payload(),lh=hs(lp),last=jp(lg(SK),{}).h;
+if(!rem){var p=hasData(lp)?push():Promise.resolve();return p.then(function(){ready=true;st.s="ok";lastTs=lastTs||Date.now()})}
+var d=rem.data||{},rp={a:d.a==null?null:d.a,b:d.b==null?null:d.b,c:d.c||"{}"},rh=hs(rp);
+if(rh===lh){setH(lh);ready=true;st.s="ok";lastTs=Date.now();return}
+if(!hasData(lp)||last===lh){apply(rp);return}
+if(last===rh){return push().then(function(){ready=true;st.s="ok"})}
+st.conflict={rp:rp};st.s="conflict"}).catch(function(){st.s="err";schedRetry()}).then(ui)}
+function schedRetry(){clearTimeout(rt);rt=setTimeout(function(){if(!sess)return;if(ready)doPush();else reconcile()},30000)}
+function doPush(){if(!sess||!ready)return;if(hs(payload())===jp(lg(SK),{}).h){st.s="ok";ui();return}st.s="syncing";ui();return push().then(function(){st.s="ok"}).catch(function(){st.s="err";schedRetry()}).then(ui)}
+function changed(){if(!sess||!ready)return;clearTimeout(tm);tm=setTimeout(doPush,2500)}
+Storage.prototype.setItem=function(k){origSet.apply(this,arguments);try{if(this===localStorage&&KEYS.indexOf(k)>=0)changed()}catch(e){}};
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden"&&tm){clearTimeout(tm);tm=0;doPush()}});
+window.addEventListener("online",function(){if(sess){if(ready)doPush();else reconcile()}});
+function site(){return location.origin+location.pathname.replace(/index\.html$/,"")}
+function err(j){var m=(j&&(j.error_description||j.msg||j.message))||"Something went wrong. Try again.";if(/invalid login/i.test(m))return"Wrong email or password.";return m}
+function val(i){var e=document.getElementById(i);return e?e.value.trim():""}
+function login(){var em=val("xaE"),pw=document.getElementById("xaP")?document.getElementById("xaP").value:"";if(!em||!pw){st.msg="Enter your email and password.";return ui()}
+st.busy=true;st.msg="";ui();api("/auth/v1/token?grant_type=password",{method:"POST",body:JSON.stringify({email:em,password:pw})}).then(function(r){st.busy=false;if(r.ok&&r.j&&r.j.access_token){setSess(mkSess(r.j));reconcile()}else{st.msg=err(r.j);ui()}},function(){st.busy=false;st.msg="Something went wrong. Try again.";ui()})}
+function signup(){var em=val("xaE"),pw=document.getElementById("xaP")?document.getElementById("xaP").value:"";if(!em||!pw){st.msg="Enter your email and password.";return ui()}if(pw.length<6){st.msg="Password must have at least 6 characters.";return ui()}
+st.busy=true;st.msg="";ui();api("/auth/v1/signup?redirect_to="+encodeURIComponent(site()),{method:"POST",body:JSON.stringify({email:em,password:pw})}).then(function(r){st.busy=false;if(r.ok&&r.j&&r.j.access_token){setSess(mkSess(r.j));reconcile()}else if(r.ok){st.msg="Check your email to confirm your account, then log in.";ui()}else{st.msg=err(r.j);ui()}},function(){st.busy=false;st.msg="Something went wrong. Try again.";ui()})}
+function magic(){var em=val("xaE");if(!em){st.msg="Enter your email first.";return ui()}
+st.busy=true;st.msg="";ui();api("/auth/v1/otp?redirect_to="+encodeURIComponent(site()),{method:"POST",body:JSON.stringify({email:em,create_user:true})}).then(function(r){st.busy=false;st.msg=r.ok?"Login link sent. Check your email.":err(r.j);ui()},function(){st.busy=false;st.msg="Something went wrong. Try again.";ui()})}
+function google(){location.href=SB+"/auth/v1/authorize?provider=google&redirect_to="+encodeURIComponent(site())}
+function signout(msg){var t=sess&&sess.access_token;if(t)api("/auth/v1/logout",{method:"POST",headers:{Authorization:"Bearer "+t}}).catch(function(){});setSess(null);try{localStorage.removeItem(SK)}catch(e){}ready=false;clearTimeout(tm);st={s:"idle",conflict:null,msg:msg||"Signed out. Your data stays on this device.",busy:false,del:false};ui()}
+function delOnline(){if(!st.del){st.del=true;ui();setTimeout(function(){if(st.del){st.del=false;ui()}},4000);return}
+st.del=false;authed("/rest/v1/backups?user_id=eq."+encodeURIComponent(sess.user.id),{method:"DELETE"}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
+var inp='style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%"';
+function ui(){var keep={xaE:val("xaE")},pw=document.getElementById("xaP")?document.getElementById("xaP").value:"",h='<h2>☁️ Account &amp; sync</h2>';
+if(!sess){h+='<p class="pct" style="margin:0 0 12px">Sign in to save your data online and use it on all your devices. The site also works without an account.</p>'
++'<button class="save" id="xaG" type="button" style="width:100%">Continue with Google</button><div class="pct" style="text-align:center;margin:10px 0">or</div>'
++'<div style="display:grid;gap:8px"><input type="email" id="xaE" autocomplete="email" placeholder="Email" aria-label="Email" '+inp+'><input type="password" id="xaP" autocomplete="current-password" placeholder="Password (6+ characters)" aria-label="Password" '+inp+'></div>'
++'<div class="row" style="margin-top:10px"><button class="save" id="xaL" type="button"'+(st.busy?' disabled':'')+'>Log in</button><button class="ghost" id="xaS" type="button" style="width:auto;padding:0 16px;font-size:.9rem"'+(st.busy?' disabled':'')+'>Create account</button></div>'
++'<button class="ghost" id="xaM" type="button" style="width:auto;padding:0 14px;font-size:.88rem;margin-top:8px"'+(st.busy?' disabled':'')+'>Email me a login link instead</button>'}
+else{var lbl={idle:"Not synced yet",syncing:"Syncing…",ok:"Synced",err:"Sync error, will retry",conflict:"Not synced yet"}[st.s]||"";
+h+='<p style="margin:0 0 6px"><span>Signed in as</span> <b>'+esc(sess.user.email||"")+'</b></p><div class="pct" style="margin-bottom:12px"><span>'+lbl+'</span>'+(st.s==="ok"&&lastTs?' <span>'+new Date(lastTs).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+'</span>':'')+'</div>';
+if(st.conflict)h+='<div class="sw"><p style="margin:0 0 8px">This device and your online account have different data. Which should be kept?</p><div class="row"><button class="save" id="xaCloud" type="button">Use online data</button><button class="ghost" id="xaDev" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Keep this device’s data</button></div><div class="pct" style="margin-top:8px">Tip: use Export in the Backup section first if you are unsure.</div></div>';
+h+='<div class="row"><button class="ghost" id="xaN" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Sync now</button><button class="ghost" id="xaO" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Sign out</button><button class="ghost" id="xaD" type="button" style="width:auto;padding:0 14px;font-size:.9rem">'+(st.del?'Click again to confirm':'Delete my online data')+'</button></div>'}
+h+='<div class="toast" role="status" style="margin-top:8px">'+esc(st.msg||"")+'</div><div class="pct" style="margin-top:10px">Your data is stored on Supabase servers and protected by access rules: only you can read it. Note: the person who runs this site can technically access the database.</div>';
+box.innerHTML=h;if(keep.xaE&&document.getElementById("xaE"))document.getElementById("xaE").value=keep.xaE;if(pw&&document.getElementById("xaP"))document.getElementById("xaP").value=pw}
+box.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var i=b.id;
+if(i==="xaG")google();else if(i==="xaL")login();else if(i==="xaS")signup();else if(i==="xaM")magic();else if(i==="xaO")signout();else if(i==="xaD")delOnline();
+else if(i==="xaN"){ready?doPush():reconcile()}
+else if(i==="xaCloud"&&st.conflict)apply(st.conflict.rp);
+else if(i==="xaDev"){st.conflict=null;push().then(function(){ready=true;st.s="ok"}).catch(function(){st.s="err";schedRetry()}).then(ui)}});
+box.addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.target.id==="xaE"||e.target.id==="xaP")){e.preventDefault();login()}});
+function fromUrl(){var raw=(location.hash||"").replace(/^#/,""),q=(location.search||"").replace(/^\?/,""),p=new URLSearchParams(raw||q),q2=new URLSearchParams(q);
+var hasTok=p.get("access_token"),e=p.get("error_description")||q2.get("error_description");if(!hasTok&&!e)return Promise.resolve();
+try{history.replaceState(null,"",location.pathname)}catch(x){}
+if(!hasTok){st.msg=e;return Promise.resolve()}
+return api("/auth/v1/user",{headers:{Authorization:"Bearer "+hasTok}}).then(function(r){if(r.ok&&r.j&&r.j.id){setSess(mkSess({access_token:hasTok,refresh_token:p.get("refresh_token"),expires_at:p.get("expires_at"),expires_in:p.get("expires_in")},{id:r.j.id,email:r.j.email}));setTimeout(function(){var t=document.querySelector('.tab[data-t="settings"]');if(t)t.click()},50)}else{st.msg="Something went wrong. Try again."}},function(){st.msg="Something went wrong. Try again."})}
+ui();fromUrl().then(function(){ui();return reconcile()});
 })();
 </script>
 <script>
@@ -1084,6 +1162,40 @@ var DL=[
 ["Move to a chapter","Déplacer dans un chapitre","Mover a un capítulo","Premakni v poglavje"],["Move","Déplacer","Mover","Premakni"],
 ["Appearance","Apparence","Apariencia","Videz"],["System","Système","Sistema","Sistem"],["Light","Clair","Claro","Svetlo"],["Dark","Sombre","Oscuro","Temno"],["Daily reminder","Rappel quotidien","Recordatorio diario","Dnevni opomnik"],["Remind me to reach my daily goal","Me rappeler d’atteindre mon objectif du jour","Recordarme alcanzar mi meta diaria","Opomni me na dnevni cilj"],["Remind me at","Me le rappeler à","Recordármelo a las","Opomni me ob"],["Send a test","Envoyer un test","Enviar una prueba","Pošlji preizkus"],["Notifications work while the page or the app is open. Allow them when your browser asks.","Les notifications marchent quand la page ou l’appli est ouverte. Autorise-les quand ton navigateur le demande.","Las notificaciones funcionan mientras la página o la app están abiertas. Permítelas cuando tu navegador lo pida.","Obvestila delujejo, ko je stran ali aplikacija odprta. Dovoli jih, ko brskalnik vpraša."],["Notifications are blocked in this browser.","Les notifications sont bloquées dans ce navigateur.","Las notificaciones están bloqueadas en este navegador.","Obvestila so v tem brskalniku blokirana."],
 ["Auto (matches the theme)","Auto (selon le thème)","Auto (según el tema)","Samodejno (glede na temo)"],["Bells","Cloches","Campanas","Zvonci"],["Wind chime","Carillon","Campanillas","Zvončki"],["Gong","Gong","Gong","Gong"],["Laser","Laser","Láser","Laser"],["Ding","Ding","Ding","Ding"],["Coin","Pièce","Moneda","Kovanec"],["Bubbles","Bulles","Burbujas","Mehurčki"],["Wood","Bois","Madera","Les"],["Harp","Harpe","Arpa","Harfa"],["Sting","Sting","Sting","Sting"],["Drone","Drone","Drone","Drone"],["Pop","Pop","Pop","Pop"],["Play sound","Jouer le son","Reproducir sonido","Predvajaj zvok"]
+
+,["Account & sync","Compte et synchronisation","Cuenta y sincronización","Račun in sinhronizacija"],
+["Sign in to save your data online and use it on all your devices. The site also works without an account.","Connecte-toi pour sauvegarder tes données en ligne et les retrouver sur tous tes appareils. Le site fonctionne aussi sans compte.","Inicia sesión para guardar tus datos en línea y usarlos en todos tus dispositivos. El sitio también funciona sin cuenta.","Prijavi se, da shraniš podatke na spletu in jih uporabljaš na vseh napravah. Stran deluje tudi brez računa."],
+["Continue with Google","Continuer avec Google","Continuar con Google","Nadaljuj z Googlom"],
+["or","ou","o","ali"],
+["Email","E-mail","Correo electrónico","E-pošta"],
+["Password","Mot de passe","Contraseña","Geslo"],
+["Password (6+ characters)","Mot de passe (6 caractères ou plus)","Contraseña (6 o más caracteres)","Geslo (6 ali več znakov)"],
+["Log in","Se connecter","Iniciar sesión","Prijava"],
+["Create account","Créer un compte","Crear cuenta","Ustvari račun"],
+["Email me a login link instead","Recevoir plutôt un lien de connexion par e-mail","Recibir mejor un enlace de acceso por correo","Raje mi pošlji povezavo za prijavo"],
+["Signed in as","Connectée en tant que","Sesión iniciada como","Prijavljena kot"],
+["Not synced yet","Pas encore synchronisé","Aún sin sincronizar","Še ni sinhronizirano"],
+["Syncing…","Synchronisation…","Sincronizando…","Sinhroniziranje …"],
+["Synced","Synchronisé","Sincronizado","Sinhronizirano"],
+["Sync error, will retry","Erreur de synchronisation, nouvel essai bientôt","Error de sincronización, se reintentará","Napaka pri sinhronizaciji, poskusila bom znova"],
+["Sync now","Synchroniser maintenant","Sincronizar ahora","Sinhroniziraj zdaj"],
+["Sign out","Se déconnecter","Cerrar sesión","Odjava"],
+["Delete my online data","Supprimer mes données en ligne","Eliminar mis datos en línea","Izbriši moje spletne podatke"],
+["Click again to confirm","Clique encore pour confirmer","Haz clic otra vez para confirmar","Klikni znova za potrditev"],
+["This device and your online account have different data. Which should be kept?","Cet appareil et ton compte en ligne n’ont pas les mêmes données. Lesquelles garder ?","Este dispositivo y tu cuenta en línea tienen datos distintos. ¿Cuáles conservar?","Ta naprava in tvoj spletni račun imata različne podatke. Katere obdržim?"],
+["Use online data","Utiliser les données en ligne","Usar los datos en línea","Uporabi spletne podatke"],
+["Keep this device’s data","Garder les données de cet appareil","Conservar los datos de este dispositivo","Ohrani podatke te naprave"],
+["Tip: use Export in the Backup section first if you are unsure.","Astuce : utilise d’abord Exporter dans la section Sauvegarde si tu hésites.","Consejo: usa primero Exportar en la sección Copia de seguridad si dudas.","Namig: če ne veš, najprej uporabi Izvozi v razdelku Varnostna kopija."],
+["Your data is stored on Supabase servers and protected by access rules: only you can read it. Note: the person who runs this site can technically access the database.","Tes données sont stockées sur les serveurs de Supabase et protégées par des règles d’accès : toi seule peux les lire. À noter : la personne qui gère ce site peut techniquement accéder à la base de données.","Tus datos se guardan en los servidores de Supabase y están protegidos por reglas de acceso: solo tú puedes leerlos. Ojo: quien gestiona este sitio puede acceder técnicamente a la base de datos.","Tvoji podatki so shranjeni na strežnikih Supabase in zaščiteni s pravili dostopa: berješ jih lahko samo ti. Opomba: oseba, ki upravlja to stran, ima tehnično dostop do baze."],
+["Signed out. Your data stays on this device.","Déconnectée. Tes données restent sur cet appareil.","Sesión cerrada. Tus datos siguen en este dispositivo.","Odjavljena. Tvoji podatki ostanejo na tej napravi."],
+["Online data deleted and signed out. Your data stays on this device.","Données en ligne supprimées et déconnexion faite. Tes données restent sur cet appareil.","Datos en línea eliminados y sesión cerrada. Tus datos siguen en este dispositivo.","Spletni podatki so izbrisani in odjavljena si. Tvoji podatki ostanejo na tej napravi."],
+["Enter your email and password.","Entre ton e-mail et ton mot de passe.","Introduce tu correo y tu contraseña.","Vnesi e-pošto in geslo."],
+["Enter your email first.","Entre d’abord ton e-mail.","Introduce primero tu correo.","Najprej vnesi e-pošto."],
+["Password must have at least 6 characters.","Le mot de passe doit avoir au moins 6 caractères.","La contraseña debe tener al menos 6 caracteres.","Geslo mora imeti vsaj 6 znakov."],
+["Check your email to confirm your account, then log in.","Vérifie tes e-mails pour confirmer ton compte, puis connecte-toi.","Revisa tu correo para confirmar tu cuenta y luego inicia sesión.","Preveri e-pošto, potrdi račun in se nato prijavi."],
+["Login link sent. Check your email.","Lien de connexion envoyé. Vérifie tes e-mails.","Enlace de acceso enviado. Revisa tu correo.","Povezava za prijavo je poslana. Preveri e-pošto."],
+["Wrong email or password.","E-mail ou mot de passe incorrect.","Correo o contraseña incorrectos.","Napačna e-pošta ali geslo."],
+["Something went wrong. Try again.","Un problème est survenu. Réessaie.","Algo salió mal. Inténtalo de nuevo.","Nekaj je šlo narobe. Poskusi znova."]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
