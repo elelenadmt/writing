@@ -989,7 +989,7 @@ applyAp();buildNav();
 
 var pm=null;
 function pClose(){if(pm){pm.remove();pm=null}}
-function pStats(){var o=wmAll(),tot=0,dy=0,k;for(k in o){tot+=o[k];if(o[k]>0)dy++}return[[fmt(tot),"words in total"],[dy,"days I wrote"],[S.manuscripts.length,"manuscripts"]]}
+function pStats(){var o=wmAll(),tot=0,dy=0,k;S.manuscripts.forEach(function(m){tot+=m.base||0});for(k in o){tot+=o[k];if(o[k]>0)dy++}return[[fmt(tot),"words in total"],[dy,"days I wrote"],[S.manuscripts.length,"manuscripts"]]}
 function pOpen(){pClose();var au=null;try{au=JSON.parse(localStorage.getItem("wt-auth"))}catch(e){}
 var nm=(window.WTME&&window.WTME())||"";
 pm=document.createElement("div");pm.className="pmodal";pm.setAttribute("role","dialog");pm.setAttribute("aria-modal","true");
