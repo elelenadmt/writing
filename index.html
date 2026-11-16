@@ -219,6 +219,18 @@ html:not([data-mode="editor"]) .eonly{display:none!important}
 .pmodal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px}
 .pcard{position:relative;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:22px;width:min(420px,100%);max-height:90vh;overflow:auto;text-align:center}
 .pclose{position:absolute;top:12px;right:12px;width:34px;height:34px;font-size:20px;padding:0}
+
+.dh{width:28px;height:34px;padding:0;border:0;background:none;color:var(--mute);cursor:grab;touch-action:none;display:inline-grid;place-items:center;border-radius:8px;flex-shrink:0}.dh:hover{color:var(--accent);background:var(--bg)}.dh:active{cursor:grabbing}
+.dragging{position:relative;z-index:40;background:var(--card);border-radius:12px;box-shadow:0 12px 26px -10px rgba(0,0,0,.45)!important;opacity:.95;transition:none!important}
+.dt-before{box-shadow:0 -3px 0 var(--accent)}.dt-after{box-shadow:0 3px 0 var(--accent)}
+body.dnd{user-select:none;-webkit-user-select:none;cursor:grabbing}
+.chrow{grid-template-columns:auto 1fr 110px 100px auto;align-items:center}
+@media (max-width:520px){.chrow{grid-template-columns:auto 1fr 90px auto}.chrow .chn{grid-column:2/-1}.chrow .chs{grid-column:2}}
+.trow{grid-template-columns:auto 1fr 1fr auto}
+@media (max-width:520px){.trow{grid-template-columns:auto 1fr auto}.trow b{grid-column:2/-1}.trow .tw{grid-column:2}}
+.gdd{position:relative}.gchip .car{font-size:.7em;margin-left:4px;opacity:.7}
+.gmenu{position:absolute;top:calc(100% + 6px);left:0;z-index:30;min-width:220px;max-width:calc(100vw - 36px);display:grid;gap:2px;padding:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px -10px rgba(0,0,0,.35)}.gmenu.r{left:auto;right:0}
+.gitem{font:inherit;color:inherit;text-align:left;background:none;border:0;border-radius:10px;padding:9px 12px;cursor:pointer}.gitem:hover,.gitem.on{background:var(--bg)}.gitem.on{font-weight:700;color:var(--accent2)}
 </style>
 </head>
 <body>
@@ -443,6 +455,28 @@ $("prev").addEventListener("click",function(){shift(-1)});
 $("next").addEventListener("click",function(){shift(1)});
 $("bkEx").addEventListener("click",function(){var t=JSON.stringify({manuscripts:S.manuscripts,challenges:S.challenges});$("bk").value=t;$("bk").focus();$("bk").select();var ok=false;try{navigator.clipboard.writeText(t).then(function(){$("bkMsg").textContent="Exported and copied."},function(){$("bkMsg").textContent="Exported: copy the text above."});ok=true}catch(e){}if(!ok)$("bkMsg").textContent="Exported: copy the text above."});
 $("bkIm").addEventListener("click",function(){try{var p=JSON.parse($("bk").value);if(!p||!Array.isArray(p.manuscripts)||!p.manuscripts.length||typeof p.challenges!=="object")throw 1;S.manuscripts=p.manuscripts;S.challenges=p.challenges;Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(!c.entries)c.entries={};if(!c.ms)c.ms=S.manuscripts[0].id});S.msSel=null;save();loadForm();render();$("bkMsg").textContent="Import done."}catch(e){$("bkMsg").textContent="This text is not a valid backup."}});
+
+var WTDH='<button class="dh" type="button" aria-label="Drag to reorder" title="Drag to reorder"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></button>';
+function wtDrag(root,itemSel,onMove){
+root.addEventListener("pointerdown",function(e){var h=e.target.closest(".dh");if(!h||!root.contains(h)||(e.button>0))return;
+var el=h.closest(itemSel);if(!el||el.dataset.i===undefined)return;e.preventDefault();
+var from=+el.dataset.i,y0=e.clientY,sy0=window.scrollY,items=Array.prototype.slice.call(root.querySelectorAll(itemSel)).filter(function(x){return x.dataset.i!==undefined}),tgt=null,pos=0;
+try{h.setPointerCapture(e.pointerId)}catch(x){}
+el.classList.add("dragging");document.body.classList.add("dnd");
+function clear(){items.forEach(function(x){x.classList.remove("dt-before","dt-after")})}
+function mv(ev){if(ev.clientY<60)window.scrollBy(0,-14);else if(ev.clientY>window.innerHeight-60)window.scrollBy(0,14);
+el.style.transform="translateY("+(ev.clientY-y0+(window.scrollY-sy0))+"px)";clear();tgt=null;
+var others=items.filter(function(x){return x!==el});
+for(var k=0;k<others.length;k++){var rc=others[k].getBoundingClientRect();if(ev.clientY<rc.top+rc.height/2){tgt=others[k];pos=0;break}}
+if(!tgt&&others.length){tgt=others[others.length-1];pos=1}
+if(tgt)tgt.classList.add(pos?"dt-after":"dt-before")}
+function end(ev){h.removeEventListener("pointermove",mv);h.removeEventListener("pointerup",end);h.removeEventListener("pointercancel",end);
+el.classList.remove("dragging");el.style.transform="";document.body.classList.remove("dnd");clear();
+if(ev.type==="pointerup"&&tgt){var t=+tgt.dataset.i,to=pos?(t>from?t:t+1):(t>from?t-1:t);if(to!==from)onMove(from,to)}}
+h.addEventListener("pointermove",mv);h.addEventListener("pointerup",end);h.addEventListener("pointercancel",end)});
+root.addEventListener("keydown",function(e){var h=e.target.closest&&e.target.closest(".dh");if(!h||(e.key!=="ArrowUp"&&e.key!=="ArrowDown"))return;
+var el=h.closest(itemSel);if(!el||el.dataset.i===undefined)return;var i=+el.dataset.i,n=root.querySelectorAll(itemSel+"[data-i]").length,to=i+(e.key==="ArrowUp"?-1:1);if(to<0||to>=n)return;e.preventDefault();onMove(i,to);
+setTimeout(function(){Array.prototype.forEach.call(root.querySelectorAll(itemSel+" .dh"),function(b){if(+b.closest(itemSel).dataset.i===to)b.focus()})},0)})}
 loadForm();render();
 </script>
 <script>
@@ -522,9 +556,9 @@ var ORIG=Object.keys(TH);
 (window.WTGL||[]).forEach(function(g){TH[g.id]={n:g.n,e:g.e,st:g.st,lb:window.WTGLB,ic:window.WTGIC,pat:g.pat}});
 var GROUPS=(window.WTGROUPS||[]).map(function(q){return{id:q[0],n:q[1],e:q[2],items:window.WTGL.filter(function(g){return g.group===q[0]}).map(function(g){return g.id})}}).concat([{id:"others",n:"Others",e:"🎨",items:ORIG}]);
 var GOPEN=null;
-function themesHTML(){return '<div class="gchips">'+GROUPS.map(function(q){return '<button class="ghost gchip" type="button" data-g="'+q.id+'" aria-pressed="'+(GOPEN===q.id)+'">'+q.e+' '+q.n+'</button>'}).join("")+'</div>'+GROUPS.map(function(q){return '<div class="gsubs" data-gs="'+q.id+'"'+(GOPEN===q.id?'':' hidden')+'>'+q.items.map(function(k){return '<button class="ghost th" type="button" data-t="'+k+'" aria-pressed="'+(k===X.theme)+'">'+TH[k].e+' '+TH[k].n+'</button>'}).join("")+'</div>'}).join("")}
+function themesHTML(){return '<div class="gchips">'+GROUPS.map(function(q){var cur=q.items.indexOf(X.theme)>=0;return '<div class="gdd"><button class="ghost gchip" type="button" data-g="'+q.id+'" aria-haspopup="true" aria-expanded="'+(GOPEN===q.id)+'" aria-pressed="'+cur+'">'+q.e+' '+q.n+' <span class="car">▾</span></button><div class="gmenu" role="menu" data-gs="'+q.id+'"'+(GOPEN===q.id?'':' hidden')+'>'+q.items.map(function(k){return '<button class="gitem'+(k===X.theme?' on':'')+'" type="button" role="menuitem" data-t="'+k+'">'+TH[k].e+' '+TH[k].n+(k===X.theme?' ✓':'')+'</button>'}).join("")+'</div></div>'}).join("")+'</div>'}
 if(!TH[X.theme])X.theme="winter";
-GROUPS.forEach(function(q){if(q.items.indexOf(X.theme)>=0)GOPEN=q.id});
+
 var _s=save;save=function(){_s();saveX()};
 function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 function daily(id){var o={};Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(id&&c.ms!==id)return;Object.keys(c.entries).forEach(function(d){o[d]=(o[d]||0)+(c.entries[d].words||0)})});return o}
@@ -535,7 +569,11 @@ r.style.setProperty("--pat",'url("data:image/svg+xml,'+encodeURIComponent(svg)+'
 document.querySelectorAll("section.panel h2").forEach(function(h,i){h.setAttribute("data-i",t.ic[i]||"")});
 $("themes").innerHTML=themesHTML()}
 function setPlant(){var c=ch(),t=sumC(c),p=Math.min(100,t/c.goal*100),i=t>=c.goal?5:p>=75?4:p>=50?3:p>=25?2:p>0?1:0,th=TH[X.theme];$("plant").textContent=th.st[i];$("plantLbl").textContent=th.lb[i]}
-$("themes").addEventListener("click",function(e){var gq=e.target.closest(".gchip");if(gq){GOPEN=GOPEN===gq.dataset.g?null:gq.dataset.g;$("themes").innerHTML=themesHTML();return}var b=e.target.closest(".th");if(!b)return;X.theme=b.dataset.t;saveX();applyTheme();setPlant()});
+function posMenu(){var m=$("themes").querySelector(".gmenu:not([hidden])");if(m){m.classList.remove("r");if(m.getBoundingClientRect().right>window.innerWidth-8)m.classList.add("r")}}
+function closeMenu(){if(GOPEN){GOPEN=null;$("themes").innerHTML=themesHTML()}}
+$("themes").addEventListener("click",function(e){e.wtT=1;var gq=e.target.closest(".gchip");if(gq){GOPEN=GOPEN===gq.dataset.g?null:gq.dataset.g;$("themes").innerHTML=themesHTML();posMenu();return}var b=e.target.closest("[data-t]");if(!b)return;GOPEN=null;X.theme=b.dataset.t;saveX();applyTheme();setPlant()});
+document.addEventListener("click",function(e){if(GOPEN&&!e.wtT)closeMenu()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMenu()});
 
 function msX(){var ms=curMs(),dd=daily(ms.id),tr=0,k,t=new Date();for(k in dd)tr+=dd[k];var tot=(ms.base||0)+tr,goal=ms.goal||80000,pace=0,i;
 for(i=0;i<30;i++)pace+=dd[dstr(new Date(t.getFullYear(),t.getMonth(),t.getDate()-i))]||0;pace/=30;
@@ -551,7 +589,7 @@ var ST=["Idea","Draft","Revised","Done"];
 var chOpen={};
 function cnPanel(c,i){var nt=c.nt||[];return '<div class="chnotes" data-i="'+i+'"><div class="pct">Notes for editing this chapter</div>'+nt.map(function(q,j){return '<div class="cnrow"><input type="checkbox" class="cnx" data-j="'+j+'"'+(q.x?' checked':'')+'><span class="cnt'+(q.x?' dn':'')+'">'+esc(q.t)+'</span><button class="ghost cnd" type="button" data-j="'+j+'" aria-label="Delete note">×</button></div>'}).join("")+'<div class="row" style="margin-top:6px"><input type="text" class="cni" maxlength="200" placeholder="Idea to fix or improve…"><button class="ghost cna" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add note</button></div></div>'}
 function chap(){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]),w=0,dn=0;cs.forEach(function(c){w+=c.w||0;if(c.s==="Done")dn++});
-$("xChBody").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+esc(ms.name)+' · '+cs.length+' chapters · '+dn+' done · '+fmt(w)+' words in chapters</p>'+cs.map(function(c,i){return '<div class="chrow" data-i="'+i+'"><input class="chn" value="'+esc(c.n)+'" aria-label="Chapter title"><select class="chs" aria-label="Status">'+ST.map(function(s){return '<option'+(s===c.s?' selected':'')+'>'+s+'</option>'}).join("")+'</select><input class="chw" type="number" min="0" value="'+(c.w||0)+'" aria-label="Words"><span class="mv"><button class="ghost chu" type="button" aria-label="Move up">▲</button><button class="ghost chdn" type="button" aria-label="Move down">▼</button><button class="ghost chn2" type="button" aria-label="Edit notes" title="Edit notes">📝'+((c.nt||[]).filter(function(q){return!q.x}).length?' '+(c.nt||[]).filter(function(q){return!q.x}).length:'')+'</button><button class="ghost chd" type="button" aria-label="Delete chapter">×</button></span></div>'+(chOpen[i]?cnPanel(c,i):'')}).join("")+'<button class="ghost" id="chAdd" type="button" style="width:auto;padding:0 16px;font-size:.9rem">+ Add chapter</button>'}
+$("xChBody").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+esc(ms.name)+' · '+cs.length+' chapters · '+dn+' done · '+fmt(w)+' words in chapters</p>'+cs.map(function(c,i){return '<div class="chrow" data-i="'+i+'">'+WTDH+'<input class="chn" value="'+esc(c.n)+'" aria-label="Chapter title"><select class="chs" aria-label="Status">'+ST.map(function(s){return '<option'+(s===c.s?' selected':'')+'>'+s+'</option>'}).join("")+'</select><input class="chw" type="number" min="0" value="'+(c.w||0)+'" aria-label="Words"><span class="mv"><button class="ghost chn2" type="button" aria-label="Edit notes" title="Edit notes">📝'+((c.nt||[]).filter(function(q){return!q.x}).length?' '+(c.nt||[]).filter(function(q){return!q.x}).length:'')+'</button><button class="ghost chd" type="button" aria-label="Delete chapter">×</button></span></div>'+(chOpen[i]?cnPanel(c,i):'')}).join("")+'<button class="ghost" id="chAdd" type="button" style="width:auto;padding:0 16px;font-size:.9rem">+ Add chapter</button>'}
 $("xChBody").addEventListener("change",function(e){var row=e.target.closest(".chrow");if(!row)return;var c=curMs().chapters[+row.dataset.i],t=e.target;if(t.classList.contains("chn"))c.n=t.value;else if(t.classList.contains("chs"))c.s=t.value;else if(t.classList.contains("chw"))c.w=Math.max(0,parseInt(t.value,10)||0);save();chap()});
 $("xChBody").addEventListener("click",function(e){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]);if(e.target.id==="chAdd"){cs.push({n:"Chapter "+(cs.length+1),s:"Draft",w:0})}else if(e.target.classList.contains("chd")){cs.splice(+e.target.closest(".chrow").dataset.i,1);chOpen={}}
 else if(e.target.classList.contains("chu")){var ui=+e.target.closest(".chrow").dataset.i;if(ui>0){var tm0=cs[ui];cs[ui]=cs[ui-1];cs[ui-1]=tm0}chOpen={}}
@@ -562,6 +600,7 @@ else if(e.target.classList.contains("cnd")){cs[+e.target.closest(".chnotes").dat
 else if(e.target.classList.contains("cnx")){cs[+e.target.closest(".chnotes").dataset.i].nt[+e.target.dataset.j].x=e.target.checked?1:0}
 else return;save();chap()});
 
+wtDrag($("xChBody"),".chrow",function(from,to){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]),ord=cs.map(function(_,i){return i}),no={};ord.splice(to,0,ord.splice(from,1)[0]);ord.forEach(function(o,np){if(chOpen[o])no[np]=true});chOpen=no;cs.splice(to,0,cs.splice(from,1)[0]);save();chap()});
 function yearV(){var y=cur.y,dd=daily(),first=(new Date(y,0,1).getDay()+6)%7,h='',mx=1,tot=0,dys=0,d=new Date(y,0,1),days=[],i;
 while(d.getFullYear()===y){var k=dstr(d),w=dd[k]||0;days.push([k,w]);if(w>mx)mx=w;tot+=w;if(w>0)dys++;d=new Date(y,d.getMonth(),d.getDate()+1)}
 for(i=0;i<first;i++)h+='<i style="background:none"></i>';
@@ -709,7 +748,7 @@ var ideaEdit=-1,ideaMove=-1;
 function moveForm(ms,i){var cs=chaps(ms);return cs.length?'<div class="row" style="margin-top:6px"><select id="xImS">'+cs.map(function(c,k){return '<option value="'+k+'">'+esc(c.n)+'</option>'}).join("")+'</select><button class="save xiy" type="button" data-i="'+i+'">Move</button><button class="ghost xic2" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div>':'<div class="pct" style="margin-top:6px">Add chapters first.</div>'}
 function notesV(){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]);if(!ms.ideasV2){is.reverse();ms.ideasV2=1;save()}
 var old=$("xIdeaT")?$("xIdeaT").value:"",h='',i,bt='style="width:26px;height:26px;font-size:12px;padding:0"';
-for(i=0;i<is.length;i++){h+=ideaEdit===i?'<div class="fr"><textarea id="xIdeaE" rows="3" maxlength="500" style="width:100%">'+esc(is[i].t)+'</textarea><div class="row"><button class="save xis" type="button" data-i="'+i+'">Save</button><button class="ghost xic" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div></div>':'<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(is[i].t)+'</span><span class="mv"><button class="ghost xiu" type="button" data-i="'+i+'" aria-label="Move up" '+bt+'>▲</button><button class="ghost xidn" type="button" data-i="'+i+'" aria-label="Move down" '+bt+'>▼</button><button class="ghost xim" type="button" data-i="'+i+'" aria-label="Move to a chapter" title="Move to a chapter" '+bt+'>📥</button><button class="ghost xie" type="button" data-i="'+i+'" aria-label="Edit idea" '+bt+'>✎</button><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" '+bt+'>×</button></span></div><div class="pct">'+esc(is[i].d||"")+'</div>'+(ideaMove===i?moveForm(ms,i):'')+'</div>'}
+for(i=0;i<is.length;i++){h+=ideaEdit===i?'<div class="fr" data-i="'+i+'"><textarea id="xIdeaE" rows="3" maxlength="500" style="width:100%">'+esc(is[i].t)+'</textarea><div class="row"><button class="save xis" type="button" data-i="'+i+'">Save</button><button class="ghost xic" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div></div>':'<div class="fr" data-i="'+i+'"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">'+WTDH+'<span style="white-space:pre-wrap;overflow-wrap:anywhere;flex:1;min-width:0">'+esc(is[i].t)+'</span><span class="mv"><button class="ghost xim" type="button" data-i="'+i+'" aria-label="Move to a chapter" title="Move to a chapter" '+bt+'>📥</button><button class="ghost xie" type="button" data-i="'+i+'" aria-label="Edit idea" '+bt+'>✎</button><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" '+bt+'>×</button></span></div><div class="pct">'+esc(is[i].d||"")+'</div>'+(ideaMove===i?moveForm(ms,i):'')+'</div>'}
 $("xNotes").innerHTML='<h2>💡 Idea notebook'+ARW("id")+'</h2><div class="cb"'+HID("id")+'><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+' · '+is.length+(is.length===1?' idea':' ideas')+'</div><textarea id="xIdeaT" rows="2" placeholder="Scene idea, character name, plot twist…"></textarea><button class="save" id="xIdeaAdd" type="button" style="margin-top:8px">Add idea</button>'+h+'</div>';$("xIdeaT").value=old}
 $("xNotes").addEventListener("click",function(e){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]),c=e.target.classList,i=+e.target.dataset.i,t;
 if(e.target.id==="xIdeaAdd"){var tx=$("xIdeaT").value.trim();if(!tx)return;is.unshift({t:tx.slice(0,500),d:todayKey});$("xIdeaT").value=""}
@@ -791,6 +830,7 @@ function newBingo(sd){return{t:shuf(TR,sd).slice(0,9),x:[0,0,0,0,0,0,0,0,0]}}
 function bingoOf(c){if(!c.bingo||!c.bingo.t||c.bingo.t.length!==9){var sd=0,k=mk();for(var i=0;i<k.length;i++)sd=(sd*31+k.charCodeAt(i))>>>0;c.bingo=newBingo(sd)}return c.bingo}
 var LN=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 function lines(b){return LN.filter(function(l){return l.every(function(i){return b.x[i]})}).length}
+wtDrag($("xNotes"),".fr",function(from,to){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]);is.splice(to,0,is.splice(from,1)[0]);ideaEdit=-1;ideaMove=-1;save();notesV()});
 var gb=document.createElement("div");gb.className="gcard";gb.id="xBingo";var hs=$("hist").closest("section");hs.parentNode.insertBefore(gb,hs);G.push(["month",gb]);
 function bingoV(){var c=ch(),b=bingoOf(c),n=b.x.filter(Boolean).length,ln=lines(b);
 $("xBingo").innerHTML='<h2>🎲 Trope bingo'+ARW("bg")+'</h2><div class="cb"'+HID("bg")+'><div class="pct" style="margin-bottom:10px">Tick the tropes you write this month. Complete a line for a bingo!</div><div class="bgrid">'+b.t.map(function(t,i){return '<button class="bcell'+(b.x[i]?' on':'')+'" type="button" data-i="'+i+'" aria-pressed="'+(b.x[i]?"true":"false")+'">'+esc(t)+'</button>'}).join("")+'</div><div class="row" style="margin-top:12px;align-items:center"><button class="ghost" id="xBsh" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Shuffle card</button><span class="pct">'+n+' / 9 tropes this month</span>'+(ln?'<span class="pct"><b>'+(n===9?'Full card!':'Bingo!')+' 🎉</b></span>':'')+'</div></div>'}
@@ -799,11 +839,12 @@ if(e.target.id==="xBsh"){c.bingo=newBingo(Math.floor(Math.random()*4e9));save();
 var cell=e.target.closest(".bcell");if(!cell)return;var i=+cell.dataset.i,before=lines(b);b.x[i]=b.x[i]?0:1;if(lines(b)>before)confetti();save();render()});
 var gt=document.createElement("div");gt.className="gcard";gt.id="xTropes";var chs=$("xChBody").closest("section");chs.parentNode.insertBefore(gt,chs.nextSibling);G.push(["book",gt]);
 function tropeV(){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
-$("xTropes").innerHTML='<h2>🎭 Tropes in my book'+ARW("tr")+'</h2><div class="cb"'+HID("tr")+'><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+'</div>'+(tp.length?tp.map(function(t,i){return '<div class="trow" data-i="'+i+'"><b>'+esc(t.n)+'</b><input class="tw" type="text" maxlength="60" value="'+esc(t.w||"")+'" placeholder="Which chapters? e.g. 3, 7" aria-label="Chapters"><span class="mv"><button class="ghost tu" type="button" aria-label="Move up">▲</button><button class="ghost tdn" type="button" aria-label="Move down">▼</button><button class="ghost td" type="button" aria-label="Delete trope">×</button></span></div>'}).join(""):'<div class="pct">No tropes yet. Add the tropes of your story.</div>')+'<div class="row" style="margin-top:10px"><label>Pick a trope<select id="xTsel"><option value="">—</option>'+TR.map(function(t){return '<option>'+esc(t)+'</option>'}).join("")+'</select></label><label>or type your own<input type="text" id="xTnew" maxlength="40"></label><button class="ghost" id="xTadd" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div></div>'}
+$("xTropes").innerHTML='<h2>🎭 Tropes in my book'+ARW("tr")+'</h2><div class="cb"'+HID("tr")+'><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+'</div>'+(tp.length?tp.map(function(t,i){return '<div class="trow" data-i="'+i+'">'+WTDH+'<b>'+esc(t.n)+'</b><input class="tw" type="text" maxlength="60" value="'+esc(t.w||"")+'" placeholder="Which chapters? e.g. 3, 7" aria-label="Chapters"><span class="mv"><button class="ghost td" type="button" aria-label="Delete trope">×</button></span></div>'}).join(""):'<div class="pct">No tropes yet. Add the tropes of your story.</div>')+'<div class="row" style="margin-top:10px"><label>Pick a trope<select id="xTsel"><option value="">—</option>'+TR.map(function(t){return '<option>'+esc(t)+'</option>'}).join("")+'</select></label><label>or type your own<input type="text" id="xTnew" maxlength="40"></label><button class="ghost" id="xTadd" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div></div>'}
 gt.addEventListener("click",function(e){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
 if(e.target.id==="xTadd"){var n=($("xTnew").value.trim()||$("xTsel").value).slice(0,40);if(!n||tp.some(function(t){return t.n===n}))return;tp.push({n:n,w:""});save();render()}
 else{var row=e.target.closest(".trow");if(!row)return;var ti=+row.dataset.i,cl=e.target.classList,tt;if(cl.contains("td"))tp.splice(ti,1);else if(cl.contains("tu")&&ti>0){tt=tp[ti];tp[ti]=tp[ti-1];tp[ti-1]=tt}else if(cl.contains("tdn")&&ti<tp.length-1){tt=tp[ti];tp[ti]=tp[ti+1];tp[ti+1]=tt}else return;save();render()}});
 gt.addEventListener("change",function(e){if(!e.target.classList.contains("tw"))return;var ms=curMsE();ms.tropes[+e.target.closest(".trow").dataset.i].w=e.target.value.slice(0,60);save()});
+wtDrag($("xTropes"),".trow",function(from,to){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);tp.splice(to,0,tp.splice(from,1)[0]);save();render()});
 var gd=document.createElement("div");gd.className="gcard wonly";gd.id="xTod";gc.parentNode.insertBefore(gd,gc.nextSibling);G.push(["today",gd]);
 function todI(){if(Y.tod&&Y.tod.d===todayKey)return Y.tod.i;var d=new Date(now.getFullYear(),now.getMonth(),now.getDate());return (Math.floor((d-new Date(d.getFullYear(),0,0))/864e5)*7)%TR.length}
 function todV(){$("xTod").innerHTML='<h2>🎭 Trope of the day</h2><div class="pct">Write a scene with this trope:</div><div class="big" style="font-size:1.7rem;margin:6px 0 10px">'+esc(TR[todI()])+'</div><button class="ghost" id="xTnew2" type="button" style="width:auto;padding:0 14px;font-size:.9rem">New trope</button>'}
@@ -1239,6 +1280,8 @@ var DL=[
 ["Not signed in","Non connectée","Sin sesión iniciada","Nisi prijavljena"],
 ["Sign in or create an account","Se connecter ou créer un compte","Iniciar sesión o crear una cuenta","Prijava ali ustvari račun"],
 ["Close","Fermer","Cerrar","Zapri"]
+
+,["Drag to reorder","Glisse pour réorganiser","Arrastra para reordenar","Povleci za preureditev"]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
