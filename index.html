@@ -212,6 +212,13 @@ html:not([data-mode="editor"]) .eonly{display:none!important}
 :root[data-mode="editor"] .tab{border-radius:8px 8px 0 0;border-width:1px 1px 3px;background:transparent}
 :root[data-mode="editor"] .tab[aria-current=true]{background:var(--card);color:var(--ink);border-color:var(--accent2);border-bottom-color:var(--accent);font-weight:700}
 :root[data-mode="editor"] body{background-image:repeating-linear-gradient(transparent,transparent 31px,color-mix(in srgb,var(--line) 55%,transparent) 32px)}
+
+.mrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 0}.mrow .modes{margin:0}
+.av{width:46px;height:46px;border-radius:50%;border:2px solid var(--accent2);background:var(--card);color:var(--accent2);padding:0;overflow:hidden;font:700 1.2rem Fraunces,Georgia,serif;display:grid;place-items:center;flex-shrink:0;cursor:pointer}
+.av img{width:100%;height:100%;object-fit:cover;display:block}.av.big{width:96px;height:96px;font-size:2.4rem;margin:12px auto 0;cursor:default}
+.pmodal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px}
+.pcard{position:relative;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:22px;width:min(420px,100%);max-height:90vh;overflow:auto;text-align:center}
+.pclose{position:absolute;top:12px;right:12px;width:34px;height:34px;font-size:20px;padding:0}
 </style>
 </head>
 <body>
@@ -573,6 +580,7 @@ function friendsV(){var c=ch(),rows=[{n:(X.me||"Me")+" (you)",w:sumC(c),g:c.goal
 $("xName").value=X.me||"";$("xFcode").value=code();
 $("xFr").innerHTML=rows.map(function(f,i){return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(f.n)+'</span><span>'+fmt(f.w)+' / '+fmt(f.g)+(i?' <button class="ghost fdel" type="button" data-n="'+esc(f.n)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px">×</button>':'')+'</span></div><div class="fbar"><i style="width:'+Math.min(100,f.w/f.g*100)+'%"></i></div></div>'}).join("")}
 $("xName").addEventListener("change",function(){X.me=$("xName").value.trim();saveX();friendsV()});
+window.WTME=function(v){if(v===undefined)return X.me||"";X.me=String(v).trim().slice(0,30);saveX();friendsV();return X.me};
 $("xCopy").addEventListener("click",function(){$("xFcode").select();try{navigator.clipboard.writeText($("xFcode").value).then(function(){$("xFmsg").textContent="Code copied."},function(){$("xFmsg").textContent="Copy the selected code."})}catch(e){$("xFmsg").textContent="Copy the selected code."}});
 $("xAdd").addEventListener("click",function(){var v=$("xFin").value.trim();try{if(v.indexOf("WT1:")!==0)throw 1;var o=JSON.parse(decodeURIComponent(escape(atob(v.slice(4)))));if(typeof o.n!=="string"||!isFinite(o.w)||!(o.g>0)||!/^\d{4}-\d{2}$/.test(o.m))throw 1;
 X.friends=X.friends.filter(function(f){return!(f.n===o.n&&f.m===o.m)});X.friends.push({n:o.n.slice(0,30),m:o.m,w:+o.w,g:+o.g,t:String(o.t||"").slice(0,80),s:Array.isArray(o.s)?o.s.slice(0,31).map(function(v){return+v||0}):null});saveX();$("xFin").value="";$("xFmsg").textContent=o.m===mk()?"Friend added!":"Added for "+o.m+": go to that month to see it.";xr()}catch(e){$("xFmsg").textContent="This code is not valid."}});
@@ -769,7 +777,10 @@ if(!Y.mode)Y.mode="writer";
 [gc,$("save").closest("section")].forEach(function(e){e.classList.add("wonly")});
 var md=document.createElement("div");md.className="modes";md.setAttribute("role","group");
 md.innerHTML='<span class="mlabel">Mode</span><button class="ghost mbtn" type="button" data-m="writer" title="First draft: count the words you write">✍️ Writer</button><button class="ghost mbtn" type="button" data-m="editor" title="Revision: track your editing work">🔍 Editor</button>';
-nav.parentNode.insertBefore(md,nav);
+var mrow=document.createElement("div");mrow.className="mrow";nav.parentNode.insertBefore(mrow,nav);
+var avb=document.createElement("button");avb.type="button";avb.className="av";avb.id="xAv";avb.setAttribute("aria-label","Profile");avb.title="Profile";mrow.appendChild(avb);mrow.appendChild(md);
+function avHTML(){var nm=(window.WTME&&window.WTME())||"",ch0=nm?nm.trim().charAt(0).toUpperCase():"";return Y.av?'<img alt="" src="'+Y.av+'">':(ch0||"👤")}
+function avV(){avb.innerHTML=avHTML()}
 function setMode(m){Y.mode=m;saveY();if(window.WTNAV)window.WTNAV();document.documentElement.setAttribute("data-mode",m);md.querySelectorAll(".mbtn").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===m))})}
 md.addEventListener("click",function(e){var b=e.target.closest(".mbtn");if(b){setMode(b.dataset.m);render()}});
 setMode(Y.mode);
@@ -975,7 +986,30 @@ $("xRem").addEventListener("change",function(){if($("xRem").checked){askPerm(fun
 $("xRemT").addEventListener("change",function(){Y.rem.t=$("xRemT").value||"18:00";Y.rem.d="";saveY()});
 $("xRemTest").addEventListener("click",function(){askPerm(function(ok){if(ok){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}","100"))}render()})});
 applyAp();buildNav();
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync()};
+
+var pm=null;
+function pClose(){if(pm){pm.remove();pm=null}}
+function pStats(){var o=wmAll(),tot=0,dy=0,k;for(k in o){tot+=o[k];if(o[k]>0)dy++}return[[fmt(tot),"words in total"],[dy,"days I wrote"],[S.manuscripts.length,"manuscripts"]]}
+function pOpen(){pClose();var au=null;try{au=JSON.parse(localStorage.getItem("wt-auth"))}catch(e){}
+var nm=(window.WTME&&window.WTME())||"";
+pm=document.createElement("div");pm.className="pmodal";pm.setAttribute("role","dialog");pm.setAttribute("aria-modal","true");
+pm.innerHTML='<div class="pcard"><button class="ghost pclose" type="button" aria-label="Close" id="pX">×</button><h2>Profile</h2><div class="av big" id="pAv">'+avHTML()+'</div><div class="row" style="justify-content:center;margin:10px 0"><button class="ghost" id="pPh" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Change photo</button>'+(Y.av?'<button class="ghost" id="pRm" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Remove photo</button>':'')+'</div><input type="file" id="pFile" accept="image/*" hidden>'
++'<label style="text-align:left">My name<input type="text" id="pNm" maxlength="30" value="'+esc(nm)+'" style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"></label><div class="pct" style="text-align:left;margin-top:4px">Shown to friends when you share your code.</div>'
++'<div class="stats" style="margin:16px 0 12px">'+pStats().map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div>'
++'<div class="pct" style="margin-bottom:8px">'+(au&&au.user?'<span>Signed in as</span> <b>'+esc(au.user.email||"")+'</b>':'Not signed in')+'</div>'
++'<button class="save" id="pAc" type="button">'+(au&&au.user?'Account &amp; sync':'Sign in or create an account')+'</button></div>';
+document.body.appendChild(pm);setTimeout(function(){var q=pm&&pm.querySelector("#pX");if(q)q.focus()},0)}
+document.addEventListener("keydown",function(e){if(e.key==="Escape")pClose()});
+avb.addEventListener("click",pOpen);
+document.addEventListener("click",function(e){if(!pm)return;var t=e.target,i=t.id;
+if(t===pm||i==="pX"){pClose();return}
+if(i==="pPh"){pm.querySelector("#pFile").click();return}
+if(i==="pRm"){delete Y.av;saveY();avV();pOpen();return}
+if(i==="pAc"){pClose();var tb=document.querySelector('.tab[data-t="settings"]');if(tb)tb.click();setTimeout(function(){var a=$("xAcct");if(a&&a.scrollIntoView)a.scrollIntoView({behavior:"smooth",block:"start"})},80)}});
+document.addEventListener("change",function(e){if(!pm)return;var t=e.target;
+if(t.id==="pNm"){window.WTME(t.value);avV();var a=pm.querySelector("#pAv");if(a)a.innerHTML=avHTML()}
+else if(t.id==="pFile"&&t.files&&t.files[0]){var f=t.files[0],rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var n=160,c=document.createElement("canvas");c.width=c.height=n;var x=c.getContext("2d"),m=Math.min(im.width,im.height),sx=(im.width-m)/2,sy=(im.height-m)/2;x.drawImage(im,sx,sy,m,m,0,0,n,n);try{Y.av=c.toDataURL("image/jpeg",.82);saveY();avV();if(pm)pOpen()}catch(er){}};im.src=rd.result};rd.readAsDataURL(f)}});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1196,6 +1230,15 @@ var DL=[
 ["Login link sent. Check your email.","Lien de connexion envoyé. Vérifie tes e-mails.","Enlace de acceso enviado. Revisa tu correo.","Povezava za prijavo je poslana. Preveri e-pošto."],
 ["Wrong email or password.","E-mail ou mot de passe incorrect.","Correo o contraseña incorrectos.","Napačna e-pošta ali geslo."],
 ["Something went wrong. Try again.","Un problème est survenu. Réessaie.","Algo salió mal. Inténtalo de nuevo.","Nekaj je šlo narobe. Poskusi znova."]
+
+,["Profile","Profil","Perfil","Profil"],
+["Change photo","Changer la photo","Cambiar la foto","Spremeni fotografijo"],
+["Remove photo","Retirer la photo","Quitar la foto","Odstrani fotografijo"],
+["Shown to friends when you share your code.","Affiché à tes amies quand tu partages ton code.","Se muestra a tus amigas cuando compartes tu código.","Prikazano prijateljicam, ko deliš svojo kodo."],
+["manuscripts","manuscrits","manuscritos","rokopisov"],
+["Not signed in","Non connectée","Sin sesión iniciada","Nisi prijavljena"],
+["Sign in or create an account","Se connecter ou créer un compte","Iniciar sesión o crear una cuenta","Prijava ali ustvari račun"],
+["Close","Fermer","Cerrar","Zapri"]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
