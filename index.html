@@ -197,6 +197,21 @@ html:not([data-mode="editor"]) .eonly{display:none!important}
 [hidden]{display:none!important}
 #stats{grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:14px 0}
 #stats .stat{padding:8px 10px;border-radius:12px}#stats .stat b{font-size:1.15rem}#stats .stat span{font-size:.74rem;line-height:1.25}
+
+.phases{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.phb{flex:1;min-width:42px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:6px 2px;font-size:1.15rem;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink);font-family:inherit}.phb small{font-size:.65rem;color:var(--mute)}.phb.on{background:var(--accent2);color:var(--onacc);border-color:transparent}.phb.on small{color:var(--onacc)}.phb.done{opacity:.55}
+.phname{font-size:1.05rem}.enet{margin:10px 0}.tdch{margin-top:10px}
+.stk{display:flex;height:14px;border-radius:9px;overflow:hidden;background:var(--line);margin:8px 0}.stk i{display:block;height:100%}.stk .s1{background:color-mix(in srgb,var(--accent2) 22%,var(--line))}.stk .s2{background:color-mix(in srgb,var(--accent2) 45%,var(--line))}.stk .s3{background:color-mix(in srgb,var(--accent2) 70%,var(--line))}.stk .s4{background:var(--accent2)}
+.subs{margin-top:16px;padding-top:12px;border-top:1px dashed var(--line);display:grid;gap:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{border:0;background:var(--bg);padding:8px 16px;color:var(--ink);font:inherit}.seg button[aria-pressed=true]{background:var(--accent2);color:var(--onacc)}
+.remrow{display:flex;flex-direction:row;gap:8px;align-items:center;color:var(--ink)}
+#spSndSel{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:5px 8px;max-width:11rem}
+.chrow{grid-template-columns:1fr 110px 100px auto}
+@media (max-width:520px){.chrow{grid-template-columns:1fr 90px auto}}
+:root[data-mode="editor"][data-th] section.panel,:root[data-mode="editor"][data-th] .gcard{border-radius:10px;border-left:6px solid var(--accent2);box-shadow:none}
+:root[data-mode="editor"] section.panel::before,:root[data-mode="editor"] section.panel::after,:root[data-mode="editor"] .gcard::before,:root[data-mode="editor"] .gcard::after{display:none}
+:root[data-mode="editor"] .tab{border-radius:8px 8px 0 0;border-width:1px 1px 3px;background:transparent}
+:root[data-mode="editor"] .tab[aria-current=true]{background:var(--card);color:var(--ink);border-color:var(--accent2);border-bottom-color:var(--accent);font-weight:700}
+:root[data-mode="editor"] body{background-image:repeating-linear-gradient(transparent,transparent 31px,color-mix(in srgb,var(--line) 55%,transparent) 32px)}
 </style>
 </head>
 <body>
@@ -529,9 +544,11 @@ var ST=["Idea","Draft","Revised","Done"];
 var chOpen={};
 function cnPanel(c,i){var nt=c.nt||[];return '<div class="chnotes" data-i="'+i+'"><div class="pct">Notes for editing this chapter</div>'+nt.map(function(q,j){return '<div class="cnrow"><input type="checkbox" class="cnx" data-j="'+j+'"'+(q.x?' checked':'')+'><span class="cnt'+(q.x?' dn':'')+'">'+esc(q.t)+'</span><button class="ghost cnd" type="button" data-j="'+j+'" aria-label="Delete note">×</button></div>'}).join("")+'<div class="row" style="margin-top:6px"><input type="text" class="cni" maxlength="200" placeholder="Idea to fix or improve…"><button class="ghost cna" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add note</button></div></div>'}
 function chap(){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]),w=0,dn=0;cs.forEach(function(c){w+=c.w||0;if(c.s==="Done")dn++});
-$("xChBody").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+esc(ms.name)+' · '+cs.length+' chapters · '+dn+' done · '+fmt(w)+' words in chapters</p>'+cs.map(function(c,i){return '<div class="chrow" data-i="'+i+'"><input class="chn" value="'+esc(c.n)+'" aria-label="Chapter title"><select class="chs" aria-label="Status">'+ST.map(function(s){return '<option'+(s===c.s?' selected':'')+'>'+s+'</option>'}).join("")+'</select><input class="chw" type="number" min="0" value="'+(c.w||0)+'" aria-label="Words"><button class="ghost chd" type="button" aria-label="Delete chapter">×</button><button class="ghost chn2" type="button" aria-label="Edit notes" title="Edit notes">📝'+((c.nt||[]).filter(function(q){return!q.x}).length?' '+(c.nt||[]).filter(function(q){return!q.x}).length:'')+'</button></div>'+(chOpen[i]?cnPanel(c,i):'')}).join("")+'<button class="ghost" id="chAdd" type="button" style="width:auto;padding:0 16px;font-size:.9rem">+ Add chapter</button>'}
+$("xChBody").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+esc(ms.name)+' · '+cs.length+' chapters · '+dn+' done · '+fmt(w)+' words in chapters</p>'+cs.map(function(c,i){return '<div class="chrow" data-i="'+i+'"><input class="chn" value="'+esc(c.n)+'" aria-label="Chapter title"><select class="chs" aria-label="Status">'+ST.map(function(s){return '<option'+(s===c.s?' selected':'')+'>'+s+'</option>'}).join("")+'</select><input class="chw" type="number" min="0" value="'+(c.w||0)+'" aria-label="Words"><span class="mv"><button class="ghost chu" type="button" aria-label="Move up">▲</button><button class="ghost chdn" type="button" aria-label="Move down">▼</button><button class="ghost chn2" type="button" aria-label="Edit notes" title="Edit notes">📝'+((c.nt||[]).filter(function(q){return!q.x}).length?' '+(c.nt||[]).filter(function(q){return!q.x}).length:'')+'</button><button class="ghost chd" type="button" aria-label="Delete chapter">×</button></span></div>'+(chOpen[i]?cnPanel(c,i):'')}).join("")+'<button class="ghost" id="chAdd" type="button" style="width:auto;padding:0 16px;font-size:.9rem">+ Add chapter</button>'}
 $("xChBody").addEventListener("change",function(e){var row=e.target.closest(".chrow");if(!row)return;var c=curMs().chapters[+row.dataset.i],t=e.target;if(t.classList.contains("chn"))c.n=t.value;else if(t.classList.contains("chs"))c.s=t.value;else if(t.classList.contains("chw"))c.w=Math.max(0,parseInt(t.value,10)||0);save();chap()});
 $("xChBody").addEventListener("click",function(e){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]);if(e.target.id==="chAdd"){cs.push({n:"Chapter "+(cs.length+1),s:"Draft",w:0})}else if(e.target.classList.contains("chd")){cs.splice(+e.target.closest(".chrow").dataset.i,1);chOpen={}}
+else if(e.target.classList.contains("chu")){var ui=+e.target.closest(".chrow").dataset.i;if(ui>0){var tm0=cs[ui];cs[ui]=cs[ui-1];cs[ui-1]=tm0}chOpen={}}
+else if(e.target.classList.contains("chdn")){var di=+e.target.closest(".chrow").dataset.i;if(di<cs.length-1){var tm1=cs[di];cs[di]=cs[di+1];cs[di+1]=tm1}chOpen={}}
 else if(e.target.classList.contains("chn2")){var ci=+e.target.closest(".chrow").dataset.i;chOpen[ci]=!chOpen[ci];chap();return}
 else if(e.target.classList.contains("cna")){var pn=e.target.closest(".chnotes"),tx=pn.querySelector(".cni").value.trim();if(!tx)return;var ch2=cs[+pn.dataset.i];(ch2.nt||(ch2.nt=[])).push({t:tx.slice(0,200),x:0})}
 else if(e.target.classList.contains("cnd")){cs[+e.target.closest(".chnotes").dataset.i].nt.splice(+e.target.dataset.j,1)}
@@ -652,7 +669,7 @@ gp.innerHTML='<h2>⚙️ Preferences</h2><label>Language<select id="xLang"><opti
 var TB=[["today","🏠","Today"],["month","📅","Month"],["book","📖","Book"],["progress","🏅","Progress"],["friends","👯","Friends"],["settings","⚙️","Settings"]];
 var nav=document.createElement("nav");nav.className="tabs";nav.setAttribute("aria-label","Sections");document.querySelector("main>header").after(nav);
 nav.innerHTML=TB.map(function(t){return '<button class="tab" type="button" data-t="'+t[0]+'">'+t[1]+' '+t[2]+'</button>'}).join("");
-function showTab(t){if(!TB.some(function(x){return x[0]===t}))t="today";G.forEach(function(g){g[1].classList.toggle("off",g[0]!==t)});nav.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.t===t))});Y.tab=t;saveY()}
+function showTab(t){var L=curTB();if(!L.some(function(x){return x[0]===t}))t=L[0][0];G.forEach(function(g){var tt=Y.mode==="editor"?(EG.get(g[1])||"-"):g[0];g[1].classList.toggle("off",tt!==t)});nav.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.t===t))});Y.tab=t;if(!Y.tb)Y.tb={};Y.tb[Y.mode]=t;saveY()}
 nav.addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;showTab(b.dataset.t);window.scrollTo({top:0})});
 
 function confetti(){if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;var set=CF[document.documentElement.getAttribute("data-th")]||CF.winter;
@@ -680,16 +697,20 @@ var PR=["Every page you write is a page you didn’t have yesterday.","You can�
 function promptV(){$("xPrompt").innerHTML='<div class="qrow"><span class="quote">'+PR[pi]+'</span><button class="ghost" id="xPNew" type="button" aria-label="New quote" title="New quote">↻</button></div>'}
 $("xPrompt").addEventListener("click",function(e){if(e.target.id!=="xPNew")return;pi=(pi+1+Math.floor(Math.random()*(PR.length-1)))%PR.length;promptV()});
 
-var ideaEdit=-1;
+var ideaEdit=-1,ideaMove=-1;
+function moveForm(ms,i){var cs=chaps(ms);return cs.length?'<div class="row" style="margin-top:6px"><select id="xImS">'+cs.map(function(c,k){return '<option value="'+k+'">'+esc(c.n)+'</option>'}).join("")+'</select><button class="save xiy" type="button" data-i="'+i+'">Move</button><button class="ghost xic2" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div>':'<div class="pct" style="margin-top:6px">Add chapters first.</div>'}
 function notesV(){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]);if(!ms.ideasV2){is.reverse();ms.ideasV2=1;save()}
 var old=$("xIdeaT")?$("xIdeaT").value:"",h='',i,bt='style="width:26px;height:26px;font-size:12px;padding:0"';
-for(i=0;i<is.length;i++){h+=ideaEdit===i?'<div class="fr"><textarea id="xIdeaE" rows="3" maxlength="500" style="width:100%">'+esc(is[i].t)+'</textarea><div class="row"><button class="save xis" type="button" data-i="'+i+'">Save</button><button class="ghost xic" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div></div>':'<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(is[i].t)+'</span><span class="mv"><button class="ghost xiu" type="button" data-i="'+i+'" aria-label="Move up" '+bt+'>▲</button><button class="ghost xidn" type="button" data-i="'+i+'" aria-label="Move down" '+bt+'>▼</button><button class="ghost xie" type="button" data-i="'+i+'" aria-label="Edit idea" '+bt+'>✎</button><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" '+bt+'>×</button></span></div><div class="pct">'+esc(is[i].d||"")+'</div></div>'}
+for(i=0;i<is.length;i++){h+=ideaEdit===i?'<div class="fr"><textarea id="xIdeaE" rows="3" maxlength="500" style="width:100%">'+esc(is[i].t)+'</textarea><div class="row"><button class="save xis" type="button" data-i="'+i+'">Save</button><button class="ghost xic" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Cancel</button></div></div>':'<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(is[i].t)+'</span><span class="mv"><button class="ghost xiu" type="button" data-i="'+i+'" aria-label="Move up" '+bt+'>▲</button><button class="ghost xidn" type="button" data-i="'+i+'" aria-label="Move down" '+bt+'>▼</button><button class="ghost xim" type="button" data-i="'+i+'" aria-label="Move to a chapter" title="Move to a chapter" '+bt+'>📥</button><button class="ghost xie" type="button" data-i="'+i+'" aria-label="Edit idea" '+bt+'>✎</button><button class="ghost xid" type="button" data-i="'+i+'" aria-label="Delete idea" '+bt+'>×</button></span></div><div class="pct">'+esc(is[i].d||"")+'</div>'+(ideaMove===i?moveForm(ms,i):'')+'</div>'}
 $("xNotes").innerHTML='<h2>💡 Idea notebook'+ARW("id")+'</h2><div class="cb"'+HID("id")+'><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+' · '+is.length+(is.length===1?' idea':' ideas')+'</div><textarea id="xIdeaT" rows="2" placeholder="Scene idea, character name, plot twist…"></textarea><button class="save" id="xIdeaAdd" type="button" style="margin-top:8px">Add idea</button>'+h+'</div>';$("xIdeaT").value=old}
 $("xNotes").addEventListener("click",function(e){var ms=msById(S.msSel||ch().ms),is=ms.ideas||(ms.ideas=[]),c=e.target.classList,i=+e.target.dataset.i,t;
 if(e.target.id==="xIdeaAdd"){var tx=$("xIdeaT").value.trim();if(!tx)return;is.unshift({t:tx.slice(0,500),d:todayKey});$("xIdeaT").value=""}
 else if(c.contains("xid")){is.splice(i,1);ideaEdit=-1}
 else if(c.contains("xiu")&&i>0){t=is[i];is[i]=is[i-1];is[i-1]=t}
 else if(c.contains("xidn")&&i<is.length-1){t=is[i];is[i]=is[i+1];is[i+1]=t}
+else if(c.contains("xim")){ideaMove=ideaMove===i?-1:i;notesV();return}
+else if(c.contains("xiy")){var cs2=chaps(ms),ci2=+$("xImS").value;if(!cs2[ci2])return;(cs2[ci2].nt||(cs2[ci2].nt=[])).push({t:is[i].t,x:0});is.splice(i,1);ideaMove=-1}
+else if(c.contains("xic2")){ideaMove=-1}
 else if(c.contains("xie")){ideaEdit=i;notesV();$("xIdeaE").focus();return}
 else if(c.contains("xis")){var v=$("xIdeaE").value.trim();if(v)is[i].t=v.slice(0,500);ideaEdit=-1}
 else if(c.contains("xic")){ideaEdit=-1}
@@ -749,27 +770,9 @@ if(!Y.mode)Y.mode="writer";
 var md=document.createElement("div");md.className="modes";md.setAttribute("role","group");
 md.innerHTML='<span class="mlabel">Mode</span><button class="ghost mbtn" type="button" data-m="writer" title="First draft: count the words you write">✍️ Writer</button><button class="ghost mbtn" type="button" data-m="editor" title="Revision: track your editing work">🔍 Editor</button>';
 nav.parentNode.insertBefore(md,nav);
-function setMode(m){Y.mode=m;saveY();document.documentElement.setAttribute("data-mode",m);md.querySelectorAll(".mbtn").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===m))})}
+function setMode(m){Y.mode=m;saveY();if(window.WTNAV)window.WTNAV();document.documentElement.setAttribute("data-mode",m);md.querySelectorAll(".mbtn").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===m))})}
 md.addEventListener("click",function(e){var b=e.target.closest(".mbtn");if(b){setMode(b.dataset.m);render()}});
 setMode(Y.mode);
-var ge=document.createElement("div");ge.className="gcard eonly";ge.id="xEdit";gc.parentNode.insertBefore(ge,gc);G.push(["today",ge]);
-function wkStart(){var t=new Date(now.getFullYear(),now.getMonth(),now.getDate());return wmDay(new Date(t.getFullYear(),t.getMonth(),t.getDate()-((t.getDay()+6)%7)))}
-function curMsE(){return msById(S.msSel||ch().ms)}
-function editV(){var keep={};if(!noKeep)["xEd","xEm","xEc","xEx","xEa","xEp","xEn"].forEach(function(i){if($(i))keep[i]=$(i).value});noKeep=false;var ms=curMsE(),ed=ms.edits||(ms.edits=[]),tm=0,tc=0,cut=0,add=0,ps=1,wk=0,st=wkStart(),g=Y.eg||3;
-ed.forEach(function(e){tm+=e.min||0;tc+=e.ch||0;cut+=e.cut||0;add+=e.add||0;if((e.pass||1)>ps)ps=e.pass||1;if(e.d>=st)wk+=e.ch||0});
-var h='<h2>🔍 Editing session</h2><div class="pct">'+esc(ms.name)+'</div><div class="stats" style="margin:12px 0">'+[[wmHM(tm),"editing time"],[tc,"chapters revised"],["−"+fmt(cut),"words cut"],["+"+fmt(add),"words added"],[ps,"current pass"]].map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div>';
-h+='<label>Weekly goal (chapters revised)<input type="number" id="xEg" min="1" value="'+g+'" style="width:6rem"></label><div class="bar"><i style="width:'+Math.min(100,wk/g*100)+'%"></i></div><div class="pct" style="margin-bottom:14px">'+wk+' of '+g+' chapters revised this week</div>';
-h+=swHTML()+'<div class="eform"><label>Day<input type="date" id="xEd" value="'+todayKey+'"></label><label>Minutes edited<input type="number" id="xEm" min="0" step="5"></label><label>Chapters revised<input type="number" id="xEc" min="0"></label><label>Words cut<input type="number" id="xEx" min="0" step="10"></label><label>Words added<input type="number" id="xEa" min="0" step="10"></label><label>Pass<input type="number" id="xEp" min="1" value="'+ps+'"></label></div><label style="margin-top:10px">Note (optional)<textarea id="xEn" maxlength="200"></textarea></label><div class="row" style="margin-top:10px"><button class="save" id="xEs" type="button">Save editing session</button><span class="toast" id="xEmsg" role="status"></span></div>';
-var rows=ed.map(function(e,i){return [e,i]}).reverse().slice(0,8);
-h+=rows.length?'<div class="ehist">'+rows.map(function(q){var e=q[0];return '<div class="erow"><span>'+esc(e.d)+'</span><span>'+(e.min||0)+' min</span><span>'+(e.ch===1?'1 chapter':(e.ch||0)+' chapters')+'</span><span>−'+(e.cut||0)+' / +'+(e.add||0)+' words</span><span>Pass '+(e.pass||1)+'</span><button class="ghost edel" type="button" data-i="'+q[1]+'" aria-label="Delete session" style="width:26px;height:26px;font-size:14px">×</button>'+(e.note?'<div class="en">'+esc(e.note)+'</div>':'')+'</div>'}).join("")+'</div>':'<div class="pct" style="margin-top:12px">No editing sessions yet.</div>';
-$("xEdit").innerHTML=h;Object.keys(keep).forEach(function(i){if($(i)&&keep[i]!=="")$(i).value=keep[i]})}
-ge.addEventListener("click",function(e){var ms=curMsE(),ed=ms.edits||(ms.edits=[]);if(swClick(e))return;
-if(e.target.id==="xEs"){var v=function(i){return Math.max(0,parseInt($(i).value,10)||0)},d=$("xEd").value||todayKey,m=v("xEm"),c=v("xEc"),x=v("xEx"),a=v("xEa"),pp=Math.max(1,parseInt($("xEp").value,10)||1),nt=$("xEn").value.trim().slice(0,200);
-if(!m&&!c&&!x&&!a){$("xEmsg").textContent="Add at least one number to save.";return}
-ed.push({d:d,min:m,ch:c,cut:x,add:a,pass:pp,note:nt});ed.sort(function(q,w){return q.d<w.d?-1:q.d>w.d?1:0});save();noKeep=true;swReset();render();$("xEmsg").textContent="Editing session saved."}
-else if(e.target.classList.contains("edel")){ed.splice(+e.target.dataset.i,1);save();render()}});
-ge.addEventListener("change",function(e){if(e.target.id==="xEg"){Y.eg=Math.max(1,parseInt(e.target.value,10)||3);saveY();render()}});
-
 /* ---- Tropes: bingo, tracker, trope of the day ---- */
 var TR=["Enemies to lovers","Friends to lovers","Fake dating","Forced proximity","Only one bed","Slow burn","Love triangle","Second chance","Grumpy x sunshine","Forbidden love","Marriage of convenience","Secret identity","The chosen one","Mentor’s death","Found family","Reluctant hero","Hidden heir","Prophecy","Quest","Dark lord","Training montage","Betrayal","Redemption arc","Unreliable narrator","Locked room","Red herring","Amnesia","Time loop","Fish out of water","Rags to riches","Heist","Whodunit","Chekhov’s gun","Villain monologue","Plot twist","Morally grey","Love letter","Road trip","Ticking clock","Mistaken identity","Tournament","Magic school","Haunted house","Last stand"];
 function shuf(a,sd){var b=a.slice(),r0=sd;function rnd(){r0=(r0*1664525+1013904223)%4294967296;return r0/4294967296}for(var i=b.length-1;i>0;i--){var j=Math.floor(rnd()*(i+1)),t=b[i];b[i]=b[j];b[j]=t}return b}
@@ -794,17 +797,6 @@ var gd=document.createElement("div");gd.className="gcard wonly";gd.id="xTod";gc.
 function todI(){if(Y.tod&&Y.tod.d===todayKey)return Y.tod.i;var d=new Date(now.getFullYear(),now.getMonth(),now.getDate());return (Math.floor((d-new Date(d.getFullYear(),0,0))/864e5)*7)%TR.length}
 function todV(){$("xTod").innerHTML='<h2>🎭 Trope of the day</h2><div class="pct">Write a scene with this trope:</div><div class="big" style="font-size:1.7rem;margin:6px 0 10px">'+esc(TR[todI()])+'</div><button class="ghost" id="xTnew2" type="button" style="width:auto;padding:0 14px;font-size:.9rem">New trope</button>'}
 gd.addEventListener("click",function(e){if(e.target.id==="xTnew2"){Y.tod={d:todayKey,i:Math.floor(Math.random()*TR.length)};saveY();todV()}});
-
-var noKeep=false,SW={run:false,t0:0,acc:0,iv:null};
-function swMs(){return SW.acc+(SW.run?Date.now()-SW.t0:0)}
-function swHMS(ms){var q=Math.floor(ms/1000);return pad(Math.floor(q/3600))+":"+pad(Math.floor(q%3600/60))+":"+pad(q%60)}
-function swShow(){var el=$("xSw");if(el)el.textContent=swHMS(swMs())}
-function swHTML(){return '<div class="sw"><div class="pct" style="margin-bottom:4px">Stopwatch</div><div class="row" style="align-items:center"><div class="spt" id="xSw">'+swHMS(swMs())+'</div><button class="save" id="xSwGo" type="button">'+(SW.run?'Pause':(SW.acc?'Resume':'Start'))+'</button><button class="ghost" id="xSwRs" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button><button class="ghost" id="xSwUse" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Use as minutes</button></div></div>'}
-function swReset(){clearInterval(SW.iv);SW.run=false;SW.acc=0}
-function swClick(e){var id=e.target.id;
-if(id==="xSwGo"){if(SW.run){SW.acc+=Date.now()-SW.t0;SW.run=false;clearInterval(SW.iv)}else{SW.t0=Date.now();SW.run=true;SW.iv=setInterval(swShow,500)}render();return true}
-if(id==="xSwRs"){swReset();render();return true}
-if(id==="xSwUse"){$("xEm").value=Math.max(1,Math.round(swMs()/60000));return true}return false}
 
 function readEx(){try{return JSON.parse(localStorage.getItem("wt-extra"))||{}}catch(e){return {}}}
 var gr=document.createElement("div");gr.className="gcard";gr.id="xRace";gf.parentNode.insertBefore(gr,gf);G.push(["friends",gr]);
@@ -838,7 +830,7 @@ sting:function(){tn(196,0,.6,"sawtooth",.1,185);tn(147,.5,.9,"sawtooth",.1,140);
 drone:function(){tn(82,0,2.4,"sawtooth",.1,70);tn(123,.1,2.2,"sine",.08)},
 pop:function(){tn(520,0,.12,"sine",.14,880);tn(780,.14,.18,"sine",.14,1180);tn(1040,.34,.3,"sine",.12)}};
 var FM={winter:"bells",garden:"chime",twilight:"gong",galaxy:"laser",cafe:"ding",arcade:"coin",ocean:"bubble",autumn:"wood",sakura:"chime",fe:"gong",fd:"drone",fc:"chime",fu:"gong",ft:"harp",fw:"chime",rc:"harp",rh:"bells",rd:"gong",rf:"harp",rr:"pop",rs:"harp",so:"laser",sc:"coin",sp:"drone",sd:"sting",st:"bells",ss:"chime",td:"sting",tp:"sting",tc:"ding",tn:"sting",ts:"sting",hg:"gong",hs:"drone",hl:"sting",hc:"drone",hf:"wood",ya:"bells",ym:"bells",yv:"ding",yw:"bells",yr:"harp",ac:"pop",as:"ding",af:"chime",ad:"coin",ar:"pop"};
-function playEnd(){if(Y.snd===false)return;acUnlock();if(!AC)return;(FAM[FM[document.documentElement.getAttribute("data-th")]||"bells"])()}
+function playEnd(){if(Y.snd===false)return;acUnlock();if(!AC)return;(FAM[(Y.sndf&&FAM[Y.sndf])?Y.sndf:(FM[document.documentElement.getAttribute("data-th")]||"bells")])()}
 $("spGo").addEventListener("click",acUnlock);
 $("spSet").insertAdjacentHTML("afterend",'<label class="snd" title="Play a sound when the time is up"><input type="checkbox" id="spSnd"> 🔔 Sound</label>');
 $("spSnd").checked=Y.snd!==false;
@@ -865,6 +857,123 @@ var bw="",bwv=0,bm="",bmv=0,k2;for(k2 in ws)if(ws[k2]>bwv){bwv=ws[k2];bw=k2}for(
 function dl(k,op){var p=k.split("-");return new Date(+p[0],+p[1]-1,+(p[2]||1)).toLocaleDateString(loc,op)}
 var cards=[[fmt(bdv),'record day ('+dl(bd,{day:"numeric",month:"short",year:"numeric"})+')'],[fmt(bwv),'record week (from '+dl(bw,{day:"numeric",month:"short"})+')'],[fmt(bmv),'record month ('+dl(bm,{month:"long",year:"numeric"})+')'],[best+(best===1?' day':' days'),'longest streak'],[fmt(tot),'words in total'],[ks.length,'days I wrote']];
 $("xRec").innerHTML='<h2>🏆 Personal records</h2><div class="stats" style="margin:0">'+cards.map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div>'}
+
+/* ===== Editor system: tabs, desk, chapters, to-do, stats ===== */
+var EG=new Map(),TBE=[["edesk","🖊️","Desk"],["echap","📑","Chapters"],["etodo","📋","To-do"],["estats","📊","Stats"],["settings","⚙️","Settings"]],CST=["Idea","Draft","Revised","Done"];
+function curTB(){return Y.mode==="editor"?TBE:TB}
+function buildNav(){nav.innerHTML=curTB().map(function(t){return '<button class="tab" type="button" data-t="'+t[0]+'">'+t[1]+' '+t[2]+'</button>'}).join("")}
+window.WTNAV=function(){buildNav();showTab((Y.tb&&Y.tb[Y.mode])||curTB()[0][0])};
+function mkc(id){var d=document.createElement("div");d.className="gcard";d.id=id;return d}
+function curMsE(){return msById(S.msSel||ch().ms)}
+function chaps(ms){return ms.chapters||(ms.chapters=[])}
+function wkStartOff(n){var t=new Date(now.getFullYear(),now.getMonth(),now.getDate());return wmDay(new Date(t.getFullYear(),t.getMonth(),t.getDate()-((t.getDay()+6)%7)-7*n))}
+function wkStart(){return wkStartOff(0)}
+function net(e){return(e.bef!==undefined||e.aft!==undefined)?((e.aft||0)-(e.bef||0)):((e.add||0)-(e.cut||0))}
+function sgn(n){return(n>0?"+":n<0?"−":"")+fmt(Math.abs(n))}
+var PHI=["😴","🧭","🎭","✂️","🔤","💬","🔍","🏁"],PHN=["Rest & reread","Big picture","Scenes & characters","Line edit","Copy edit","Feedback","Proofread","Done!"],PHD=["Let the draft rest, then read it from start to finish without editing.","Plot, structure, pacing and plot holes.","Rewrite scenes, deepen characters and stakes.","Style, rhythm, wording and repetitions.","Grammar, spelling and consistency.","Beta readers and their comments.","A last read for typos and formatting.","Ready to share or publish!"];
+var gph=mkc("xPhase"),ge=mkc("xEdit"),gwg=mkc("xWG"),gcs=mkc("xChSum"),gtd=mkc("xTodo"),ges=mkc("xEStats");
+gq.after(gph);gph.after(ge);ge.after(gwg);
+var chs0=$("xChBody").closest("section");chs0.parentNode.insertBefore(gcs,chs0);gt.parentNode.insertBefore(gtd,gt);gi.parentNode.insertBefore(ges,gi);
+[[gph,"-","edesk"],[ge,"-","edesk"],[gwg,"today","edesk"],[gcs,"-","echap"],[gtd,"-","etodo"],[ges,"-","estats"]].forEach(function(q){G.push([q[1],q[0]]);EG.set(q[0],q[2])});
+EG.set(gq,"edesk");EG.set(chs0,"echap");EG.set(gt,"etodo");EG.set(gn,"etodo");
+G.forEach(function(g){if(g[0]==="settings")EG.set(g[1],"settings")});
+
+/* stopwatch */
+var SW={run:false,t0:0,acc:0,iv:null},noKeep=false;
+function swMs(){return SW.acc+(SW.run?Date.now()-SW.t0:0)}
+function swHMS(ms){var q=Math.floor(ms/1000);return pad(Math.floor(q/3600))+":"+pad(Math.floor(q%3600/60))+":"+pad(q%60)}
+function swShow(){var el=$("xSw");if(el)el.textContent=swHMS(swMs())}
+function swHTML(){return '<div class="sw"><div class="pct" style="margin-bottom:4px">Stopwatch</div><div class="row" style="align-items:center"><div class="spt" id="xSw">'+swHMS(swMs())+'</div><button class="save" id="xSwGo" type="button">'+(SW.run?'Pause':(SW.acc?'Resume':'Start'))+'</button><button class="ghost" id="xSwRs" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button></div></div>'}
+function swReset(){clearInterval(SW.iv);SW.run=false;SW.acc=0}
+function swFill(){var m=swMs();if(m>=30000&&$("xEm"))$("xEm").value=Math.max(1,Math.round(m/60000))}
+function swClick(e){var id=e.target.id;
+if(id==="xSwGo"){if(SW.run){SW.acc+=Date.now()-SW.t0;SW.run=false;clearInterval(SW.iv);swFill()}else{SW.t0=Date.now();SW.run=true;SW.iv=setInterval(swShow,500)}render();return true}
+if(id==="xSwRs"){swFill();swReset();render();return true}return false}
+
+/* editing phase */
+function phaseV(){var ms=curMsE(),ph=ms.phase||0;
+$("xPhase").innerHTML='<h2>🧭 Editing phase</h2><div class="pct">'+esc(ms.name)+'</div><div class="phases">'+PHI.map(function(ic,i){return '<button class="phb'+(i===ph?' on':i<ph?' done':'')+'" type="button" data-p="'+i+'" aria-label="'+PHN[i]+'" title="'+PHN[i]+'">'+ic+'<small>'+(i+1)+'</small></button>'}).join("")+'</div><div class="phname"><b>'+PHN[ph]+'</b></div><div class="pct">'+PHD[ph]+'</div><div class="row" style="margin-top:10px"><button class="ghost" id="xPhP" type="button" style="width:auto;padding:0 14px;font-size:.9rem"'+(ph===0?' disabled':'')+'>‹ Previous phase</button><button class="save" id="xPhN" type="button"'+(ph===7?' disabled':'')+'>Next phase ›</button></div>'}
+gph.addEventListener("click",function(e){var ms=curMsE(),b=e.target.closest(".phb");if(b)ms.phase=+b.dataset.p;else if(e.target.id==="xPhN")ms.phase=Math.min(7,(ms.phase||0)+1);else if(e.target.id==="xPhP")ms.phase=Math.max(0,(ms.phase||0)-1);else return;if(ms.phase===7)confetti();save();render()});
+
+/* editing session */
+function logV(){var keep={};if(!noKeep)["xEch","xEb","xEa","xEm","xEs2","xEd","xEn"].forEach(function(i){if($(i))keep[i]=$(i).value});noKeep=false;
+var ms=curMsE(),cs=chaps(ms);
+$("xEdit").innerHTML='<h2>🖊️ Editing session</h2><div class="pct">'+esc(ms.name)+'</div><label style="margin-top:8px">What are you editing?<select id="xEch"><option value="">Whole book</option>'+cs.map(function(c,i){return '<option value="'+i+'">'+esc(c.n)+'</option>'}).join("")+'</select></label>'+swHTML()
++'<div class="eform"><label>Words before<input type="number" id="xEb" min="0"></label><label>Words after<input type="number" id="xEa" min="0"></label><label>Minutes<input type="number" id="xEm" min="0" step="5"></label><label>Chapter status after<select id="xEs2"><option value="">Keep as is</option>'+CST.map(function(x){return '<option value="'+x+'">'+x+'</option>'}).join("")+'</select></label><label>Day<input type="date" id="xEd" value="'+todayKey+'"></label></div>'
++'<div class="enet"><span class="pct">Net change (words)</span> <b id="xNetV">—</b></div><label>Note (optional)<textarea id="xEn" maxlength="200"></textarea></label><div class="row" style="margin-top:10px"><button class="save" id="xEsv" type="button">Save editing session</button><span class="toast" id="xEmsg" role="status"></span></div>';
+Object.keys(keep).forEach(function(i){if($(i)&&keep[i]!=="")$(i).value=keep[i]});netUpdate()}
+function netUpdate(){var el=$("xNetV");if(!el)return;var b=parseInt($("xEb").value,10),a=parseInt($("xEa").value,10);if(isNaN(b)||isNaN(a)){el.textContent="—";return}var d=a-b,pc=b>0?Math.round(d/b*100):0;el.textContent=sgn(d)+" ("+(d>0?"+":d<0?"−":"")+Math.abs(pc)+"%)"}
+ge.addEventListener("input",function(e){if(e.target.id==="xEb"||e.target.id==="xEa")netUpdate()});
+ge.addEventListener("change",function(e){if(e.target.id==="xEch"){var cs=chaps(curMsE()),i=e.target.value;$("xEb").value=i!==""&&cs[+i]&&cs[+i].w?cs[+i].w:"";netUpdate()}});
+ge.addEventListener("click",function(e){if(swClick(e))return;if(e.target.id!=="xEsv"){if(e.target.classList.contains("edel")){var ms0=curMsE();ms0.edits.splice(+e.target.dataset.i,1);save();render()}return}
+var ms=curMsE(),cs=chaps(ms),ed=ms.edits||(ms.edits=[]),n=function(i){var v=parseInt($(i).value,10);return isNaN(v)?undefined:Math.max(0,v)},m=n("xEm"),bf=n("xEb"),af=n("xEa"),ci=$("xEch").value,c=ci!==""?cs[+ci]:null;
+if(!m&&bf===undefined&&af===undefined){$("xEmsg").textContent="Add at least one number to save.";return}
+var en={d:$("xEd").value||todayKey,min:m||0,cn:c?c.n:"",ph:ms.phase||0,note:$("xEn").value.trim().slice(0,200)};if(bf!==undefined)en.bef=bf;if(af!==undefined)en.aft=af;
+if(c){if(af!==undefined)c.w=af;var st=$("xEs2").value;if(st)c.s=st}
+ed.push(en);ed.sort(function(q,w){return q.d<w.d?-1:q.d>w.d?1:0});noKeep=true;swReset();save();render();$("xEmsg").textContent="Editing session saved."});
+
+/* stats */
+function estV(){var ms=curMsE(),ed=ms.edits||(ms.edits=[]),tm=0,nt=0,cn={},loc=window.WTLOC||"en-GB",ph=ms.phase||0,i,wv=[],wl2=[];
+ed.forEach(function(e){tm+=e.min||0;nt+=net(e);if(e.cn)cn[e.cn]=1});
+for(i=7;i>=0;i--){var st=wkStartOff(i),sd=new Date(st+"T00:00:00"),en=wmDay(new Date(sd.getFullYear(),sd.getMonth(),sd.getDate()+6)),sum=0;ed.forEach(function(e){if(e.d>=st&&e.d<=en)sum+=e.min||0});wv.push(sum);wl2.push(sd.toLocaleDateString(loc,{day:"numeric",month:"numeric"}))}
+var cards=[[wmHM(tm),"editing time"],[ed.length,"sessions"],[Object.keys(cn).length,"chapters touched"],[sgn(nt),"net words"],[PHI[ph]+" "+(ph+1)+"/8","current phase"]];
+var rows=ed.map(function(e,k){return[e,k]}).reverse().slice(0,12);
+$("xEStats").innerHTML='<h2>📊 Editing stats</h2><div class="pct">'+esc(ms.name)+'</div><div class="stats" style="margin:12px 0">'+cards.map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div><div class="pct">Editing time per week (minutes)</div>'+wmBars(wv,wl2)+'<div class="pct" style="margin-top:14px">Latest sessions</div>'+(rows.length?'<div class="ehist">'+rows.map(function(q){var e=q[0],ba=(e.bef!==undefined||e.aft!==undefined);return '<div class="erow"><span>'+esc(e.d)+'</span><span>'+(e.cn?esc(e.cn):'Whole book')+'</span><span>'+(e.min||0)+' min</span>'+(ba?'<span>'+(e.bef||0)+' → '+(e.aft||0)+'</span>':'')+'<span><b>'+sgn(net(e))+'</b></span><span>'+PHI[e.ph||0]+'</span><button class="ghost edel" type="button" data-i="'+q[1]+'" aria-label="Delete session" style="width:26px;height:26px;font-size:14px">×</button>'+(e.note?'<div class="en">'+esc(e.note)+'</div>':'')+'</div>'}).join("")+'</div>':'<div class="pct">No editing sessions yet.</div>')}
+ges.addEventListener("click",function(e){if(!e.target.classList.contains("edel"))return;curMsE().edits.splice(+e.target.dataset.i,1);save();render()});
+
+/* chapter board + revision to-do */
+function chsumV(){var ms=curMsE(),cs=chaps(ms),cnt={Idea:0,Draft:0,Revised:0,Done:0},w=0;cs.forEach(function(c){cnt[c.s]=(cnt[c.s]||0)+1;w+=c.w||0});var n=cs.length,nx=cs.filter(function(c){return c.s!=="Done"})[0];
+$("xChSum").innerHTML='<h2>📑 Chapter board</h2><div class="pct">'+esc(ms.name)+' · '+n+' chapters · '+cnt.Done+' done · '+fmt(w)+' words in chapters</div>'+(n?'<div class="stk">'+CST.map(function(k,i){return '<i class="s'+(i+1)+'" style="width:'+(cnt[k]/n*100)+'%"></i>'}).join("")+'</div><div class="chips">'+CST.map(function(k){return '<span class="chip">'+k+' <b>'+cnt[k]+'</b></span>'}).join("")+'</div><div class="pct" style="margin-top:8px">'+(nx?'Next up: <b>'+esc(nx.n)+'</b>':'All chapters are done 🎉')+'</div>':'<div class="pct">Add chapters first.</div>')}
+function todoV(){var ms=curMsE(),cs=chaps(ms),rows='',n=0,dn=0;
+cs.forEach(function(c,i){var nt=c.nt||[],op=[];nt.forEach(function(q,j){if(q.x)dn++;else op.push([q,j])});if(!op.length)return;n+=op.length;rows+='<div class="tdch"><b>'+esc(c.n)+'</b>'+op.map(function(z){return '<div class="cnrow"><input type="checkbox" class="tdx" data-c="'+i+'" data-j="'+z[1]+'"><span class="cnt">'+esc(z[0].t)+'</span><button class="ghost tdd" type="button" data-c="'+i+'" data-j="'+z[1]+'" aria-label="Delete note">×</button></div>'}).join("")+'</div>'});
+$("xTodo").innerHTML='<h2>📋 Revision to-do</h2><div class="pct">'+esc(ms.name)+'</div><div class="pct">'+n+' to do · '+dn+' done</div>'+(n?rows:'<div class="pct" style="margin-top:8px">Nothing to do. Add notes to your chapters (📝) or here.</div>')+(cs.length?'<div class="row" style="margin-top:10px"><select id="xTdC">'+cs.map(function(c,i){return '<option value="'+i+'">'+esc(c.n)+'</option>'}).join("")+'</select><input type="text" id="xTdT" class="cni" maxlength="200" placeholder="Idea to fix or improve…"><button class="ghost" id="xTdA" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add note</button></div>':'<div class="pct" style="margin-top:8px">Add chapters first.</div>')}
+gtd.addEventListener("click",function(e){var cs=chaps(curMsE()),cl=e.target.classList;
+if(cl.contains("tdx")){cs[+e.target.dataset.c].nt[+e.target.dataset.j].x=1}
+else if(cl.contains("tdd")){cs[+e.target.dataset.c].nt.splice(+e.target.dataset.j,1)}
+else if(e.target.id==="xTdA"){var tx=$("xTdT").value.trim(),c=cs[+$("xTdC").value];if(!tx||!c)return;(c.nt||(c.nt=[])).push({t:tx.slice(0,200),x:0})}else return;save();render()});
+
+/* goals of the week */
+function wgList(ms){ms.wg=ms.wg||{};var k=wkStart();return ms.wg[k]||(ms.wg[k]=[])}
+function wgV(){var ms=curMsE(),L=wgList(ms),dn=L.filter(function(q){return q.x}).length,loc=window.WTLOC||"en-GB",st=new Date(wkStart()+"T00:00:00"),en=new Date(st.getFullYear(),st.getMonth(),st.getDate()+6),prev=(ms.wg[wkStartOff(1)]||[]).filter(function(q){return!q.x});
+$("xWG").innerHTML='<h2>🎯 Goals of the week</h2><div class="pct">'+esc(ms.name)+' · '+st.toLocaleDateString(loc,{day:"numeric",month:"short"})+' – '+en.toLocaleDateString(loc,{day:"numeric",month:"short"})+'</div>'+L.map(function(q,j){return '<div class="cnrow"><input type="checkbox" class="wgx" data-j="'+j+'"'+(q.x?' checked':'')+'><span class="cnt'+(q.x?' dn':'')+'">'+esc(q.t)+'</span><button class="ghost wgd" type="button" data-j="'+j+'" aria-label="Delete goal">×</button></div>'}).join("")+'<div class="row" style="margin-top:8px"><input type="text" id="xWGi" class="cni" maxlength="120" placeholder="e.g. Write the prologue, finish chapter 8"><button class="ghost" id="xWGa" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div><div class="pct" style="margin-top:6px">'+dn+' / '+L.length+' done</div>'+(!L.length&&prev.length?'<button class="ghost" id="xWGc" type="button" style="width:auto;padding:0 14px;font-size:.9rem;margin-top:6px">Copy last week’s unfinished goals</button>':'')}
+function wgAdd(){var tx=$("xWGi").value.trim();if(!tx)return;wgList(curMsE()).push({t:tx.slice(0,120),x:0});save();render()}
+gwg.addEventListener("click",function(e){var ms=curMsE(),L=wgList(ms),cl=e.target.classList;
+if(cl.contains("wgx")){L[+e.target.dataset.j].x=e.target.checked?1:0;if(L.length&&L.every(function(q){return q.x}))confetti()}
+else if(cl.contains("wgd")){L.splice(+e.target.dataset.j,1)}
+else if(e.target.id==="xWGa"){wgAdd();return}
+else if(e.target.id==="xWGc"){(ms.wg[wkStartOff(1)]||[]).filter(function(q){return!q.x}).forEach(function(q){L.push({t:q.t,x:0})})}else return;save();render()});
+gwg.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.id==="xWGi"){e.preventDefault();wgAdd()}});
+G.push(["today",gwg]);
+function editV(){phaseV();logV();estV();chsumV();todoV();wgV()}
+
+/* sound picker */
+var SNDN=[["auto","Auto (matches the theme)"],["bells","Bells"],["chime","Wind chime"],["gong","Gong"],["laser","Laser"],["ding","Ding"],["coin","Coin"],["bubble","Bubbles"],["wood","Wood"],["harp","Harp"],["sting","Sting"],["drone","Drone"],["pop","Pop"]];
+$("spSnd").parentNode.insertAdjacentHTML("afterend",'<select id="spSndSel" aria-label="Sound">'+SNDN.map(function(q){return '<option value="'+q[0]+'">'+q[1]+'</option>'}).join("")+'</select><button class="ghost" id="spSndTest" type="button" aria-label="Play sound" title="Play sound" style="width:30px;height:30px;font-size:13px;padding:0">▶</button>');
+$("spSndSel").value=Y.sndf||"auto";
+$("spSndSel").addEventListener("change",function(){Y.sndf=$("spSndSel").value;saveY();acUnlock();playEnd()});
+$("spSndTest").addEventListener("click",function(){acUnlock();playEnd()});
+
+/* appearance: system / light / dark */
+(function(){try{for(var si=0;si<document.styleSheets.length;si++){var sh=document.styleSheets[si],rl;try{rl=sh.cssRules}catch(e){continue}var add=[];
+for(var ri=0;ri<rl.length;ri++){var ru=rl[ri];if(ru.type===4&&/prefers-color-scheme:\s*dark/.test(ru.conditionText||ru.media.mediaText)){for(var k=0;k<ru.cssRules.length;k++){var sr=ru.cssRules[k];if(sr.selectorText&&sr.selectorText.indexOf(':not([data-theme="light"])')>=0)add.push(sr.selectorText.split(':not([data-theme="light"])').join('[data-theme="dark"]')+'{'+sr.style.cssText+'}')}}}
+add.forEach(function(t){try{sh.insertRule(t,sh.cssRules.length)}catch(e){}})}}catch(e){}})();
+function applyAp(){var a=Y.ap||"system",r0=document.documentElement;if(a==="light"||a==="dark")r0.setAttribute("data-theme",a);else r0.removeAttribute("data-theme");document.querySelectorAll("#xAp button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.a===a))})}
+
+/* daily reminder */
+var NTX={en:["Time to write! ✍️","{n} words to go today to reach your goal."],fr:["C’est l’heure d’écrire ! ✍️","Encore {n} mots aujourd’hui pour atteindre ton objectif."],es:["¡Hora de escribir! ✍️","Faltan {n} palabras hoy para tu meta."],sl:["Čas za pisanje! ✍️","Še {n} besed danes do cilja."]};
+if(!Y.rem)Y.rem={on:false,t:"18:00",d:""};
+function dailyGap(){var d0=new Date(),tk=wmDay(d0),c=S.challenges[tk.slice(0,7)];if(!c)return null;var tw=(c.entries[tk]&&c.entries[tk].words)||0,left=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate()-d0.getDate()+1,remain=Math.max(0,c.goal-(sumC(c)-tw)),g=Math.ceil(remain/left);return{tk:tk,need:Math.max(0,g-tw)}}
+function notify(t,b){try{new Notification(t,{body:b})}catch(e){}}
+function remTick(){var R=Y.rem;if(!R||!R.on||typeof Notification==="undefined"||Notification.permission!=="granted")return;var d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes()),q=dailyGap();if(!q||R.d===q.tk||hm<R.t)return;if(q.need>0){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}",fmt(q.need)))}R.d=q.tk;saveY()}
+setInterval(remTick,30000);
+gp.insertAdjacentHTML("beforeend",'<div class="subs"><b>Appearance</b><div class="seg" id="xAp"><button type="button" data-a="system">System</button><button type="button" data-a="light">Light</button><button type="button" data-a="dark">Dark</button></div></div><div class="subs"><b>Daily reminder</b><label class="remrow"><input type="checkbox" id="xRem"><span>Remind me to reach my daily goal</span></label><label>Remind me at<input type="time" id="xRemT" style="width:8rem"></label><div class="row"><button class="ghost" id="xRemTest" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Send a test</button><span class="toast" id="xRemMsg" role="status"></span></div><div class="pct">Notifications work while the page or the app is open. Allow them when your browser asks.</div></div>');
+$("xAp").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;Y.ap=b.dataset.a;saveY();applyAp()});
+$("xRem").checked=!!Y.rem.on;$("xRemT").value=Y.rem.t;
+function askPerm(cb){if(typeof Notification==="undefined"){$("xRemMsg").textContent="Notifications are blocked in this browser.";cb(false);return}if(Notification.permission==="granted"){cb(true);return}try{Notification.requestPermission().then(function(p){if(p!=="granted")$("xRemMsg").textContent="Notifications are blocked in this browser.";cb(p==="granted")})}catch(e){cb(false)}}
+$("xRem").addEventListener("change",function(){if($("xRem").checked){askPerm(function(ok){Y.rem.on=ok;$("xRem").checked=ok;saveY();render()})}else{Y.rem.on=false;saveY()}});
+$("xRemT").addEventListener("change",function(){Y.rem.t=$("xRemT").value||"18:00";Y.rem.d="";saveY()});
+$("xRemTest").addEventListener("click",function(){askPerm(function(ok){if(ok){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}","100"))}render()})});
+applyAp();buildNav();
 var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync()};
 vine();parts();showTab(Y.tab);render();
 })();
@@ -963,10 +1072,23 @@ var DL=[
 ["Progress race","Course de progression","Carrera de progreso","Tekma napredka"],["Everyone’s progress this month. Friends’ lines update when they share a fresh code.","La progression de tout le monde ce mois-ci. Les courbes de tes amis se mettent à jour quand ils partagent un nouveau code.","El progreso de todos este mes. Las líneas de tus amigos se actualizan cuando comparten un código nuevo.","Napredek vseh ta mesec. Črte prijateljev se osvežijo, ko delijo novo kodo."],["(estimated)","(estimé)","(estimado)","(ocenjeno)"],["Progress race chart","Graphique de la course de progression","Gráfico de la carrera de progreso","Graf tekme napredka"],
 ["Edit notes","Notes de relecture","Notas de edición","Opombe za urejanje"],["Notes for editing this chapter","Notes pour relire ce chapitre","Notas para editar este capítulo","Opombe za urejanje tega poglavja"],["Idea to fix or improve…","Idée à corriger ou améliorer…","Idea para corregir o mejorar…","Ideja za popravek ali izboljšavo…"],["Add note","Ajouter une note","Añadir nota","Dodaj opombo"],["Delete note","Supprimer la note","Eliminar nota","Izbriši opombo"],["Show or hide","Afficher ou masquer","Mostrar u ocultar","Pokaži ali skrij"],
 ["Personal records","Records personnels","Récords personales","Osebni rekordi"],["longest streak","plus longue série","racha más larga","najdaljši niz"],["words in total","mots au total","palabras en total","besed skupaj"],["Write your first session and your records will appear here.","Écris ta première séance et tes records apparaîtront ici.","Escribe tu primera sesión y tus récords aparecerán aquí.","Napiši prvo sejo in tvoji rekordi se bodo prikazali tukaj."],
-["Weekly summary","Résumé de la semaine","Resumen semanal","Tedenski povzetek"],["Last week","La semaine dernière","La semana pasada","Prejšnji teden"],["Previous week","Semaine précédente","Semana anterior","Prejšnji teden"],["Next week","Semaine suivante","Semana siguiente","Naslednji teden"],["words that week","mots cette semaine-là","palabras esa semana","besed tisti teden"],["No words the week before to compare with.","Aucun mot la semaine d’avant pour comparer.","Ninguna palabra la semana anterior para comparar.","Prejšnji teden ni bilo besed za primerjavo."]
+["Weekly summary","Résumé de la semaine","Resumen semanal","Tedenski povzetek"],["Last week","La semaine dernière","La semana pasada","Prejšnji teden"],["Previous week","Semaine précédente","Semana anterior","Prejšnji teden"],["Next week","Semaine suivante","Semana siguiente","Naslednji teden"],["words that week","mots cette semaine-là","palabras esa semana","besed tisti teden"],["No words the week before to compare with.","Aucun mot la semaine d’avant pour comparer.","Ninguna palabra la semana anterior para comparar.","Prejšnji teden ni bilo besed za primerjavo."],
+["Desk","Bureau","Escritorio","Miza"],["To-do","À faire","Pendientes","Naloge"],["Stats","Stats","Estadísticas","Statistika"],
+["Editing phase","Phase de révision","Fase de edición","Faza urejanja"],["Rest & reread","Repos et relecture","Descanso y relectura","Počitek in ponovno branje"],["Big picture","Vue d’ensemble","Visión general","Širša slika"],["Scenes & characters","Scènes et personnages","Escenas y personajes","Prizori in liki"],["Line edit","Révision ligne à ligne","Edición de línea","Slogovno urejanje"],["Copy edit","Correction linguistique","Corrección de estilo","Jezikovni pregled"],["Feedback","Retours","Comentarios","Povratne informacije"],["Proofread","Relecture finale","Corrección final","Lektura"],["Done!","Terminé !","¡Terminado!","Končano!"],
+["Let the draft rest, then read it from start to finish without editing.","Laisse reposer le brouillon, puis lis-le du début à la fin sans rien corriger.","Deja reposar el borrador y léelo de principio a fin sin editar.","Pusti osnutek počivati, nato ga preberi od začetka do konca brez urejanja."],["Plot, structure, pacing and plot holes.","Intrigue, structure, rythme et incohérences.","Trama, estructura, ritmo y agujeros en la trama.","Zaplet, zgradba, tempo in luknje v zgodbi."],["Rewrite scenes, deepen characters and stakes.","Réécris les scènes, approfondis les personnages et les enjeux.","Reescribe escenas, profundiza personajes y conflictos.","Prepiši prizore, poglobi like in stave."],["Style, rhythm, wording and repetitions.","Style, rythme, formulations et répétitions.","Estilo, ritmo, redacción y repeticiones.","Slog, ritem, izrazi in ponavljanja."],["Grammar, spelling and consistency.","Grammaire, orthographe et cohérence.","Gramática, ortografía y coherencia.","Slovnica, pravopis in doslednost."],["Beta readers and their comments.","Bêta-lecteurs et leurs retours.","Lectores beta y sus comentarios.","Beta bralci in njihovi komentarji."],["A last read for typos and formatting.","Une dernière lecture pour les fautes de frappe et la mise en forme.","Una última lectura para erratas y formato.","Zadnje branje za tipkarske napake in oblikovanje."],["Ready to share or publish!","Prêt à être partagé ou publié !","¡Listo para compartir o publicar!","Pripravljeno za deljenje ali objavo!"],
+["Previous phase","Phase précédente","Fase anterior","Prejšnja faza"],["Next phase","Phase suivante","Fase siguiente","Naslednja faza"],
+["What are you editing?","Qu’est-ce que tu relis ?","¿Qué estás editando?","Kaj urejaš?"],["Whole book","Tout le livre","Todo el libro","Celotna knjiga"],["Keep as is","Ne pas changer","Dejar como está","Pusti, kot je"],["Words before","Mots avant","Palabras antes","Besede prej"],["Words after","Mots après","Palabras después","Besede potem"],["Chapter status after","Statut du chapitre après","Estado del capítulo después","Stanje poglavja potem"],["Net change (words)","Variation nette (mots)","Cambio neto (palabras)","Neto sprememba (besede)"],
+["Editing stats","Stats de relecture","Estadísticas de edición","Statistika urejanja"],["sessions","séances","sesiones","seje"],["chapters touched","chapitres travaillés","capítulos trabajados","obdelana poglavja"],["net words","mots nets","palabras netas","neto besede"],["current phase","phase en cours","fase actual","trenutna faza"],["Editing time per week (minutes)","Temps de relecture par semaine (minutes)","Tiempo de edición por semana (minutos)","Čas urejanja na teden (minute)"],["Latest sessions","Dernières séances","Últimas sesiones","Zadnje seje"],
+["Chapter board","Tableau des chapitres","Tablero de capítulos","Pregled poglavij"],["Next up:","À suivre :","Siguiente:","Na vrsti:"],["All chapters are done","Tous les chapitres sont terminés","Todos los capítulos están terminados","Vsa poglavja so končana"],["Revision to-do","À faire pour la révision","Pendientes de revisión","Naloge za pregled"],["Nothing to do. Add notes to your chapters (📝) or here.","Rien à faire. Ajoute des notes à tes chapitres (📝) ou ici.","Nada pendiente. Añade notas a tus capítulos (📝) o aquí.","Ničesar ni za storiti. Dodaj opombe poglavjem (📝) ali tukaj."],["Add chapters first.","Ajoute d’abord des chapitres.","Añade primero capítulos.","Najprej dodaj poglavja."],
+["Goals of the week","Objectifs de la semaine","Metas de la semana","Cilji tedna"],["e.g. Write the prologue, finish chapter 8","ex. Écrire le prologue, finir le chapitre 8","p. ej. Escribir el prólogo, terminar el capítulo 8","npr. Napiši prolog, dokončaj 8. poglavje"],["Copy last week’s unfinished goals","Copier les objectifs non terminés de la semaine dernière","Copiar las metas sin terminar de la semana pasada","Kopiraj nedokončane cilje prejšnjega tedna"],["Delete goal","Supprimer l’objectif","Eliminar meta","Izbriši cilj"],
+["Move to a chapter","Déplacer dans un chapitre","Mover a un capítulo","Premakni v poglavje"],["Move","Déplacer","Mover","Premakni"],
+["Appearance","Apparence","Apariencia","Videz"],["System","Système","Sistema","Sistem"],["Light","Clair","Claro","Svetlo"],["Dark","Sombre","Oscuro","Temno"],["Daily reminder","Rappel quotidien","Recordatorio diario","Dnevni opomnik"],["Remind me to reach my daily goal","Me rappeler d’atteindre mon objectif du jour","Recordarme alcanzar mi meta diaria","Opomni me na dnevni cilj"],["Remind me at","Me le rappeler à","Recordármelo a las","Opomni me ob"],["Send a test","Envoyer un test","Enviar una prueba","Pošlji preizkus"],["Notifications work while the page or the app is open. Allow them when your browser asks.","Les notifications marchent quand la page ou l’appli est ouverte. Autorise-les quand ton navigateur le demande.","Las notificaciones funcionan mientras la página o la app están abiertas. Permítelas cuando tu navegador lo pida.","Obvestila delujejo, ko je stran ali aplikacija odprta. Dovoli jih, ko brskalnik vpraša."],["Notifications are blocked in this browser.","Les notifications sont bloquées dans ce navigateur.","Las notificaciones están bloqueadas en este navegador.","Obvestila so v tem brskalniku blokirana."],
+["Auto (matches the theme)","Auto (selon le thème)","Auto (según el tema)","Samodejno (glede na temo)"],["Bells","Cloches","Campanas","Zvonci"],["Wind chime","Carillon","Campanillas","Zvončki"],["Gong","Gong","Gong","Gong"],["Laser","Laser","Láser","Laser"],["Ding","Ding","Ding","Ding"],["Coin","Pièce","Moneda","Kovanec"],["Bubbles","Bulles","Burbujas","Mehurčki"],["Wood","Bois","Madera","Les"],["Harp","Harpe","Arpa","Harfa"],["Sting","Sting","Sting","Sting"],["Drone","Drone","Drone","Drone"],["Pop","Pop","Pop","Pop"],["Play sound","Jouer le son","Reproducir sonido","Predvajaj zvok"]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
+[/^(\d+) to do · (\d+) done$/,["$1 à faire · $2 faites","$1 pendientes · $2 hechas","$1 za narediti · $2 končanih"]],
+[/^(\d+) \/ (\d+) done$/,["$1 / $2 faits","$1 / $2 hechos","$1 / $2 opravljenih"]],
 [/^(\d+) days written that week$/,["$1 jours écrits cette semaine-là","$1 días escritos esa semana","$1 dni pisanja tisti teden"]],
 [/^(\d+)% more than the week before$/,["$1 % de plus que la semaine d’avant","$1 % más que la semana anterior","$1 % več kot teden prej"]],
 [/^(\d+)% less than the week before$/,["$1 % de moins que la semaine d’avant","$1 % menos que la semana anterior","$1 % manj kot teden prej"]],
