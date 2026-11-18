@@ -280,8 +280,11 @@ body.dnd{user-select:none;-webkit-user-select:none;cursor:grabbing}
   <div class="entry">
     <div class="row">
       <label>Day<input type="date" id="date"></label>
-      <label>Words written that day<input type="number" id="words" min="0" step="50" placeholder="ex. 750"></label>
+      <label>Words written in this session<input type="number" id="words" min="0" step="10" placeholder="ex. 350"></label>
     </div>
+    <div class="pct" id="dayTot"><span>Total for this day</span> <b id="dayN">0</b> <span>words</span></div>
+    <label class="remrow" style="font-size:.88rem;color:var(--mute)"><input type="checkbox" id="setTot"> Replace the day’s total instead of adding</label>
+    <label class="remrow" style="font-size:.88rem;color:var(--mute)"><input type="checkbox" id="restDay"> 😴 Rest day (keeps my streak)</label>
     <div>
       <div style="font-size:.88rem;color:var(--mute);margin-bottom:6px">My mood</div>
       <div class="moods" id="moods" role="group" aria-label="Mood"></div>
@@ -363,7 +366,7 @@ function paintMood(){document.querySelectorAll(".mood").forEach(function(b){b.se
 function loadForm(){
   $("date").value=sel;
   var e=E()[sel];
-  $("words").value=e?e.words:"";
+  $("words").value="";$("setTot").checked=false;$("restDay").checked=!!(e&&e.rest&&!(e.words>0));$("dayN").textContent=fmt(e?e.words||0:0);
   $("note").value=e&&e.note?e.note:"";
   S.mood=e?e.mood:3;paintMood();
 }
@@ -389,7 +392,7 @@ function render(){
   $("plant").textContent=pl[0];$("plantLbl").textContent=pl[1];
   $("pct").textContent=total>=c.goal?"Goal reached, well done! 🎉":Math.round(pct)+"% of the goal reached";
   var streak=0,start=el;
-  if(el>0){if(!daily[el-1])start=el-1;for(var i=start;i>=1;i--){if(daily[i-1]>0)streak++;else break}}
+  if(el>0){if(!daily[el-1])start=el-1;for(var i=start;i>=1;i--){var ee=ent[dkey(i)];if(daily[i-1]>0)streak++;else if(ee&&ee.rest)continue;else break}}
   var remain=Math.max(0,c.goal-total),left=n-el+(el>0&&el<n?1:0);
   if(el===0)left=n;if(el===n)left=0;
   var need=left>0?Math.ceil(remain/left):0;
@@ -427,7 +430,7 @@ function drawCal(n,ent){
     var k=dkey(d),e=ent[k],cls="day";
     if(e&&e.words>0)cls+=" has";if(k===sel)cls+=" sel";if(k===todayKey)cls+=" today";
     var st=e&&e.words>0?' style="background:var(--m'+e.mood+')"':'';
-    h+='<button class="'+cls+'" data-k="'+k+'"'+st+' aria-label="Day '+d+'"><span class="n">'+d+'</span><span class="e">'+(e&&e.words>0?MOODS[e.mood-1][0]:"")+'</span><span class="w">'+(e&&e.words>0?fmt(e.words):"")+'</span>'+(e&&e.note&&e.note.trim()?'<span class="t">'+esc(e.note)+'</span>':'')+'</button>';
+    h+='<button class="'+cls+'" data-k="'+k+'"'+st+' aria-label="Day '+d+'"><span class="n">'+d+'</span><span class="e">'+(e&&e.words>0?MOODS[e.mood-1][0]:(e&&e.rest?"😴":""))+'</span><span class="w">'+(e&&e.words>0?fmt(e.words):"")+'</span>'+(e&&e.note&&e.note.trim()?'<span class="t">'+esc(e.note)+'</span>':'')+'</button>';
   }
   $("cal").innerHTML=h;
   $("legend").innerHTML=MOODS.map(function(m,i){return '<span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--m'+(i+1)+');vertical-align:-1px"></span> '+m[0]+' '+m[1]+'</span>'}).join("");
@@ -437,10 +440,12 @@ function toast(t){$("toast").textContent=t;setTimeout(function(){$("toast").text
 $("cal").addEventListener("click",function(e){var b=e.target.closest(".day[data-k]");if(!b)return;sel=b.dataset.k;loadForm();render();$("words").focus()});
 $("date").addEventListener("change",function(){if(!$("date").value)return;sel=$("date").value;cur={y:+sel.slice(0,4),m:+sel.slice(5,7)-1};loadForm();render()});
 $("save").addEventListener("click",function(){
-  var w=parseInt($("words").value,10);
-  if(isNaN(w)||w<0){toast("Enter a word count (0 or more).");return}
-  E()[sel]={words:w,mood:S.mood,note:$("note").value};save();render();toast(["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
+  var w=parseInt($("words").value,10),old=E()[sel],rep=$("setTot").checked,rd=$("restDay").checked;
+  if(isNaN(w)){if((old&&!rep)||rd)w=0;else{toast("Enter a word count (0 or more).");return}}
+  if(w<0){toast("Enter a word count (0 or more).");return}
+  var nw=rep?w:((old&&old.words)||0)+w,ent={words:nw,mood:S.mood,note:$("note").value};if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
 });
+$("setTot").addEventListener("change",function(){var e=E()[sel];$("words").value=$("setTot").checked&&e?e.words||0:"";$("words").focus()});
 $("del").addEventListener("click",function(){delete E()[sel];save();loadForm();render();toast("Day cleared.")});
 $("cname").addEventListener("input",function(){ch().name=$("cname").value;save()});
 $("goal").addEventListener("change",function(){var g=parseInt($("goal").value,10);if(g>0){ch().goal=g;save();render()}});
@@ -456,6 +461,8 @@ $("next").addEventListener("click",function(){shift(1)});
 $("bkEx").addEventListener("click",function(){var t=JSON.stringify({manuscripts:S.manuscripts,challenges:S.challenges});$("bk").value=t;$("bk").focus();$("bk").select();var ok=false;try{navigator.clipboard.writeText(t).then(function(){$("bkMsg").textContent="Exported and copied."},function(){$("bkMsg").textContent="Exported: copy the text above."});ok=true}catch(e){}if(!ok)$("bkMsg").textContent="Exported: copy the text above."});
 $("bkIm").addEventListener("click",function(){try{var p=JSON.parse($("bk").value);if(!p||!Array.isArray(p.manuscripts)||!p.manuscripts.length||typeof p.challenges!=="object")throw 1;S.manuscripts=p.manuscripts;S.challenges=p.challenges;Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(!c.entries)c.entries={};if(!c.ms)c.ms=S.manuscripts[0].id});S.msSel=null;save();loadForm();render();$("bkMsg").textContent="Import done."}catch(e){$("bkMsg").textContent="This text is not a valid backup."}});
 
+function wtRestK(k){var c=S.challenges[k.slice(0,7)];return!!(c&&c.entries&&c.entries[k]&&c.entries[k].rest&&!(c.entries[k].words>0))}
+function wtGapOK(prev,t){var d=Math.round((t-prev)/864e5);if(d===1)return true;if(d<1||d>40)return false;for(var i=1;i<d;i++){var q=new Date(prev);q.setDate(q.getDate()+i);if(!wtRestK(q.getFullYear()+"-"+pad(q.getMonth()+1)+"-"+pad(q.getDate())))return false}return true}
 var WTDH='<button class="dh" type="button" aria-label="Drag to reorder" title="Drag to reorder"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></button>';
 function wtDrag(root,itemSel,onMove){
 root.addEventListener("pointerdown",function(e){var h=e.target.closest(".dh");if(!h||!root.contains(h)||(e.button>0))return;
@@ -608,7 +615,7 @@ days.forEach(function(x){var l=x[1]>0?Math.max(25,Math.ceil(x[1]/mx*4)*25):0;h+=
 $("xYear").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+y+' · '+fmt(tot)+' words · '+dys+' days written</p><div style="overflow-x:auto;padding-bottom:6px"><div class="yr">'+h+'</div></div>'}
 
 function badgesV(){var dd=daily(),ks=Object.keys(dd).filter(function(k){return dd[k]>0}).sort(),best=0,run=0,prev=null,mxd=0;
-ks.forEach(function(k){var p=k.split("-"),t=new Date(+p[0],+p[1]-1,+p[2]).getTime();run=prev!==null&&Math.round((t-prev)/864e5)===1?run+1:1;prev=t;if(run>best)best=run;if(dd[k]>mxd)mxd=dd[k]});
+ks.forEach(function(k){var p=k.split("-"),t=new Date(+p[0],+p[1]-1,+p[2]).getTime();run=prev!==null&&wtGapOK(prev,t)?run+1:1;prev=t;if(run>best)best=run;if(dd[k]>mxd)mxd=dd[k]});
 var gh=Object.keys(S.challenges).some(function(k){var c=S.challenges[k],t=sumC(c);return t>0&&t>=c.goal}),big=0;
 S.manuscripts.forEach(function(m){var t=m.base||0,x=daily(m.id),k;for(k in x)t+=x[k];if(t>big)big=t});
 var L=[["✍️","First session",ks.length>=1],["🔥","3-day streak",best>=3],["🔥","7-day streak",best>=7],["🔥","14-day streak",best>=14],["🌟","30-day streak",best>=30],["⚡","1,000 words in a day",mxd>=1000],["📅","10 days written",ks.length>=10],["📆","50 days written",ks.length>=50],["🏆","Challenge goal reached",gh],["📚","10,000 words in a book",big>=10000],["📘","25,000 words in a book",big>=25000],["📕","50,000 words in a book",big>=50000],["🎉","80,000 words in a book",big>=80000],["⏱️","First sprint",X.sprints.length>=1],["🏃","10 sprints",X.sprints.length>=10],["👯","Friend added",X.friends.length>=1]];
@@ -736,7 +743,7 @@ Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];Object.keys(
 var DL=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],aw=wd.map(function(x,i){return wc[i]?x/wc[i]:0}),am=md.map(function(x,i){return mc[i]?x/mc[i]:0}),bw=aw.indexOf(Math.max.apply(null,aw)),bm=am.indexOf(Math.max.apply(null,am));
 $("xIns").innerHTML='<h2>📈 Insights</h2>'+(any<3?'<div class="pct">Write a few more days and I’ll show your patterns here.</div>':'<p style="margin:0 0 12px">You write the most on <b>'+["Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays","Sundays"][bw]+'</b> (about '+fmt(aw[bw])+' words) and when you feel <b>'+MOODS[bm][0]+' '+MOODS[bm][1].toLowerCase()+'</b> (about '+fmt(am[bm])+' words).</p>')+'<div class="pct" style="margin-top:8px">Average words by weekday</div>'+bars(aw,DL)+'<div class="pct" style="margin-top:14px">Average words by mood</div>'+bars(am,MOODS.map(function(m){return m[0]}))+'<div class="pct" style="margin-top:14px">Words per month in '+cur.y+'</div>'+bars(mo,["J","F","M","A","M","J","J","A","S","O","N","D"])}
 function cheerV(){var ex={};try{ex=JSON.parse(localStorage.getItem("wt-extra"))||{}}catch(e){}
-var rows=[{n:(ex.me||"Me")+" (you)",w:sumC(ch()),t:Y.msg||""}].concat((ex.friends||[]).filter(function(f){return f.m===mk()}).map(function(f){return{n:f.n,w:f.w,t:f.t||""}})),tot=0,md=["🥇","🥈","🥉"];
+var rows=[{n:(ex.me||"Me")+" (you)",w:sumC(ch()),t:Y.msg||""}].concat((ex.friends||[]).filter(function(f){return f.m===mk()}).map(function(f){return{n:f.n,w:f.w,t:f.t||""}}).concat((mk()===todayKey.slice(0,7)&&window.WTLIVE?window.WTLIVE.rows():[]).filter(function(f){return f.row}).map(function(f){return{n:f.name,w:f.row.words,t:f.row.msg||""}}))),tot=0,md=["🥇","🥈","🥉"];
 rows.forEach(function(q){tot+=q.w});rows.sort(function(a,b){return b.w-a.w});
 $("xCheer").innerHTML='<h2>💌 Team &amp; cheers</h2><div class="row" style="align-items:center"><div class="big" style="font-size:2.4rem;color:var(--accent)">'+fmt(tot)+'</div><div class="of">words written together this month</div></div>'+rows.map(function(q,i){return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+(rows.length>1?(md[i]||"•")+" ":"")+esc(q.n)+'</span><span>'+fmt(q.w)+' words</span></div>'+(q.t?'<div class="pct">“'+esc(q.t)+'”</div>':'')+'</div>'}).join("")+'<label style="margin-top:12px">My cheer for my friends (shown next to my name when they add my code)<input type="text" id="xMsg" maxlength="80" value="'+esc(Y.msg||"")+'" placeholder="ex. You got this!" style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"></label>'}
 $("xCheer").addEventListener("change",function(e){if(e.target.id!=="xMsg")return;Y.msg=e.target.value.trim().slice(0,80);saveY();render()});
@@ -837,6 +844,36 @@ $("xBingo").innerHTML='<h2>🎲 Trope bingo'+ARW("bg")+'</h2><div class="cb"'+HI
 gb.addEventListener("click",function(e){var c=ch(),b=bingoOf(c);
 if(e.target.id==="xBsh"){c.bingo=newBingo(Math.floor(Math.random()*4e9));save();render();return}
 var cell=e.target.closest(".bcell");if(!cell)return;var i=+cell.dataset.i,before=lines(b);b.x[i]=b.x[i]?0:1;if(lines(b)>before)confetti();save();render()});
+
+var gm=document.createElement("div");gm.className="gcard";gm.id="xRecap";hs.parentNode.insertBefore(gm,hs);G.push(["month",gm]);
+function recapData(){var c=ch(),ent=c.entries,n=dim(),tot=0,days=0,best=0,bestD=0,rest=0,run=0,lg=0,mc=[0,0,0,0,0],i;
+for(i=1;i<=n;i++){var e=ent[dkey(i)],w=e?e.words||0:0;tot+=w;if(w>0){days++;run++;if(run>lg)lg=run;mc[(e.mood||3)-1]++;if(w>best){best=w;bestD=i}}else if(e&&e.rest){rest++}else run=0}
+var tm=mc.indexOf(Math.max.apply(null,mc)),sp=(readEx().sprints||[]).filter(function(q){return q.d&&q.d.slice(0,7)===mk()});
+return{c:c,tot:tot,days:days,best:best,bestD:bestD,rest:rest,lg:lg,mood:days?MOODS[tm][0]:"—",sp:sp.length,avg:days?tot/days:0,n:n}}
+function recapCards(d){return[[fmt(d.avg),"average on writing days"],[d.days+"/"+d.n,"days I wrote"],[d.best?fmt(d.best):"—","best day"+(d.best?" (the "+d.bestD+")":"")],[d.lg+(d.lg===1?" day":" days"),"longest streak"],[d.mood,"top mood"],[d.sp,"writing sprints"],[d.rest,"rest days"]]}
+function recapV(){var d=recapData(),c=d.c,pc=Math.min(100,d.tot/c.goal*100),mn=new Date(cur.y,cur.m,1).toLocaleDateString("en-GB",{month:"long"});
+$("xRecap").innerHTML='<h2>📊 <span>Your</span> <span>'+mn+'</span> <span>in numbers</span></h2><div class="row" style="align-items:center"><div class="big" style="font-size:2.4rem;color:var(--accent)">'+fmt(d.tot)+'</div><div class="of"><span>of</span> <b>'+fmt(c.goal)+'</b> <span>words</span></div></div><div class="bar"><i style="width:'+pc+'%"></i></div><div class="pct">'+(d.tot>=c.goal?"Goal reached, well done!":Math.round(pc)+"% of the goal reached")+'</div><div class="stats" style="margin:14px 0">'+recapCards(d).map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div><div class="row" style="align-items:center"><button class="save" id="xRecShare" type="button">Share as image</button><span class="toast" id="xRecMsg" role="status"></span></div>'}
+function TR2(s0){return window.WTTR?window.WTTR(s0):s0}
+function rrect(x,a,b,w,h,rad){x.beginPath();x.moveTo(a+rad,b);x.arcTo(a+w,b,a+w,b+h,rad);x.arcTo(a+w,b+h,a,b+h,rad);x.arcTo(a,b+h,a,b,rad);x.arcTo(a,b,a+w,b,rad);x.closePath()}
+function shareRecap(){var d=recapData(),c=d.c,cs=getComputedStyle(document.documentElement),g=function(v,f){return(cs.getPropertyValue(v)||"").trim()||f};
+var W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;var x=cv.getContext("2d");
+var bg=g("--bg","#fff"),card=g("--card","#fff"),ink=g("--ink","#222"),mute=g("--mute","#666"),ac=g("--accent","#c33"),a2=g("--accent2","#383"),ln=g("--line","#ddd"),hf='Fraunces,Georgia,serif',bf='"DM Sans",system-ui,sans-serif';
+x.fillStyle=bg;x.fillRect(0,0,W,H);x.fillStyle=card;rrect(x,60,60,W-120,H-120,48);x.fill();x.strokeStyle=ln;x.lineWidth=3;x.stroke();
+x.textAlign="center";x.textBaseline="alphabetic";
+var em=($("plant")&&$("plant").textContent)||"✍️";x.font="110px sans-serif";x.fillStyle=ink;x.fillText(em,W/2,210);
+var mn=new Date(cur.y,cur.m,1).toLocaleDateString("en-GB",{month:"long"});
+x.fillStyle=ink;x.font="700 60px "+hf;x.fillText(TR2("Your")+" "+TR2(mn)+" "+TR2("in numbers"),W/2,310);
+x.fillStyle=ac;x.font="700 190px "+hf;x.fillText(fmt(d.tot),W/2,520);
+x.fillStyle=mute;x.font="500 38px "+bf;x.fillText(TR2("of")+" "+fmt(c.goal)+" "+TR2("words"),W/2,580);
+var pc=Math.min(1,d.tot/c.goal);x.fillStyle=ln;rrect(x,140,620,W-280,28,14);x.fill();if(pc>0){x.fillStyle=a2;rrect(x,140,620,Math.max(28,(W-280)*pc),28,14);x.fill()}
+var cards=recapCards(d).slice(0,6),cw=(W-280)/2,ch0=140,y0=720;
+cards.forEach(function(q,i){var cx=140+(i%2)*cw+cw/2,cy=y0+Math.floor(i/2)*(ch0+20);x.textAlign="center";x.fillStyle=ink;x.font="700 58px "+hf;x.fillText(String(q[0]),cx,cy+60);x.fillStyle=mute;x.font="500 28px "+bf;x.fillText(TR2(String(q[1])),cx,cy+108)});
+x.fillStyle=mute;x.font="500 30px "+bf;var nm=(window.WTME&&window.WTME())||"";x.fillText((nm?nm+" · ":"")+TR2("My writing challenges"),W/2,H-110);
+var msg=$("xRecMsg");
+cv.toBlob(function(b){if(!b)return;var f=null;try{f=new File([b],"my-month.png",{type:"image/png"})}catch(e){}
+function dl(){var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="my-month.png";document.body.appendChild(a);a.click();a.remove();if(msg)msg.textContent="Image saved."}
+if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){})}else dl()},"image/png")}
+gm.addEventListener("click",function(e){if(e.target.id==="xRecShare")shareRecap()});
 var gt=document.createElement("div");gt.className="gcard";gt.id="xTropes";var chs=$("xChBody").closest("section");chs.parentNode.insertBefore(gt,chs.nextSibling);G.push(["book",gt]);
 function tropeV(){var ms=curMsE(),tp=ms.tropes||(ms.tropes=[]);
 $("xTropes").innerHTML='<h2>🎭 Tropes in my book'+ARW("tr")+'</h2><div class="cb"'+HID("tr")+'><div class="pct" style="margin-bottom:8px">'+esc(ms.name)+'</div>'+(tp.length?tp.map(function(t,i){return '<div class="trow" data-i="'+i+'">'+WTDH+'<b>'+esc(t.n)+'</b><input class="tw" type="text" maxlength="60" value="'+esc(t.w||"")+'" placeholder="Which chapters? e.g. 3, 7" aria-label="Chapters"><span class="mv"><button class="ghost td" type="button" aria-label="Delete trope">×</button></span></div>'}).join(""):'<div class="pct">No tropes yet. Add the tropes of your story.</div>')+'<div class="row" style="margin-top:10px"><label>Pick a trope<select id="xTsel"><option value="">—</option>'+TR.map(function(t){return '<option>'+esc(t)+'</option>'}).join("")+'</select></label><label>or type your own<input type="text" id="xTnew" maxlength="40"></label><button class="ghost" id="xTadd" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Add</button></div></div>'}
@@ -857,6 +894,7 @@ function raceV(){var ex=readEx(),c=ch(),y0=+mk().slice(0,4),m0=+mk().slice(5,7),
 for(i=1;i<=lim;i++){var e=c.entries[mk()+"-"+pad(i)];cm+=(e&&e.words)||0;me.push(cm)}
 var L=[{n:(ex.me||"Me")+" (you)",s:me,col:"var(--accent)",est:false,w:cm}];
 (ex.friends||[]).filter(function(f){return f.m===mk()}).forEach(function(f,j){var has=f.s&&f.s.length,sr=has?f.s.slice(0,n):[];if(!has)for(i=1;i<=lim;i++)sr.push(f.w*i/lim);L.push({n:f.n,s:sr,col:RC[j%RC.length],est:!has,w:f.w})});
+if(mk()===todayKey.slice(0,7)&&window.WTLIVE)window.WTLIVE.rows().forEach(function(f){var r0=f.row;if(!r0)return;var sr=(r0.series||[]).slice(0,n).map(function(v){return+v||0});if(!sr.length)return;L.push({n:f.name,s:sr,col:RC[L.length%RC.length],est:false,w:r0.words})});
 var mx=c.goal;L.forEach(function(q){q.s.forEach(function(v){if(v>mx)mx=v})});mx*=1.05;
 var W=640,Hh=230,Lm=46,Rm=14,Tm=14,Bm=26,pw=W-Lm-Rm,ph=Hh-Tm-Bm,xx=function(d){return Lm+(n>1?(d-1)/(n-1):0)*pw},yy=function(v){return Tm+ph-v/mx*ph},o='';
 for(i=0;i<=4;i++){var v=mx/1.05*i/4,y2=yy(v);o+='<line x1="'+Lm+'" x2="'+(W-Rm)+'" y1="'+y2+'" y2="'+y2+'" style="stroke:var(--line)"/><text x="'+(Lm-6)+'" y="'+(y2+4)+'" text-anchor="end">'+(v>=1000?(Math.round(v/100)/10)+"k":Math.round(v))+'</text>'}
@@ -904,7 +942,7 @@ var gv=document.createElement("div");gv.className="gcard";gv.id="xRec";gi.parent
 function recV(){var o=wmAll(),ks=Object.keys(o).filter(function(k){return o[k]>0}).sort(),loc=window.WTLOC||"en-GB",tot=0,bd="",bdv=0,ws={},ms={},best=0,run=0,prev=null,i;
 if(!ks.length){$("xRec").innerHTML='<h2>🏆 Personal records</h2><div class="pct">Write your first session and your records will appear here.</div>';return}
 ks.forEach(function(k){var w=o[k],p=k.split("-"),dt=new Date(+p[0],+p[1]-1,+p[2]),wk=wmDay(new Date(+p[0],+p[1]-1,+p[2]-((dt.getDay()+6)%7)));tot+=w;if(w>bdv){bdv=w;bd=k}ws[wk]=(ws[wk]||0)+w;ms[k.slice(0,7)]=(ms[k.slice(0,7)]||0)+w;
-var tt=dt.getTime();run=prev!==null&&Math.round((tt-prev)/864e5)===1?run+1:1;prev=tt;if(run>best)best=run});
+var tt=dt.getTime();run=prev!==null&&wtGapOK(prev,tt)?run+1:1;prev=tt;if(run>best)best=run});
 var bw="",bwv=0,bm="",bmv=0,k2;for(k2 in ws)if(ws[k2]>bwv){bwv=ws[k2];bw=k2}for(k2 in ms)if(ms[k2]>bmv){bmv=ms[k2];bm=k2}
 function dl(k,op){var p=k.split("-");return new Date(+p[0],+p[1]-1,+(p[2]||1)).toLocaleDateString(loc,op)}
 var cards=[[fmt(bdv),'record day ('+dl(bd,{day:"numeric",month:"short",year:"numeric"})+')'],[fmt(bwv),'record week (from '+dl(bw,{day:"numeric",month:"short"})+')'],[fmt(bmv),'record month ('+dl(bm,{month:"long",year:"numeric"})+')'],[best+(best===1?' day':' days'),'longest streak'],[fmt(tot),'words in total'],[ks.length,'days I wrote']];
@@ -929,6 +967,7 @@ var chs0=$("xChBody").closest("section");chs0.parentNode.insertBefore(gcs,chs0);
 [[gph,"-","edesk"],[ge,"-","edesk"],[gwg,"today","edesk"],[gcs,"-","echap"],[gtd,"-","etodo"],[ges,"-","estats"]].forEach(function(q){G.push([q[1],q[0]]);EG.set(q[0],q[2])});
 EG.set(gq,"edesk");EG.set(chs0,"echap");EG.set(gt,"etodo");EG.set(gn,"etodo");
 G.forEach(function(g){if(g[0]==="settings")EG.set(g[1],"settings")});
+var gl=document.createElement("div");gl.className="gcard";gl.id="xLive";$("xFcode").closest("section").before(gl);G.push(["friends",gl]);
 var gacc=document.createElement("div");gacc.className="gcard acct";gacc.id="xAcct";$("xPrefs").after(gacc);G.push(["settings",gacc]);EG.set(gacc,"settings");
 
 /* stopwatch */
@@ -1050,7 +1089,7 @@ if(i==="pAc"){pClose();var tb=document.querySelector('.tab[data-t="settings"]');
 document.addEventListener("change",function(e){if(!pm)return;var t=e.target;
 if(t.id==="pNm"){window.WTME(t.value);avV();var a=pm.querySelector("#pAv");if(a)a.innerHTML=avHTML()}
 else if(t.id==="pFile"&&t.files&&t.files[0]){var f=t.files[0],rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var n=160,c=document.createElement("canvas");c.width=c.height=n;var x=c.getContext("2d"),m=Math.min(im.width,im.height),sx=(im.width-m)/2,sy=(im.height-m)/2;x.drawImage(im,sx,sy,m,m,0,0,n,n);try{Y.av=c.toDataURL("image/jpeg",.82);saveY();avV();if(pm)pOpen()}catch(er){}};im.src=rd.result};rd.readAsDataURL(f)}});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV()};
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1075,7 +1114,7 @@ function token(){if(!sess)return Promise.resolve(null);if(sess.expires_at-Date.n
 return api("/auth/v1/token?grant_type=refresh_token",{method:"POST",body:JSON.stringify({refresh_token:sess.refresh_token})}).then(function(r){if(r.ok&&r.j&&r.j.access_token){setSess(mkSess(r.j,sess.user));return sess.access_token}if(r.status===400||r.status===401){setSess(null);ready=false;ui();return null}return sess.access_token},function(){return sess&&sess.access_token})}
 function authed(path,opt){return token().then(function(t){if(!t)throw new Error("auth");opt=opt||{};opt.headers=Object.assign({Authorization:"Bearer "+t},opt.headers||{});return api(path,opt)})}
 function pull(){return authed("/rest/v1/backups?select=data,updated_at&limit=1").then(function(r){if(!r.ok)throw new Error("pull");return(r.j&&r.j[0])||null})}
-function push(){var p=payload();return authed("/rest/v1/backups",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({user_id:sess.user.id,data:{v:1,a:p.a,b:p.b,c:p.c},updated_at:new Date().toISOString()})}).then(function(r){if(!r.ok)throw new Error("push");setH(hs(p));lastTs=Date.now()})}
+function push(){var p=payload();return authed("/rest/v1/backups",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({user_id:sess.user.id,data:{v:1,a:p.a,b:p.b,c:p.c},updated_at:new Date().toISOString()})}).then(function(r){if(!r.ok)throw new Error("push");setH(hs(p));lastTs=Date.now();pushProgress().catch(function(){})})}
 function apply(rp){if(rp.a!=null)lset("defi-ecriture",rp.a);if(rp.b!=null)lset("wt-extra",rp.b);var loc=jp(lg("wt-extra2"),{}),rem=jp(rp.c,{});lset("wt-extra2",JSON.stringify(Object.assign({},loc,rem)));setH(hs(rp));location.reload()}
 function reconcile(){if(!sess)return;st.s="syncing";ui();
 return pull().then(function(rem){var lp=payload(),lh=hs(lp),last=jp(lg(SK),{}).h;
@@ -1084,7 +1123,7 @@ var d=rem.data||{},rp={a:d.a==null?null:d.a,b:d.b==null?null:d.b,c:d.c||"{}"},rh
 if(rh===lh){setH(lh);ready=true;st.s="ok";lastTs=Date.now();return}
 if(!hasData(lp)||last===lh){apply(rp);return}
 if(last===rh){return push().then(function(){ready=true;st.s="ok"})}
-st.conflict={rp:rp};st.s="conflict"}).catch(function(){st.s="err";schedRetry()}).then(ui)}
+st.conflict={rp:rp};st.s="conflict"}).catch(function(){st.s="err";schedRetry()}).then(ui).then(function(){return liveRefresh()})}
 function schedRetry(){clearTimeout(rt);rt=setTimeout(function(){if(!sess)return;if(ready)doPush();else reconcile()},30000)}
 function doPush(){if(!sess||!ready)return;if(hs(payload())===jp(lg(SK),{}).h){st.s="ok";ui();return}st.s="syncing";ui();return push().then(function(){st.s="ok"}).catch(function(){st.s="err";schedRetry()}).then(ui)}
 function changed(){if(!sess||!ready)return;clearTimeout(tm);tm=setTimeout(doPush,2500)}
@@ -1101,9 +1140,9 @@ st.busy=true;st.msg="";ui();api("/auth/v1/signup?redirect_to="+encodeURIComponen
 function magic(){var em=val("xaE");if(!em){st.msg="Enter your email first.";return ui()}
 st.busy=true;st.msg="";ui();api("/auth/v1/otp?redirect_to="+encodeURIComponent(site()),{method:"POST",body:JSON.stringify({email:em,create_user:true})}).then(function(r){st.busy=false;st.msg=r.ok?"Login link sent. Check your email.":err(r.j);ui()},function(){st.busy=false;st.msg="Something went wrong. Try again.";ui()})}
 function google(){location.href=SB+"/auth/v1/authorize?provider=google&redirect_to="+encodeURIComponent(site())}
-function signout(msg){var t=sess&&sess.access_token;if(t)api("/auth/v1/logout",{method:"POST",headers:{Authorization:"Bearer "+t}}).catch(function(){});setSess(null);try{localStorage.removeItem(SK)}catch(e){}ready=false;clearTimeout(tm);st={s:"idle",conflict:null,msg:msg||"Signed out. Your data stays on this device.",busy:false,del:false};ui()}
+function signout(msg){var t=sess&&sess.access_token;if(t)api("/auth/v1/logout",{method:"POST",headers:{Authorization:"Bearer "+t}}).catch(function(){});setSess(null);try{localStorage.removeItem(SK)}catch(e){}ready=false;clearTimeout(tm);live={fr:[],inc:[],out:[],ok:true,msg:"",sig:""};lastPG="";liveUi();st={s:"idle",conflict:null,msg:msg||"Signed out. Your data stays on this device.",busy:false,del:false};ui()}
 function delOnline(){if(!st.del){st.del=true;ui();setTimeout(function(){if(st.del){st.del=false;ui()}},4000);return}
-st.del=false;authed("/rest/v1/backups?user_id=eq."+encodeURIComponent(sess.user.id),{method:"DELETE"}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
+st.del=false;var uid=encodeURIComponent(sess.user.id);authed("/rest/v1/progress?user_id=eq."+uid,{method:"DELETE"}).catch(function(){}).then(function(){return authed("/rest/v1/friendships?or=(requester.eq."+uid+",addressee.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/backups?user_id=eq."+uid,{method:"DELETE"})}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
 var inp='style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%"';
 function ui(){var keep={xaE:val("xaE")},pw=document.getElementById("xaP")?document.getElementById("xaP").value:"",h='<h2>☁️ Account &amp; sync</h2>';
 if(!sess){h+='<p class="pct" style="margin:0 0 12px">Sign in to save your data online and use it on all your devices. The site also works without an account.</p>'
@@ -1128,6 +1167,46 @@ var hasTok=p.get("access_token"),e=p.get("error_description")||q2.get("error_des
 try{history.replaceState(null,"",location.pathname)}catch(x){}
 if(!hasTok){st.msg=e;return Promise.resolve()}
 return api("/auth/v1/user",{headers:{Authorization:"Bearer "+hasTok}}).then(function(r){if(r.ok&&r.j&&r.j.id){setSess(mkSess({access_token:hasTok,refresh_token:p.get("refresh_token"),expires_at:p.get("expires_at"),expires_in:p.get("expires_in")},{id:r.j.id,email:r.j.email}));setTimeout(function(){var t=document.querySelector('.tab[data-t="settings"]');if(t)t.click()},50)}else{st.msg="Something went wrong. Try again."}},function(){st.msg="Something went wrong. Try again."})}
+
+var live={fr:[],inc:[],out:[],ok:true,msg:"",sig:""},lbox=document.getElementById("xLive"),lastPG="";
+function monthKey(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
+function myNm(){var n=(window.WTME&&window.WTME())||"";return n||((sess&&sess.user&&sess.user.email)||"").split("@")[0]}
+function pgPayload(){var mk0=monthKey(),c=S.challenges[mk0];if(!c||!sess)return null;var n0=new Date(+mk0.slice(0,4),+mk0.slice(5,7),0).getDate(),lim=Math.min(n0,new Date().getDate()),cm=0,so=[],i,tot=0;
+for(i=1;i<=lim;i++){var e=c.entries[mk0+"-"+("0"+i).slice(-2)];cm+=(e&&e.words)||0;so.push(cm)}
+Object.keys(c.entries).forEach(function(k){tot+=c.entries[k].words||0});
+var y=jp(lg("wt-extra2"),{});return{user_id:sess.user.id,month:mk0,name:myNm().slice(0,30),words:tot,goal:c.goal||0,series:so,msg:String(y.msg||"").slice(0,80),updated_at:new Date().toISOString()}}
+function pushProgress(){if(!sess||!live.ok)return Promise.resolve();var p=pgPayload();if(!p)return Promise.resolve();var sig=JSON.stringify([p.month,p.name,p.words,p.goal,p.series,p.msg]);if(sig===lastPG)return Promise.resolve();
+return authed("/rest/v1/progress",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(p)}).then(function(r){if(r.ok)lastPG=sig;else if(r.status===404)live.ok=false})}
+function liveRefresh(){if(!sess){live.fr=[];live.inc=[];live.out=[];liveUi();return Promise.resolve()}
+return pushProgress().catch(function(){}).then(function(){return Promise.all([authed("/rest/v1/friendships?select=*&order=created_at"),authed("/rest/v1/progress?select=user_id,name,month,words,goal,series,msg,updated_at&month=eq."+monthKey())])}).then(function(a){var f=a[0],p=a[1];
+if(f.status===404||p.status===404){live.ok=false;liveUi();return}
+if(!f.ok||!p.ok)throw 0;live.ok=true;var me=sess.user.id,rows={};(p.j||[]).forEach(function(x){if(x.user_id!==me)rows[x.user_id]=x});
+var fr=[],inc=[],out=[];(f.j||[]).forEach(function(x){var mine=x.requester===me,other=mine?x.addressee:x.requester;
+if(x.status==="accepted"){var r0=rows[other]||null;fr.push({id:x.id,uid:other,name:(r0&&r0.name)||(mine?x.label:x.requester_name)||"?",row:r0})}
+else if(mine)out.push({id:x.id,label:x.label});else inc.push({id:x.id,name:x.requester_name||"?"})});
+var sig=JSON.stringify([fr,inc,out]),chg=sig!==live.sig;live.fr=fr;live.inc=inc;live.out=out;live.sig=sig;liveUi();if(chg&&typeof render==="function")render()}).catch(function(){})}
+window.WTLIVE={rows:function(){return live.fr}};
+var linp='style="flex:1;min-width:180px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"';
+function liveUi(){if(!lbox)return;var ke=document.getElementById("xLvE")?document.getElementById("xLvE").value:"",h='<h2>👯 Live friends</h2>';
+if(!sess){h+='<p class="pct" style="margin:0 0 10px">Sign in to invite friends by email and see each other’s progress live. Open Settings → Account &amp; sync.</p><button class="save" id="xLvGo" type="button">Open account settings</button>'}
+else if(!live.ok){h+='<p class="pct" style="margin:0 0 10px">Live friends is not set up yet.</p><button class="ghost" id="xLvRe" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Retry</button>'}
+else{h+='<div class="row" style="align-items:stretch"><input type="email" id="xLvE" placeholder="Friend’s email" aria-label="Friend’s email" '+linp+'><button class="save" id="xLvS" type="button">Send request</button></div><div class="toast" role="status">'+esc(live.msg||"")+'</div>';
+if(live.inc.length)h+='<div class="pct" style="margin-top:10px">Friend requests</div>'+live.inc.map(function(x){return '<div class="fr"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span><b>'+esc(x.name)+'</b> <span>wants to be your friend</span></span><span style="display:inline-flex;gap:6px"><button class="save xlA" type="button" data-id="'+esc(x.id)+'" style="padding:6px 14px">Accept</button><button class="ghost xlD" type="button" data-id="'+esc(x.id)+'" style="width:auto;padding:0 12px;font-size:.85rem">Decline</button></span></div></div>'}).join("");
+if(live.out.length)h+='<div class="pct" style="margin-top:10px">Request sent</div>'+live.out.map(function(x){return '<div class="fr"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>'+esc(x.label||"?")+' · <span class="pct">Pending</span></span><button class="ghost xlD" type="button" data-id="'+esc(x.id)+'" aria-label="Cancel request" style="width:26px;height:26px;font-size:14px;padding:0">×</button></div></div>'}).join("");
+h+='<div class="pct" style="margin-top:12px">Your friends</div>';
+h+=live.fr.length?live.fr.map(function(x){var r0=x.row;return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(x.name)+'</span><span>'+(r0?fmt(r0.words)+' / '+fmt(r0.goal)+' <span>words</span>':'<span class="pct">no data yet this month</span>')+' <button class="ghost xlR" type="button" data-id="'+esc(x.id)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px;padding:0">×</button></span></div>'+(r0?'<div class="fbar"><i style="width:'+Math.min(100,r0.goal>0?r0.words/r0.goal*100:0)+'%"></i></div>'+(r0.msg?'<div class="pct">“'+esc(r0.msg)+'”</div>':''):'')+'</div>'}).join(""):'<div class="pct">No friends yet. Invite someone by email.</div>';
+h+='<div class="pct" style="margin-top:12px">Friends you accept can see your name, this month’s word count, goal and daily curve. Nothing else.</div>'}
+lbox.innerHTML=h;if(ke&&document.getElementById("xLvE"))document.getElementById("xLvE").value=ke}
+if(lbox)lbox.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var i=b.id,id=b.dataset.id;
+if(i==="xLvGo"){var tb=document.querySelector('.tab[data-t="settings"]');if(tb)tb.click();setTimeout(function(){var a=document.getElementById("xAcct");if(a&&a.scrollIntoView)a.scrollIntoView({behavior:"smooth",block:"start"})},80)}
+else if(i==="xLvRe"){live.ok=true;liveRefresh()}
+else if(i==="xLvS"){var em=val("xLvE");if(!em||em.indexOf("@")<1){live.msg="Enter your friend’s email.";return liveUi()}
+authed("/rest/v1/rpc/send_friend_request",{method:"POST",body:JSON.stringify({p_email:em,p_name:myNm()})}).then(function(r){if(r.status===404){live.ok=false}else live.msg=r.ok?"Request sent. If this person has an account, she will see it.":"Something went wrong. Try again.";liveUi();if(r.ok)liveRefresh()}).catch(function(){live.msg="Something went wrong. Try again.";liveUi()})}
+else if(b.classList.contains("xlA")){authed("/rest/v1/friendships?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:"accepted"})}).then(liveRefresh).catch(function(){})}
+else if(b.classList.contains("xlD")||b.classList.contains("xlR")){authed("/rest/v1/friendships?id=eq."+encodeURIComponent(id),{method:"DELETE"}).then(liveRefresh).catch(function(){})}});
+setInterval(function(){if(sess&&!document.hidden)liveRefresh()},60000);
+liveUi();
+try{if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}
 ui();fromUrl().then(function(){ui();return reconcile()});
 })();
 </script>
@@ -1282,6 +1361,43 @@ var DL=[
 ["Close","Fermer","Cerrar","Zapri"]
 
 ,["Drag to reorder","Glisse pour réorganiser","Arrastra para reordenar","Povleci za preureditev"]
+
+,["Words written in this session","Mots écrits pendant cette séance","Palabras escritas en esta sesión","Besede, napisane v tej seji"],
+["Total for this day","Total de la journée","Total del día","Skupaj za ta dan"],
+["words","mots","palabras","besed"],
+["Replace the day’s total instead of adding","Remplacer le total de la journée au lieu d’ajouter","Reemplazar el total del día en lugar de sumar","Nadomesti dnevni skupek namesto prištevanja"]
+
+,["ex. 350","ex. 350","ej. 350","npr. 350"]
+
+,["Rest day (keeps my streak)","Jour de repos (garde ma série)","Día de descanso (mantiene mi racha)","Dan počitka (ohrani mojo serijo)"],
+["Your","Ton","Tu","Tvoj"],
+["in numbers","en chiffres","en cifras","v številkah"],
+["words written","mots écrits","palabras escritas","napisanih besed"],
+["top mood","humeur dominante","ánimo más frecuente","najpogostejše razpoloženje"],
+["writing sprints","sprints d’écriture","sprints de escritura","pisalni šprinti"],
+["rest days","jours de repos","días de descanso","dnevi počitka"],
+["Share as image","Partager en image","Compartir como imagen","Deli kot sliko"],
+["Image saved.","Image enregistrée.","Imagen guardada.","Slika shranjena."],
+["Live friends","Amies en direct","Amigas en directo","Prijateljice v živo"],
+["Sign in to invite friends by email and see each other’s progress live. Open Settings → Account & sync.","Connecte-toi pour inviter des amies par e-mail et voir vos progrès en direct. Ouvre Réglages → Compte et synchronisation.","Inicia sesión para invitar a amigas por correo y ver vuestro progreso en directo. Abre Ajustes → Cuenta y sincronización.","Prijavi se, da povabiš prijateljice po e-pošti in v živo vidiš napredek. Odpri Nastavitve → Račun in sinhronizacija."],
+["Open account settings","Ouvrir les réglages du compte","Abrir ajustes de la cuenta","Odpri nastavitve računa"],
+["Friend’s email","E-mail de ton amie","Correo de tu amiga","E-pošta prijateljice"],
+["Send request","Envoyer l’invitation","Enviar solicitud","Pošlji povabilo"],
+["Friend requests","Invitations reçues","Solicitudes de amistad","Povabila prijateljic"],
+["Accept","Accepter","Aceptar","Sprejmi"],
+["Decline","Refuser","Rechazar","Zavrni"],
+["wants to be your friend","veut être ton amie","quiere ser tu amiga","se želi spoprijateljiti s tabo"],
+["Request sent","Invitation envoyée","Solicitud enviada","Povabilo poslano"],
+["Pending","En attente","Pendiente","V teku"],
+["Your friends","Tes amies","Tus amigas","Tvoje prijateljice"],
+["No friends yet. Invite someone by email.","Pas encore d’amies. Invite quelqu’un par e-mail.","Aún no hay amigas. Invita a alguien por correo.","Še ni prijateljic. Povabi nekoga po e-pošti."],
+["Request sent. If this person has an account, she will see it.","Invitation envoyée. Si cette personne a un compte, elle la verra.","Solicitud enviada. Si esta persona tiene cuenta, la verá.","Povabilo je poslano. Če ima oseba račun, ga bo videla."],
+["Enter your friend’s email.","Entre l’e-mail de ton amie.","Introduce el correo de tu amiga.","Vnesi e-pošto prijateljice."],
+["Live friends is not set up yet.","Les amies en direct ne sont pas encore configurées.","Las amigas en directo aún no están configuradas.","Prijateljice v živo še niso nastavljene."],
+["Retry","Réessayer","Reintentar","Poskusi znova"],
+["Friends you accept can see your name, this month’s word count, goal and daily curve. Nothing else.","Les amies que tu acceptes voient ton prénom, ton nombre de mots du mois, ton objectif et ta courbe quotidienne. Rien d’autre.","Las amigas que aceptes ven tu nombre, tus palabras del mes, tu objetivo y tu curva diaria. Nada más.","Prijateljice, ki jih sprejmeš, vidijo tvoje ime, število besed v mesecu, cilj in dnevno krivuljo. Nič drugega."],
+["no data yet this month","pas encore de données ce mois-ci","aún no hay datos este mes","ta mesec še ni podatkov"],
+["Cancel request","Annuler l’invitation","Cancelar solicitud","Prekliči povabilo"]
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
@@ -1342,6 +1458,7 @@ for(var i=0;i<RX.length;i++){var m=c.match(RX[i][0]);if(m)return RX[i][1][li].re
 return c.replace(TOKRE,function(w){return TOK[w][li]})}
 function tx(str,li){var pm=str.match(PRE),pre=pm?pm[0]:"",rest=str.slice(pre.length),sm=rest.match(SUF),suf=sm?sm[0]:"",core=rest.slice(0,rest.length-suf.length);if(!core)return str;
 var out=lookup(core,li);return out===core?str:pre+out+suf}
+window.WTTR=function(s0){var li=IDX[P.l];return li===undefined?s0:tx(s0,li)};
 var O=new WeakMap(),OA=new WeakMap(),AT=["placeholder","aria-label","title"],TB=null;
 function run(){var li=IDX[P.l],w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,arr=[];document.documentElement.lang=P.l;
 while(n=w.nextNode())arr.push(n);
