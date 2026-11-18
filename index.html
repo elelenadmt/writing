@@ -446,6 +446,7 @@ $("save").addEventListener("click",function(){
   var nw=rep?w:((old&&old.words)||0)+w,ent={words:nw,mood:S.mood,note:$("note").value},dl=nw-((old&&old.words)||0);if(old&&old.h)ent.h=old.h;if(dl>0&&sel===todayKey){var hh=new Date().getHours();ent.h=Object.assign({},ent.h||{});ent.h[hh]=(ent.h[hh]||0)+dl}
   var dd0=window.wtDaily?window.wtDaily():{},pb=0,any0=0;Object.keys(dd0).forEach(function(k0){if(k0!==sel){any0++;if(dd0[k0]>pb)pb=dd0[k0]}});var rec=any0>=3&&nw>pb&&nw>0;
   if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(rec?"🏆 New personal record! Share it from the Progress tab.":["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
+  if(dl>0&&window.wtAskCh)window.wtAskCh(dl);
 });
 $("setTot").addEventListener("change",function(){var e=E()[sel];$("words").value=$("setTot").checked&&e?e.words||0:"";$("words").focus()});
 $("del").addEventListener("click",function(){delete E()[sel];save();loadForm();render();toast("Day cleared.")});
@@ -1223,7 +1224,20 @@ gsw.addEventListener("change",function(e){if(e.target.id==="xSwAdd"){var k=e.tar
 gsw.addEventListener("click",function(e){var t=e.target,i=+t.dataset.i;if(t.classList.contains("sws")){Y.sw[i].s=Y.sw[i].s==="l"?"r":"l"}else if(t.classList.contains("swd")){Y.sw.splice(i,1)}else return;saveY();render()});
 wtDrag(gsw,".swrow",function(from,to){var L=Y.sw;L.splice(to,0,L.splice(from,1)[0]);saveY();render()});
 G.forEach(function(g){if(g[0]==="friends")EG.set(g[1],"efr")});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV()};
+
+/* v34: ask which chapter new words belong to */
+var askN=0,gsb=document.createElement("div");gsb.id="xAskBox";gsb.hidden=true;$("save").closest(".row").after(gsb);
+function askBoxV(){var box=$("xAskBox");if(!askN||Y.ask===false){box.hidden=true;box.innerHTML="";return}var ms=curMsE(),cs=chaps(ms);
+var old=$("xAskC")?$("xAskC").value:"",def=0;if(Y.lc!==undefined&&cs[Y.lc])def=Y.lc;else{for(var i=0;i<cs.length;i++){if(cs[i].s!=="Done"){def=i;break}}}
+box.hidden=false;box.innerHTML='<div class="fr" style="margin-top:12px"><div class="pct" style="margin-bottom:6px">📥 <b>+'+fmt(askN)+'</b> <span>words</span> · <span>Put them in a chapter?</span></div><div class="row"><select id="xAskC" aria-label="Chapter">'+cs.map(function(c,k){return '<option value="'+k+'"'+(k===def?' selected':'')+'>'+esc(c.n)+' · '+fmt(c.w||0)+'</option>'}).join("")+'<option value="new"'+(cs.length?'':' selected')+'>＋ New chapter</option></select><button class="save" id="xAskGo" type="button">Add</button><button class="ghost" id="xAskNo" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Skip</button></div></div>';if(old!==""&&$("xAskC").querySelector('option[value="'+old+'"]'))$("xAskC").value=old}
+window.wtAskCh=function(n){if(Y.ask===false||!(n>0))return;askN=n;askBoxV()};
+gsb.addEventListener("click",function(e){var t=e.target;
+if(t.id==="xAskNo"){askN=0;askBoxV();return}
+if(t.id==="xAskGo"){var cs=chaps(curMsE()),v=$("xAskC").value,i=v==="new"?cs.length:+v;if(v==="new")cs.push({n:"Chapter "+(cs.length+1),s:"Draft",w:0});var c=cs[i];if(!c)return;c.w=(c.w||0)+askN;if(c.s==="Idea")c.s="Draft";Y.lc=i;var n=askN;askN=0;saveY();save();render();$("toast").textContent="+"+fmt(n)+" words added to "+c.n;setTimeout(function(){$("toast").textContent=""},3500)}});
+var gac=mkc("xAskCfg");$("xPrefs").after(gac);G.push(["settings",gac]);EG.set(gac,"settings");
+function askCfgV(){$("xAskCfg").innerHTML='<h2>📑 <span>Chapter prompt</span></h2><label class="remrow"><input type="checkbox" id="xAskOn"'+(Y.ask!==false?' checked':'')+'><span>After saving words, ask which chapter they belong to</span></label><div class="pct"><span>Your chapters’ word counts then add up by themselves.</span></div>'}
+gac.addEventListener("change",function(e){if(e.target.id!=="xAskOn")return;Y.ask=e.target.checked;saveY()});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV();askCfgV();askBoxV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1366,6 +1380,18 @@ if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","e
 function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
 var IDX={fr:0,es:1,sl:2};
 var DL=[
+["＋ New chapter", "＋ Nouveau chapitre", "＋ Nuevo capítulo", "＋ Novo poglavje"],
+["Put them in a chapter?", "Les mettre dans un chapitre ?", "¿Ponerlas en un capítulo?", "Jih dam v poglavje?"],
+["Add", "Ajouter", "Añadir", "Dodaj"],
+["Skip", "Passer", "Omitir", "Preskoči"],
+["Which chapter were these words for?", "À quel chapitre appartiennent ces mots ?", "¿A qué capítulo pertenecen estas palabras?", "Kateremu poglavju pripadajo te besede?"],
+["Add them to", "Les ajouter à", "Añadirlas a", "Dodaj jih k"],
+["Add to chapter", "Ajouter au chapitre", "Añadir al capítulo", "Dodaj poglavju"],
+["Not now", "Pas maintenant", "Ahora no", "Ne zdaj"],
+["Don’t ask me again", "Ne plus me le demander", "No volver a preguntar", "Ne sprašuj več"],
+["Chapter prompt", "Question du chapitre", "Pregunta del capítulo", "Vprašanje o poglavju"],
+["After saving words, ask which chapter they belong to", "Après l’enregistrement, demander à quel chapitre appartiennent les mots", "Tras guardar palabras, preguntar a qué capítulo pertenecen", "Po shranjevanju vprašaj, kateremu poglavju besede pripadajo"],
+["Your chapters’ word counts then add up by themselves.", "Le nombre de mots de tes chapitres s’additionne alors tout seul.", "Así el recuento de palabras de tus capítulos se suma solo.", "Število besed v poglavjih se nato sešteje samo."],
 ["Beta readers", "Bêta-lecteurs", "Lectores beta", "Beta bralci"],
 ["readers", "lecteurs", "lectores", "bralcev"],
 ["comments", "retours", "comentarios", "komentarjev"],
@@ -1648,6 +1674,7 @@ var DL=[
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
+[/^\+([\d,]+) words added to (.*)$/,["+$1 mots ajoutés à $2","+$1 palabras añadidas a $2","+$1 besed dodanih k $2"]],
 [/^Reminder set for (\d\d:\d\d)$/,["Rappel réglé à $1","Recordatorio fijado a las $1","Opomnik nastavljen na $1"]],
 [/^best streak: (\d+)$/,["ma meilleure série : $1","mi mejor racha: $1","moja najboljša serija: $1"]],
 [/^([\d,]+) words$/,["$1 mots","$1 palabras","$1 besed"]],
