@@ -101,7 +101,7 @@ section.panel:nth-of-type(n) h2::before{content:attr(data-i) " "}
 .chrow input,.chrow select,#xFin,#xName,#msGoal,#xFcode,#spMin,#spW{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
 .chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.85rem;background:var(--bg)}.chip.ok{background:var(--accent2);color:var(--onacc);border-color:transparent}
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}.badge{display:grid;gap:2px;justify-items:center;text-align:center;padding:12px 8px;border-radius:16px;border:1px solid var(--line);background:var(--bg);font-size:.8rem}.badge b{font-size:1.8rem}.badge.off{opacity:.45;filter:grayscale(1)}
-.yr{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px}.yr i{border-radius:3px;background:var(--line)}
+.yr{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px}.yr i{border-radius:3px;background:var(--line);cursor:pointer}.yr i.ytd{outline:2px solid var(--accent);outline-offset:-1px}.yr i.ysel{outline:2px solid var(--ink);outline-offset:1px;position:relative;z-index:2}.yr i.yrs,.yleg i.yrs{background:repeating-linear-gradient(45deg,var(--line) 0 2px,transparent 2px 4px)}.ymo{position:relative;height:16px;font-size:11px;color:var(--mute)}.ymo span{position:absolute;top:0}.yleg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mute);margin-top:8px;flex-wrap:wrap}.yleg i{width:12px;height:12px;border-radius:3px;display:inline-block}
 .fr{display:grid;gap:4px;margin-top:10px}.fbar{height:12px;border-radius:9px;background:var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--accent2)}
 @media (max-width:520px){.chrow{grid-template-columns:1fr 90px 38px}.chrow .chn{grid-column:1/-1}}
 :root[data-th="galaxy"]{--bg:#eceaff;--card:#fff;--ink:#1a1740;--mute:#5f5c94;--line:#d6d2f5;--accent:#6a3de8;--accent2:#0c8aa0;--snow:#8a6ae8;--onacc:#fff}
@@ -443,7 +443,9 @@ $("save").addEventListener("click",function(){
   var w=parseInt($("words").value,10),old=E()[sel],rep=$("setTot").checked,rd=$("restDay").checked;
   if(isNaN(w)){if((old&&!rep)||rd)w=0;else{toast("Enter a word count (0 or more).");return}}
   if(w<0){toast("Enter a word count (0 or more).");return}
-  var nw=rep?w:((old&&old.words)||0)+w,ent={words:nw,mood:S.mood,note:$("note").value};if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
+  var nw=rep?w:((old&&old.words)||0)+w,ent={words:nw,mood:S.mood,note:$("note").value},dl=nw-((old&&old.words)||0);if(old&&old.h)ent.h=old.h;if(dl>0&&sel===todayKey){var hh=new Date().getHours();ent.h=Object.assign({},ent.h||{});ent.h[hh]=(ent.h[hh]||0)+dl}
+  var dd0=window.wtDaily?window.wtDaily():{},pb=0,any0=0;Object.keys(dd0).forEach(function(k0){if(k0!==sel){any0++;if(dd0[k0]>pb)pb=dd0[k0]}});var rec=any0>=3&&nw>pb&&nw>0;
+  if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(rec?"🏆 New personal record! Share it from the Progress tab.":["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
 });
 $("setTot").addEventListener("change",function(){var e=E()[sel];$("words").value=$("setTot").checked&&e?e.words||0:"";$("words").focus()});
 $("del").addEventListener("click",function(){delete E()[sel];save();loadForm();render();toast("Day cleared.")});
@@ -567,8 +569,8 @@ function themesHTML(){return '<div class="gchips">'+GROUPS.map(function(q){var c
 if(!TH[X.theme])X.theme="winter";
 
 var _s=save;save=function(){_s();saveX()};
-function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
-function daily(id){var o={};Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(id&&c.ms!==id)return;Object.keys(c.entries).forEach(function(d){o[d]=(o[d]||0)+(c.entries[d].words||0)})});return o}
+function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}window.wtDstr=dstr;
+function daily(id){var o={};Object.keys(S.challenges).forEach(function(k){var c=S.challenges[k];if(id&&c.ms!==id)return;Object.keys(c.entries).forEach(function(d){o[d]=(o[d]||0)+(c.entries[d].words||0)})});return o}window.wtDaily=daily;
 function curMs(){return msById(S.msSel||ch().ms)}
 function applyTheme(){var t=TH[X.theme],r=document.documentElement;r.setAttribute("data-th",X.theme);
 var svg="<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='10' y='42' font-size='28'>"+t.pat[0]+"</text><text x='88' y='100' font-size='24'>"+t.pat[1]+"</text><text x='22' y='128' font-size='20'>"+t.pat[2]+"</text></svg>";
@@ -608,11 +610,19 @@ else if(e.target.classList.contains("cnx")){cs[+e.target.closest(".chnotes").dat
 else return;save();chap()});
 
 wtDrag($("xChBody"),".chrow",function(from,to){var ms=curMs(),cs=ms.chapters||(ms.chapters=[]),ord=cs.map(function(_,i){return i}),no={};ord.splice(to,0,ord.splice(from,1)[0]);ord.forEach(function(o,np){if(chOpen[o])no[np]=true});chOpen=no;cs.splice(to,0,cs.splice(from,1)[0]);save();chap()});
-function yearV(){var y=cur.y,dd=daily(),first=(new Date(y,0,1).getDay()+6)%7,h='',mx=1,tot=0,dys=0,d=new Date(y,0,1),days=[],i;
-while(d.getFullYear()===y){var k=dstr(d),w=dd[k]||0;days.push([k,w]);if(w>mx)mx=w;tot+=w;if(w>0)dys++;d=new Date(y,d.getMonth(),d.getDate()+1)}
-for(i=0;i<first;i++)h+='<i style="background:none"></i>';
-days.forEach(function(x){var l=x[1]>0?Math.max(25,Math.ceil(x[1]/mx*4)*25):0;h+='<i title="'+x[0]+': '+fmt(x[1])+' words"'+(l?' style="background:color-mix(in srgb,var(--accent2) '+l+'%,var(--line))"':'')+'></i>'});
-$("xYear").innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+y+' · '+fmt(tot)+' words · '+dys+' days written</p><div style="overflow-x:auto;padding-bottom:6px"><div class="yr">'+h+'</div></div>'}
+var yrSel="",MN3=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function yearV(){var y=cur.y,dd=daily(),first=(new Date(y,0,1).getDay()+6)%7,h='',ml='',mx=1,tot=0,dys=0,best=0,bk="",lastM=-1,d=new Date(y,0,1),days=[],i,box=$("xYear"),sc0=box.querySelector(".ysc"),keep=sc0?sc0.scrollLeft:null,todayCol=-1;
+while(d.getFullYear()===y){var k=dstr(d),w=dd[k]||0;days.push([k,w,d.getMonth()]);if(w>mx)mx=w;tot+=w;if(w>0){dys++;if(w>best){best=w;bk=k}}d=new Date(y,d.getMonth(),d.getDate()+1)}
+for(i=0;i<first;i++)h+='<i style="background:none;cursor:default"></i>';
+var cols=Math.ceil((first+days.length)/7);
+days.forEach(function(x,j){var col=Math.floor((first+j)/7);if(x[2]!==lastM){lastM=x[2];ml+='<span style="left:'+col*15+'px">'+MN3[x[2]]+'</span>'}
+var l=x[1]>0?Math.max(25,Math.ceil(x[1]/mx*4)*25):0,rs=!x[1]&&wtRestK(x[0]),cl=(rs?"yrs ":"")+(x[0]===todayKey?"ytd ":"")+(x[0]===yrSel?"ysel":"");if(x[0]===todayKey)todayCol=col;
+h+='<i data-k="'+x[0]+'" title="'+x[0]+': '+fmt(x[1])+' words"'+(cl?' class="'+cl.trim()+'"':'')+(l?' style="background:color-mix(in srgb,var(--accent2) '+l+'%,var(--line))"':'')+'></i>'});
+var sk=yrSel&&yrSel.slice(0,4)===String(y)?yrSel:(todayKey.slice(0,4)===String(y)?todayKey:bk),info='';
+if(sk){var sw=dd[sk]||0,sdt=new Date(+sk.slice(0,4),+sk.slice(5,7)-1,+sk.slice(8,10)).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});info='<b>'+sdt+'</b> · '+(sw>0?fmt(sw)+' <span>words</span>':(wtRestK(sk)?'<span>Rest day</span> 😴':'<span>No words</span>'))}
+box.innerHTML='<p style="margin:0 0 10px;color:var(--mute)">'+y+' · '+fmt(tot)+' words · '+dys+' days written</p><div class="ysc" style="overflow-x:auto;padding-bottom:6px"><div style="position:relative;width:'+cols*15+'px"><div class="ymo">'+ml+'</div><div class="yr">'+h+'</div></div></div><div class="pct" style="margin-top:6px">'+info+'</div><div class="yleg"><span>Less</span><i style="background:var(--line)"></i>'+[25,50,75,100].map(function(p){return '<i style="background:color-mix(in srgb,var(--accent2) '+p+'%,var(--line))"></i>'}).join("")+'<span>More</span><i class="yrs" style="margin-left:10px"></i><span>Rest day</span></div>';
+var sc=box.querySelector(".ysc");if(keep!=null)sc.scrollLeft=keep;else if(todayCol>=0){var tc=todayCol,go=function(){sc.scrollLeft=Math.max(0,tc*15-sc.clientWidth/2)};if(sc.clientWidth>0)go();else if(typeof IntersectionObserver!=="undefined"){var io=new IntersectionObserver(function(en){if(en[0].isIntersecting){go();io.disconnect()}});io.observe(sc)}}}
+$("xYear").addEventListener("click",function(e){var c=e.target.closest("i[data-k]");if(!c)return;yrSel=c.dataset.k;yearV()});
 
 function badgesV(){var dd=daily(),ks=Object.keys(dd).filter(function(k){return dd[k]>0}).sort(),best=0,run=0,prev=null,mxd=0;
 ks.forEach(function(k){var p=k.split("-"),t=new Date(+p[0],+p[1]-1,+p[2]).getTime();run=prev!==null&&wtGapOK(prev,t)?run+1:1;prev=t;if(run>best)best=run;if(dd[k]>mxd)mxd=dd[k]});
@@ -1055,14 +1065,23 @@ function applyAp(){var a=Y.ap||"system",r0=document.documentElement;if(a==="ligh
 var NTX={en:["Time to write! ✍️","{n} words to go today to reach your goal."],fr:["C’est l’heure d’écrire ! ✍️","Encore {n} mots aujourd’hui pour atteindre ton objectif."],es:["¡Hora de escribir! ✍️","Faltan {n} palabras hoy para tu meta."],sl:["Čas za pisanje! ✍️","Še {n} besed danes do cilja."]};
 if(!Y.rem)Y.rem={on:false,t:"18:00",d:""};
 function dailyGap(){var d0=new Date(),tk=wmDay(d0),c=S.challenges[tk.slice(0,7)];if(!c)return null;var tw=(c.entries[tk]&&c.entries[tk].words)||0,left=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate()-d0.getDate()+1,remain=Math.max(0,c.goal-(sumC(c)-tw)),g=Math.ceil(remain/left);return{tk:tk,need:Math.max(0,g-tw)}}
-function notify(t,b){try{new Notification(t,{body:b})}catch(e){}}
-function remTick(){var R=Y.rem;if(!R||!R.on||typeof Notification==="undefined"||Notification.permission!=="granted")return;var d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes()),q=dailyGap();if(!q||R.d===q.tk||hm<R.t)return;if(q.need>0){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}",fmt(q.need)))}R.d=q.tk;saveY()}
-setInterval(remTick,30000);
-gp.insertAdjacentHTML("beforeend",'<div class="subs"><b>Appearance</b><div class="seg" id="xAp"><button type="button" data-a="system">System</button><button type="button" data-a="light">Light</button><button type="button" data-a="dark">Dark</button></div></div><div class="subs"><b>Daily reminder</b><label class="remrow"><input type="checkbox" id="xRem"><span>Remind me to reach my daily goal</span></label><label>Remind me at<input type="time" id="xRemT" style="width:8rem"></label><div class="row"><button class="ghost" id="xRemTest" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Send a test</button><span class="toast" id="xRemMsg" role="status"></span></div><div class="pct">Notifications work while the page or the app is open. Allow them when your browser asks.</div></div>');
+function notify(t,b){function fb(){try{new Notification(t,{body:b})}catch(e){}}try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(function(rg){if(rg&&rg.showNotification)return rg.showNotification(t,{body:b,tag:"wt-reminder"});fb()}).catch(fb);return}}catch(e){}fb()}
+window.WTNOTIFY=notify;
+var SX={en:["Your streak is at risk 🔥","Write a few words tonight to keep your {n}-day streak."],fr:["Ta série est en danger 🔥","Écris quelques mots ce soir pour garder ta série de {n} jours."],es:["Tu racha está en peligro 🔥","Escribe unas palabras esta noche para mantener tu racha de {n} días."],sl:["Tvoja serija je ogrožena 🔥","Napiši nekaj besed nocoj, da ohraniš serijo {n} dni."]};
+function streakNow(){var dd=window.wtDaily(),d=new Date(),k=window.wtDstr(d),today=(dd[k]||0)>0,n=0,i;for(i=today?0:1;i<4000;i++){var kk=window.wtDstr(new Date(d.getFullYear(),d.getMonth(),d.getDate()-i));if((dd[kk]||0)>0)n++;else if(wtRestK(kk))continue;else break}return{n:n,today:today,rest:wtRestK(k)}}
+function bestStreak(){var dd=window.wtDaily(),ks=Object.keys(dd).filter(function(q){return dd[q]>0}).sort();if(!ks.length)return 0;var p=ks[0].split("-"),d=new Date(+p[0],+p[1]-1,+p[2]),end=new Date(),run=0,mx=0;while(d<=end){var kk=window.wtDstr(d);if((dd[kk]||0)>0){run++;if(run>mx)mx=run}else if(!wtRestK(kk))run=0;d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)}return mx}
+function remTick(){var R=Y.rem;if(!R||!R.on)return;var d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes()),q=dailyGap(),can=typeof Notification!=="undefined"&&Notification.permission==="granted",tk=wmDay(d);
+if(q&&R.d!==q.tk&&hm>=R.t){if(q.need>0&&can){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}",fmt(q.need)))}R.d=q.tk;saveY()}
+if(R.s&&R.sd!==tk&&hm>="20:30"){var st=streakNow();if(st.n>=2&&!st.today&&!st.rest&&can){var z=SX[Y.lang]||SX.en;notify(z[0],z[1].replace("{n}",st.n))}R.sd=tk;saveY()}
+remBnV()}
+setInterval(remTick,30000);setTimeout(remTick,1500);
+$("xPrefs").insertAdjacentHTML("beforeend",'<div class="subs"><b>Appearance</b><div class="seg" id="xAp"><button type="button" data-a="system">System</button><button type="button" data-a="light">Light</button><button type="button" data-a="dark">Dark</button></div></div><div class="subs"><b>Daily reminder</b><label class="remrow"><input type="checkbox" id="xRem"><span>Remind me to reach my daily goal</span></label><label>Remind me at<input type="time" id="xRemT" style="width:8rem"></label><div class="row"><button class="ghost" id="xRemTest" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Send a test</button><span class="toast" id="xRemMsg" role="status"></span></div><div class="pct">Notifications work while the page or the app is open. Allow them when your browser asks.</div></div>');
 $("xAp").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;Y.ap=b.dataset.a;saveY();applyAp()});
+$("xRemT").closest("label").insertAdjacentHTML("afterend",'<label class="remrow"><input type="checkbox" id="xRemS"><span>Streak alert at 20:30 if my streak is at risk</span></label>');
+$("xRemS").checked=!!Y.rem.s;$("xRemS").addEventListener("change",function(){Y.rem.s=$("xRemS").checked;Y.rem.sd="";saveY();if(Y.rem.s)askPerm(function(){})});
 $("xRem").checked=!!Y.rem.on;$("xRemT").value=Y.rem.t;
 function askPerm(cb){if(typeof Notification==="undefined"){$("xRemMsg").textContent="Notifications are blocked in this browser.";cb(false);return}if(Notification.permission==="granted"){cb(true);return}try{Notification.requestPermission().then(function(p){if(p!=="granted")$("xRemMsg").textContent="Notifications are blocked in this browser.";cb(p==="granted")})}catch(e){cb(false)}}
-$("xRem").addEventListener("change",function(){if($("xRem").checked){askPerm(function(ok){Y.rem.on=ok;$("xRem").checked=ok;saveY();render()})}else{Y.rem.on=false;saveY()}});
+$("xRem").addEventListener("change",function(){if($("xRem").checked){Y.rem.on=true;saveY();askPerm(function(ok){if(!ok)$("xRemMsg").textContent="Notifications are off here, so you will see the reminder inside the page.";render()})}else{Y.rem.on=false;saveY()}});
 $("xRemT").addEventListener("change",function(){Y.rem.t=$("xRemT").value||"18:00";Y.rem.d="";saveY()});
 $("xRemTest").addEventListener("click",function(){askPerm(function(ok){if(ok){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}","100"))}render()})});
 applyAp();buildNav();
@@ -1089,7 +1108,49 @@ if(i==="pAc"){pClose();var tb=document.querySelector('.tab[data-t="settings"]');
 document.addEventListener("change",function(e){if(!pm)return;var t=e.target;
 if(t.id==="pNm"){window.WTME(t.value);avV();var a=pm.querySelector("#pAv");if(a)a.innerHTML=avHTML()}
 else if(t.id==="pFile"&&t.files&&t.files[0]){var f=t.files[0],rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var n=160,c=document.createElement("canvas");c.width=c.height=n;var x=c.getContext("2d"),m=Math.min(im.width,im.height),sx=(im.width-m)/2,sy=(im.height-m)/2;x.drawImage(im,sx,sy,m,m,0,0,n,n);try{Y.av=c.toDataURL("image/jpeg",.82);saveY();avV();if(pm)pOpen()}catch(er){}};im.src=rd.result};rd.readAsDataURL(f)}});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV()};
+
+/* v31: reminder banner, hours insight, share cards */
+var gbn=document.createElement("div");gbn.className="gcard";gbn.id="xRemBn";gbn.hidden=true;gc.parentNode.insertBefore(gbn,gc);G.push(["today",gbn]);var bnOff="";
+function remBnV(){var R=Y.rem,box=$("xRemBn");if(!R||!R.on){box.hidden=true;return}var d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes()),q=dailyGap(),st=streakNow();
+if(!q||q.need<=0||hm<R.t||bnOff===q.tk){box.hidden=true;return}
+box.hidden=false;box.innerHTML='<h2>⏰ <span>Time to write!</span></h2><div class="pct">'+fmt(q.need)+' <span>words to go today</span>'+(st.n>=2&&!st.today?' · 🔥 <span>Keep your streak alive</span>':'')+'</div><div class="row" style="margin-top:8px"><button class="save" id="xBnGo" type="button">Write now</button><button class="ghost" id="xBnLater" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Later</button></div>'}
+$("xRemBn").addEventListener("click",function(e){if(e.target.id==="xBnLater"){var q=dailyGap();bnOff=q?q.tk:"";remBnV()}else if(e.target.id==="xBnGo"){if(sel!==todayKey){sel=todayKey;cur={y:+sel.slice(0,4),m:+sel.slice(5,7)-1};loadForm();render()}var w=$("words");if(w.scrollIntoView)w.scrollIntoView({behavior:"smooth",block:"center"});w.focus()}});
+
+var ghr=document.createElement("div");ghr.className="gcard";ghr.id="xHrs";gi.parentNode.insertBefore(ghr,gi);G.push(["progress",ghr]);var hrMsg="",hrPeak=0;
+function hrsV(){var h=[],i,tot=0,P=[["Night",0,5],["Morning",5,12],["Afternoon",12,18],["Evening",18,24]],ps=[0,0,0,0],body;for(i=0;i<24;i++)h.push(0);
+Object.keys(S.challenges).forEach(function(k){var e=S.challenges[k].entries;Object.keys(e).forEach(function(dk){var o=e[dk].h;if(!o)return;Object.keys(o).forEach(function(q){var hr=+q,v=+o[q]||0;if(hr>=0&&hr<24&&v>0){h[hr]+=v;tot+=v}})})});
+if(tot<150){body='<div class="pct"><span>Save a few sessions and I’ll show when you write best. The hour is noted each time you save words for today.</span></div>'}
+else{var mx=Math.max.apply(null,h),pk=h.indexOf(mx);hrPeak=pk;P.forEach(function(p,j){for(i=p[1];i<p[2];i++)ps[j]+=h[i]});var bp=ps.indexOf(Math.max.apply(null,ps));
+body='<p style="margin:0 0 12px"><span>You write the most around</span> <b>'+pad(pk)+':00</b>. <span>Your best part of the day:</span> <b><span>'+P[bp][0]+'</span></b> · '+Math.round(ps[bp]/tot*100)+'%</p><div style="display:flex;align-items:flex-end;gap:2px;height:70px">'+h.map(function(v,j){return '<i title="'+pad(j)+':00 · '+fmt(v)+' words" style="flex:1;height:'+Math.max(3,v/mx*70)+'px;border-radius:3px 3px 0 0;background:'+(j===pk?'var(--accent)':'color-mix(in srgb,var(--accent2) 70%,var(--line))')+'"></i>'}).join("")+'</div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mute);margin-top:3px"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div><div class="row" style="margin-top:12px;align-items:center"><button class="ghost" id="xHrRem" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Remind me an hour before</button><span class="toast" role="status">'+esc(hrMsg)+'</span></div>'}
+$("xHrs").innerHTML='<h2>🕐 <span>When I write best</span></h2>'+body}
+$("xHrs").addEventListener("click",function(e){if(e.target.id!=="xHrRem")return;var t=pad((hrPeak+23)%24)+":00";Y.rem.t=t;Y.rem.d="";Y.rem.on=true;saveY();$("xRemT").value=t;$("xRem").checked=true;askPerm(function(){});hrMsg="Reminder set for "+t;hrsV()});
+
+var gsh=document.createElement("div");gsh.className="gcard";gsh.id="xShare";gi.parentNode.insertBefore(gsh,gi);G.push(["progress",gsh]);var shMsg="";
+function bestDay(){var dd=window.wtDaily(),b=0,bk="";Object.keys(dd).forEach(function(k){if(dd[k]>b){b=dd[k];bk=k}});return{w:b,k:bk}}
+function doneChaps(){var o=[];S.manuscripts.forEach(function(m){(m.chapters||[]).forEach(function(c){if(c.s==="Done")o.push({ms:m.name,n:c.n,w:c.w||0})})});return o}
+function allWords(){var o=wmAll(),tot=0,k;S.manuscripts.forEach(function(m){tot+=m.base||0});for(k in o)tot+=o[k];return tot}
+function shareV(){var pv=$("xShCh")?$("xShCh").value:"",bd=bestDay(),st=streakNow(),dc=doneChaps(),bt='style="width:auto;padding:0 14px;font-size:.9rem"',h='<h2>📣 <span>Share cards</span></h2><div class="pct" style="margin-bottom:10px"><span>Make a pretty image of your progress to share with your friends.</span></div><div class="row" style="gap:8px;flex-wrap:wrap"><button class="ghost xsh" data-k="rec" type="button" '+bt+(bd.w?'':' disabled')+'>🏆 <span>Best day</span></button><button class="ghost xsh" data-k="str" type="button" '+bt+(st.n?'':' disabled')+'>🔥 <span>Streak</span></button><button class="ghost xsh" data-k="tot" type="button" '+bt+'>📚 <span>Total words</span></button></div>';
+if(dc.length)h+='<div class="row" style="margin-top:10px;align-items:flex-end"><label><span>Finished chapter</span><select id="xShCh">'+dc.map(function(c,i){return '<option value="'+i+'">'+esc(c.n)+' · '+esc(c.ms)+'</option>'}).join("")+'</select></label><button class="ghost xsh" data-k="chp" type="button" '+bt+'>✅ <span>Make the card</span></button></div>';
+h+='<div class="toast" role="status">'+esc(shMsg)+'</div>';$("xShare").innerHTML=h;if(pv&&$("xShCh"))$("xShCh").value=pv}
+function shareCard(o){var cs=getComputedStyle(document.documentElement),g=function(v,f){return(cs.getPropertyValue(v)||"").trim()||f},W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;var x=cv.getContext("2d"),
+bg=g("--bg","#fff"),card=g("--card","#fff"),ink=g("--ink","#222"),mute=g("--mute","#666"),ac=g("--accent","#c33"),ln=g("--line","#ddd"),hf='Fraunces,Georgia,serif',bf='"DM Sans",system-ui,sans-serif';
+x.fillStyle=bg;x.fillRect(0,0,W,H);x.fillStyle=card;rrect(x,60,60,W-120,H-120,48);x.fill();x.strokeStyle=ln;x.lineWidth=3;x.stroke();x.textAlign="center";x.textBaseline="alphabetic";
+x.font="150px sans-serif";x.fillStyle=ink;x.fillText(o.em,W/2,300);
+x.font="700 64px "+hf;x.fillText(TR2(o.head),W/2,420);
+var sz=240,big=String(o.big);do{x.font="700 "+sz+"px "+hf;sz-=10}while(x.measureText(big).width>W-260&&sz>70);x.fillStyle=ac;x.fillText(big,W/2,700);
+x.fillStyle=mute;x.font="500 44px "+bf;o.sub.forEach(function(t,i){x.fillText(TR2(t),W/2,800+i*64)});
+x.fillStyle=ln;rrect(x,W/2-120,1030,240,10,5);x.fill();
+x.fillStyle=mute;x.font="500 30px "+bf;var nm=(window.WTME&&window.WTME())||"";x.fillText((nm?nm+" · ":"")+TR2("My writing challenges"),W/2,H-110);
+cv.toBlob(function(b){if(!b)return;var f=null;try{f=new File([b],o.f,{type:"image/png"})}catch(e){}
+function dl(){var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=o.f;document.body.appendChild(a);a.click();a.remove();shMsg="Image saved.";shareV()}
+if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){})}else dl()},"image/png")}
+$("xShare").addEventListener("click",function(e){var b=e.target.closest(".xsh");if(!b||b.disabled)return;var k=b.dataset.k,o=null,dts=function(q){var p=q.split("-");return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})};
+if(k==="rec"){var bd=bestDay();o={em:"🏆",head:"New personal record",big:fmt(bd.w),sub:["words in one day",dts(bd.k)],f:"wt-record.png"}}
+else if(k==="str"){var st=streakNow(),bs=bestStreak(),sb=[st.n===1?"day in a row":"days in a row"];if(bs>st.n)sb.push("best streak: "+bs);o={em:"🔥",head:"Writing streak",big:String(st.n),sub:sb,f:"wt-streak.png"}}
+else if(k==="tot"){o={em:"📚",head:"Words written in total",big:fmt(allWords()),sub:["across all my manuscripts"],f:"wt-total.png"}}
+else if(k==="chp"){var dc=doneChaps(),c=dc[+($("xShCh")?$("xShCh").value:0)]||dc[0];if(!c)return;o={em:"✅",head:"Chapter finished",big:c.n,sub:[c.ms,fmt(c.w)+" words"],f:"wt-chapter.png"}}
+if(o)shareCard(o)});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1142,7 +1203,7 @@ st.busy=true;st.msg="";ui();api("/auth/v1/otp?redirect_to="+encodeURIComponent(s
 function google(){location.href=SB+"/auth/v1/authorize?provider=google&redirect_to="+encodeURIComponent(site())}
 function signout(msg){var t=sess&&sess.access_token;if(t)api("/auth/v1/logout",{method:"POST",headers:{Authorization:"Bearer "+t}}).catch(function(){});setSess(null);try{localStorage.removeItem(SK)}catch(e){}ready=false;clearTimeout(tm);live={fr:[],inc:[],out:[],ok:true,msg:"",sig:""};lastPG="";liveUi();st={s:"idle",conflict:null,msg:msg||"Signed out. Your data stays on this device.",busy:false,del:false};ui()}
 function delOnline(){if(!st.del){st.del=true;ui();setTimeout(function(){if(st.del){st.del=false;ui()}},4000);return}
-st.del=false;var uid=encodeURIComponent(sess.user.id);authed("/rest/v1/progress?user_id=eq."+uid,{method:"DELETE"}).catch(function(){}).then(function(){return authed("/rest/v1/friendships?or=(requester.eq."+uid+",addressee.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/backups?user_id=eq."+uid,{method:"DELETE"})}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
+st.del=false;var uid=encodeURIComponent(sess.user.id);authed("/rest/v1/progress?user_id=eq."+uid,{method:"DELETE"}).catch(function(){}).then(function(){return authed("/rest/v1/friendships?or=(requester.eq."+uid+",addressee.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/nudges?or=(from_user.eq."+uid+",to_user.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/backups?user_id=eq."+uid,{method:"DELETE"})}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
 var inp='style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%"';
 function ui(){var keep={xaE:val("xaE")},pw=document.getElementById("xaP")?document.getElementById("xaP").value:"",h='<h2>☁️ Account &amp; sync</h2>';
 if(!sess){h+='<p class="pct" style="margin:0 0 12px">Sign in to save your data online and use it on all your devices. The site also works without an account.</p>'
@@ -1168,7 +1229,7 @@ try{history.replaceState(null,"",location.pathname)}catch(x){}
 if(!hasTok){st.msg=e;return Promise.resolve()}
 return api("/auth/v1/user",{headers:{Authorization:"Bearer "+hasTok}}).then(function(r){if(r.ok&&r.j&&r.j.id){setSess(mkSess({access_token:hasTok,refresh_token:p.get("refresh_token"),expires_at:p.get("expires_at"),expires_in:p.get("expires_in")},{id:r.j.id,email:r.j.email}));setTimeout(function(){var t=document.querySelector('.tab[data-t="settings"]');if(t)t.click()},50)}else{st.msg="Something went wrong. Try again."}},function(){st.msg="Something went wrong. Try again."})}
 
-var live={fr:[],inc:[],out:[],ok:true,msg:"",sig:""},lbox=document.getElementById("xLive"),lastPG="";
+var live={fr:[],inc:[],out:[],ok:true,msg:"",sig:"",nv:true,nin:[]},lbox=document.getElementById("xLive"),lastPG="";
 function monthKey(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
 function myNm(){var n=(window.WTME&&window.WTME())||"";return n||((sess&&sess.user&&sess.user.email)||"").split("@")[0]}
 function pgPayload(){var mk0=monthKey(),c=S.challenges[mk0];if(!c||!sess)return null;var n0=new Date(+mk0.slice(0,4),+mk0.slice(5,7),0).getDate(),lim=Math.min(n0,new Date().getDate()),cm=0,so=[],i,tot=0;
@@ -1177,8 +1238,18 @@ Object.keys(c.entries).forEach(function(k){tot+=c.entries[k].words||0});
 var y=jp(lg("wt-extra2"),{});return{user_id:sess.user.id,month:mk0,name:myNm().slice(0,30),words:tot,goal:c.goal||0,series:so,msg:String(y.msg||"").slice(0,80),updated_at:new Date().toISOString()}}
 function pushProgress(){if(!sess||!live.ok)return Promise.resolve();var p=pgPayload();if(!p)return Promise.resolve();var sig=JSON.stringify([p.month,p.name,p.words,p.goal,p.series,p.msg]);if(sig===lastPG)return Promise.resolve();
 return authed("/rest/v1/progress",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(p)}).then(function(r){if(r.ok)lastPG=sig;else if(r.status===404)live.ok=false})}
+function nudgeIn(nv){if(!nv)return;if(nv.status===404){live.nv=false;return}if(!nv.ok)return;live.nv=true;live.nin=nv.j||[];var seen=[];try{seen=JSON.parse(sessionStorage.getItem("wt-nvseen"))||[]}catch(e){}var first=!live.nvInit;live.nvInit=true;
+live.nin.forEach(function(n0){if(seen.indexOf(n0.id)<0){seen.push(n0.id);if(!first&&window.WTNOTIFY&&typeof Notification!=="undefined"&&Notification.permission==="granted")window.WTNOTIFY((n0.from_name||"?")+" 💌",n0.text)}});try{sessionStorage.setItem("wt-nvseen",JSON.stringify(seen.slice(-50)))}catch(e){}}
+function incs(sr){return sr.map(function(v,i){return v-(i?sr[i-1]:0)})}
+function pactHtml(x){var r0=x.row;if(!r0||!r0.series)return"";var me=pgPayload();if(!me)return"";var dn=new Date().getDate(),a=incs(me.series),b=incs((r0.series||[]).map(Number)),n=Math.min(a.length,b.length),end=n-1,i,run=0,both=function(j){return a[j]>0&&b[j]>0};
+if(end===dn-1&&end>=0&&!both(end))end--;for(i=end;i>=0&&both(i);i--)run++;
+var ft=b.length>=dn?b[dn-1]>0:null,h='<div class="pct" style="margin-top:4px">';
+if(run>0)h+='🤝 <span>Pact streak:</span> <b>'+run+'</b> <span>days in a row, together</span> ';
+if(ft===true)h+='✅ <span>wrote today</span>';else if(ft===false)h+='💤 <span>hasn’t written yet today</span>';
+if(ft!==true&&live.nv!==false)h+=' <button class="ghost xlN" type="button" data-uid="'+esc(x.uid)+'" style="width:auto;padding:0 10px;font-size:.8rem;margin-left:4px">💌 <span>Nudge</span></button>';
+return h+'</div>'}
 function liveRefresh(){if(!sess){live.fr=[];live.inc=[];live.out=[];liveUi();return Promise.resolve()}
-return pushProgress().catch(function(){}).then(function(){return Promise.all([authed("/rest/v1/friendships?select=*&order=created_at"),authed("/rest/v1/progress?select=user_id,name,month,words,goal,series,msg,updated_at&month=eq."+monthKey())])}).then(function(a){var f=a[0],p=a[1];
+return pushProgress().catch(function(){}).then(function(){return Promise.all([authed("/rest/v1/friendships?select=*&order=created_at"),authed("/rest/v1/progress?select=user_id,name,month,words,goal,series,msg,updated_at&month=eq."+monthKey()),authed("/rest/v1/nudges?select=id,from_name,text,created_at&to_user=eq."+encodeURIComponent(sess.user.id)+"&order=created_at.desc&limit=8").catch(function(){return null})])}).then(function(a){var f=a[0],p=a[1],nv=a[2];nudgeIn(nv);
 if(f.status===404||p.status===404){live.ok=false;liveUi();return}
 if(!f.ok||!p.ok)throw 0;live.ok=true;var me=sess.user.id,rows={};(p.j||[]).forEach(function(x){if(x.user_id!==me)rows[x.user_id]=x});
 var fr=[],inc=[],out=[];(f.j||[]).forEach(function(x){var mine=x.requester===me,other=mine?x.addressee:x.requester;
@@ -1193,8 +1264,10 @@ else if(!live.ok){h+='<p class="pct" style="margin:0 0 10px">Live friends is not
 else{h+='<div class="row" style="align-items:stretch"><input type="email" id="xLvE" placeholder="Friend’s email" aria-label="Friend’s email" '+linp+'><button class="save" id="xLvS" type="button">Send request</button></div><div class="toast" role="status">'+esc(live.msg||"")+'</div>';
 if(live.inc.length)h+='<div class="pct" style="margin-top:10px">Friend requests</div>'+live.inc.map(function(x){return '<div class="fr"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span><b>'+esc(x.name)+'</b> <span>wants to be your friend</span></span><span style="display:inline-flex;gap:6px"><button class="save xlA" type="button" data-id="'+esc(x.id)+'" style="padding:6px 14px">Accept</button><button class="ghost xlD" type="button" data-id="'+esc(x.id)+'" style="width:auto;padding:0 12px;font-size:.85rem">Decline</button></span></div></div>'}).join("");
 if(live.out.length)h+='<div class="pct" style="margin-top:10px">Request sent</div>'+live.out.map(function(x){return '<div class="fr"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>'+esc(x.label||"?")+' · <span class="pct">Pending</span></span><button class="ghost xlD" type="button" data-id="'+esc(x.id)+'" aria-label="Cancel request" style="width:26px;height:26px;font-size:14px;padding:0">×</button></div></div>'}).join("");
+if(live.nin&&live.nin.length)h+='<div class="pct" style="margin-top:10px">Nudges from friends</div>'+live.nin.map(function(n0){return '<div class="fr"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>💌 <b>'+esc(n0.from_name||"?")+'</b> “<span>'+esc(n0.text)+'</span>”</span><button class="ghost xlK" type="button" data-id="'+esc(n0.id)+'" style="width:auto;padding:0 12px;font-size:.85rem">Thanks</button></div></div>'}).join("");
 h+='<div class="pct" style="margin-top:12px">Your friends</div>';
-h+=live.fr.length?live.fr.map(function(x){var r0=x.row;return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(x.name)+'</span><span>'+(r0?fmt(r0.words)+' / '+fmt(r0.goal)+' <span>words</span>':'<span class="pct">no data yet this month</span>')+' <button class="ghost xlR" type="button" data-id="'+esc(x.id)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px;padding:0">×</button></span></div>'+(r0?'<div class="fbar"><i style="width:'+Math.min(100,r0.goal>0?r0.words/r0.goal*100:0)+'%"></i></div>'+(r0.msg?'<div class="pct">“'+esc(r0.msg)+'”</div>':''):'')+'</div>'}).join(""):'<div class="pct">No friends yet. Invite someone by email.</div>';
+if(live.fr.length&&live.nv!==false)h+='<label style="margin:6px 0 4px"><span>Nudge message</span><select id="xNvT"><option>You’ve got this! ✍️</option><option>Your story is waiting 📖</option><option>Just 100 words today? 💪</option></select></label>';
+h+=live.fr.length?live.fr.map(function(x){var r0=x.row;return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(x.name)+'</span><span>'+(r0?fmt(r0.words)+' / '+fmt(r0.goal)+' <span>words</span>':'<span class="pct">no data yet this month</span>')+' <button class="ghost xlR" type="button" data-id="'+esc(x.id)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px;padding:0">×</button></span></div>'+(r0?'<div class="fbar"><i style="width:'+Math.min(100,r0.goal>0?r0.words/r0.goal*100:0)+'%"></i></div>'+(r0.msg?'<div class="pct">“'+esc(r0.msg)+'”</div>':'')+pactHtml(x):'')+'</div>'}).join(""):'<div class="pct">No friends yet. Invite someone by email.</div>';
 h+='<div class="pct" style="margin-top:12px">Friends you accept can see your name, this month’s word count, goal and daily curve. Nothing else.</div>'}
 lbox.innerHTML=h;if(ke&&document.getElementById("xLvE"))document.getElementById("xLvE").value=ke}
 if(lbox)lbox.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var i=b.id,id=b.dataset.id;
@@ -1202,6 +1275,8 @@ if(i==="xLvGo"){var tb=document.querySelector('.tab[data-t="settings"]');if(tb)t
 else if(i==="xLvRe"){live.ok=true;liveRefresh()}
 else if(i==="xLvS"){var em=val("xLvE");if(!em||em.indexOf("@")<1){live.msg="Enter your friend’s email.";return liveUi()}
 authed("/rest/v1/rpc/send_friend_request",{method:"POST",body:JSON.stringify({p_email:em,p_name:myNm()})}).then(function(r){if(r.status===404){live.ok=false}else live.msg=r.ok?"Request sent. If this person has an account, she will see it.":"Something went wrong. Try again.";liveUi();if(r.ok)liveRefresh()}).catch(function(){live.msg="Something went wrong. Try again.";liveUi()})}
+else if(b.classList.contains("xlN")){var tx=val("xNvT")||"You’ve got this! ✍️";authed("/rest/v1/nudges",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({from_user:sess.user.id,to_user:b.dataset.uid,from_name:myNm(),text:tx.slice(0,80)})}).then(function(r){if(r.status===404){live.nv=false;live.msg="Nudges are not set up yet."}else if(r.status===409)live.msg="You already nudged her today.";else live.msg=r.ok?"Nudge sent 💌":"Something went wrong. Try again.";liveUi()}).catch(function(){live.msg="Something went wrong. Try again.";liveUi()})}
+else if(b.classList.contains("xlK")){authed("/rest/v1/nudges?id=eq."+encodeURIComponent(id),{method:"DELETE"}).then(liveRefresh).catch(function(){})}
 else if(b.classList.contains("xlA")){authed("/rest/v1/friendships?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:"accepted"})}).then(liveRefresh).catch(function(){})}
 else if(b.classList.contains("xlD")||b.classList.contains("xlR")){authed("/rest/v1/friendships?id=eq."+encodeURIComponent(id),{method:"DELETE"}).then(liveRefresh).catch(function(){})}});
 setInterval(function(){if(sess&&!document.hidden)liveRefresh()},60000);
@@ -1218,6 +1293,58 @@ if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","e
 function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
 var IDX={fr:0,es:1,sl:2};
 var DL=[
+["Less", "Moins", "Menos", "Manj"],
+["More", "Plus", "Más", "Več"],
+["Rest day", "Jour de repos", "Día de descanso", "Dan počitka"],
+["No words", "Aucun mot", "Sin palabras", "Brez besed"],
+["words", "mots", "palabras", "besed"],
+["When I write best", "Quand j’écris le mieux", "Cuándo escribo mejor", "Kdaj pišem najbolje"],
+["Save a few sessions and I’ll show when you write best. The hour is noted each time you save words for today.", "Enregistre quelques séances et je te montrerai quand tu écris le mieux. L’heure est notée à chaque fois que tu enregistres des mots pour aujourd’hui.", "Guarda algunas sesiones y te mostraré cuándo escribes mejor. La hora se anota cada vez que guardas palabras de hoy.", "Shrani nekaj sej in pokazala ti bom, kdaj pišeš najbolje. Ura se zabeleži vsakič, ko shraniš besede za danes."],
+["You write the most around", "Tu écris le plus vers", "Escribes más hacia las", "Največ pišeš okoli"],
+["Your best part of the day:", "Ton meilleur moment de la journée :", "Tu mejor momento del día:", "Tvoj najboljši del dneva:"],
+["Night", "Nuit", "Madrugada", "Noč"],
+["Morning", "Matin", "Mañana", "Jutro"],
+["Afternoon", "Après-midi", "Tarde", "Popoldne"],
+["Evening", "Soir", "Noche", "Večer"],
+["Remind me an hour before", "Me rappeler une heure avant", "Recordármelo una hora antes", "Opomni me uro prej"],
+["Share cards", "Cartes de partage", "Tarjetas para compartir", "Kartice za deljenje"],
+["Make a pretty image of your progress to share with your friends.", "Crée une jolie image de ta progression à partager avec tes amies.", "Crea una bonita imagen de tu progreso para compartir con tus amigas.", "Ustvari lepo sliko svojega napredka za deljenje s prijateljicami."],
+["Best day", "Meilleur jour", "Mejor día", "Najboljši dan"],
+["Streak", "Série", "Racha", "Serija"],
+["Total words", "Mots au total", "Palabras en total", "Skupaj besed"],
+["Finished chapter", "Chapitre terminé", "Capítulo terminado", "Končano poglavje"],
+["Make the card", "Créer la carte", "Crear la tarjeta", "Ustvari kartico"],
+["Image saved.", "Image enregistrée.", "Imagen guardada.", "Slika shranjena."],
+["New personal record", "Nouveau record personnel", "Nuevo récord personal", "Nov osebni rekord"],
+["words in one day", "mots en une journée", "palabras en un día", "besed v enem dnevu"],
+["Writing streak", "Série d’écriture", "Racha de escritura", "Pisalna serija"],
+["day in a row", "jour d’affilée", "día seguido", "dan zapored"],
+["days in a row", "jours d’affilée", "días seguidos", "dni zapored"],
+["Chapter finished", "Chapitre terminé", "Capítulo terminado", "Poglavje končano"],
+["Words written in total", "Mots écrits au total", "Palabras escritas en total", "Skupaj napisanih besed"],
+["across all my manuscripts", "tous manuscrits confondus", "entre todos mis manuscritos", "v vseh mojih rokopisih"],
+["Time to write!", "C’est l’heure d’écrire !", "¡Hora de escribir!", "Čas za pisanje!"],
+["words to go today", "mots à écrire aujourd’hui", "palabras por escribir hoy", "besed danes do cilja"],
+["Keep your streak alive", "Garde ta série en vie", "Mantén viva tu racha", "Ohrani svojo serijo"],
+["Write now", "Écrire maintenant", "Escribir ahora", "Piši zdaj"],
+["Later", "Plus tard", "Más tarde", "Pozneje"],
+["Streak alert at 20:30 if my streak is at risk", "Alerte de série à 20h30 si ma série est en danger", "Alerta de racha a las 20:30 si mi racha está en peligro", "Opozorilo za serijo ob 20:30, če je ogrožena"],
+["Notifications are off here, so you will see the reminder inside the page.", "Les notifications sont désactivées ici : tu verras le rappel dans la page.", "Las notificaciones están desactivadas aquí, así que verás el recordatorio dentro de la página.", "Obvestila so tu izklopljena, zato boš opomnik videla v strani."],
+["Nudge message", "Message d’encouragement", "Mensaje de ánimo", "Sporočilo spodbude"],
+["Nudges from friends", "Encouragements de tes amies", "Ánimos de tus amigas", "Spodbude prijateljic"],
+["Thanks", "Merci", "Gracias", "Hvala"],
+["Nudge", "Encourager", "Animar", "Spodbudi"],
+["wrote today", "a écrit aujourd’hui", "escribió hoy", "je danes pisala"],
+["hasn’t written yet today", "n’a pas encore écrit aujourd’hui", "aún no ha escrito hoy", "danes še ni pisala"],
+["Pact streak:", "Série du pacte :", "Racha del pacto:", "Serija pakta:"],
+["days in a row, together", "jours d’affilée, ensemble", "días seguidos, juntas", "dni zapored, skupaj"],
+["You’ve got this! ✍️", "Tu vas y arriver ! ✍️", "¡Tú puedes! ✍️", "Zmoreš! ✍️"],
+["Your story is waiting 📖", "Ton histoire t’attend 📖", "Tu historia te espera 📖", "Tvoja zgodba čaka 📖"],
+["Just 100 words today? 💪", "Juste 100 mots aujourd’hui ? 💪", "¿Solo 100 palabras hoy? 💪", "Samo 100 besed danes? 💪"],
+["Nudge sent 💌", "Encouragement envoyé 💌", "Ánimo enviado 💌", "Spodbuda poslana 💌"],
+["You already nudged her today.", "Tu l’as déjà encouragée aujourd’hui.", "Ya la animaste hoy.", "Danes si jo že spodbudila."],
+["Nudges are not set up yet.", "Les encouragements ne sont pas encore configurés.", "Los ánimos aún no están configurados.", "Spodbude še niso nastavljene."],
+["🏆 New personal record! Share it from the Progress tab.", "🏆 Nouveau record personnel ! Partage-le depuis l’onglet Progrès.", "🏆 ¡Nuevo récord personal! Compártelo desde la pestaña Progreso.", "🏆 Nov osebni rekord! Deli ga iz zavihka Napredek."],
 ["Today","Aujourd’hui","Hoy","Danes"],["Month","Mois","Mes","Mesec"],["Book","Livre","Libro","Knjiga"],["Progress","Progrès","Progreso","Napredek"],["Friends","Amies","Amigas","Prijateljice"],["Settings","Réglages","Ajustes","Nastavitve"],
 ["Previous month","Mois précédent","Mes anterior","Prejšnji mesec"],["Next month","Mois suivant","Mes siguiente","Naslednji mesec"],
 ["My writing challenges","Mes défis d’écriture","Mis retos de escritura","Moji pisateljski izzivi"],
@@ -1401,6 +1528,9 @@ var DL=[
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
+[/^Reminder set for (\d\d:\d\d)$/,["Rappel réglé à $1","Recordatorio fijado a las $1","Opomnik nastavljen na $1"]],
+[/^best streak: (\d+)$/,["ma meilleure série : $1","mi mejor racha: $1","moja najboljša serija: $1"]],
+[/^([\d,]+) words$/,["$1 mots","$1 palabras","$1 besed"]],
 [/^(\d+) to do · (\d+) done$/,["$1 à faire · $2 faites","$1 pendientes · $2 hechas","$1 za narediti · $2 končanih"]],
 [/^(\d+) \/ (\d+) done$/,["$1 / $2 faits","$1 / $2 hechos","$1 / $2 opravljenih"]],
 [/^(\d+) days written that week$/,["$1 jours écrits cette semaine-là","$1 días escritos esa semana","$1 dni pisanja tisti teden"]],
@@ -1447,7 +1577,7 @@ var RX=[
 ];
 
 var TK=[["January","janvier","enero","januar"],["February","février","febrero","februar"],["March","mars","marzo","marec"],["April","avril","abril","april"],["May","mai","mayo","maj"],["June","juin","junio","junij"],["July","juillet","julio","julij"],["August","août","agosto","avgust"],["September","septembre","septiembre","september"],["October","octobre","octubre","oktober"],["November","novembre","noviembre","november"],["December","décembre","diciembre","december"],
-["Jan","janv.","ene","jan"],["Feb","févr.","feb","feb"],["Apr","avr.","abr","apr"],["Jun","juin","jun","jun"],["Jul","juil.","jul","jul"],["Aug","août","ago","avg"],["Sept","sept.","sept","sept"],["Sep","sept.","sep","sep"],["Oct","oct.","oct","okt"],["Nov","nov.","nov","nov"],["Dec","déc.","dic","dec"],
+["Jan","janv.","ene","jan"],["Mar","mars","mar","mar"],["Feb","févr.","feb","feb"],["Apr","avr.","abr","apr"],["Jun","juin","jun","jun"],["Jul","juil.","jul","jul"],["Aug","août","ago","avg"],["Sept","sept.","sept","sept"],["Sep","sept.","sep","sep"],["Oct","oct.","oct","okt"],["Nov","nov.","nov","nov"],["Dec","déc.","dic","dec"],
 ["Mon","lun.","lun","pon"],["Tue","mar.","mar","tor"],["Wed","mer.","mié","sre"],["Thu","jeu.","jue","čet"],["Fri","ven.","vie","pet"],["Sat","sam.","sáb","sob"],["Sun","dim.","dom","ned"]];
 
 var TOK={};TK.forEach(function(r){TOK[r[0]]=[r[1],r[2],r[3]]});
