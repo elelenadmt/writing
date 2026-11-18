@@ -202,7 +202,7 @@ html:not([data-mode="editor"]) .eonly{display:none!important}
 .phname{font-size:1.05rem}.enet{margin:10px 0}.tdch{margin-top:10px}
 .stk{display:flex;height:14px;border-radius:9px;overflow:hidden;background:var(--line);margin:8px 0}.stk i{display:block;height:100%}.stk .s1{background:color-mix(in srgb,var(--accent2) 22%,var(--line))}.stk .s2{background:color-mix(in srgb,var(--accent2) 45%,var(--line))}.stk .s3{background:color-mix(in srgb,var(--accent2) 70%,var(--line))}.stk .s4{background:var(--accent2)}
 .subs{margin-top:16px;padding-top:12px;border-top:1px dashed var(--line);display:grid;gap:8px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{border:0;background:var(--bg);padding:8px 16px;color:var(--ink);font:inherit}.seg button[aria-pressed=true]{background:var(--accent2);color:var(--onacc)}
+.xside{position:fixed;top:92px;width:calc((100vw - 880px)/2 - 30px);max-width:300px;display:none;flex-direction:column;gap:12px;max-height:calc(100vh - 110px);overflow:auto;z-index:5}.xside.xr{right:14px}.xside.xl{left:14px}@media (min-width:1340px){.xside.on{display:flex}.xstrip{display:none!important}}.xstrip{display:none;gap:10px;overflow-x:auto;padding:4px 2px 10px;margin-top:10px}.xstrip.on{display:flex}.xstrip .swg{flex:0 0 230px}.swg{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:0 6px 18px -12px var(--accent2);font-size:.92rem}.swg h3{margin:0 0 6px;font:inherit;font-size:.82rem;color:var(--mute);font-weight:600}.swn{font-size:1.7rem;font-weight:700;color:var(--accent);line-height:1.15}.swg .cnrow{margin-top:4px}.swr{display:grid;gap:3px;margin-top:6px}.swr .bar{height:8px}.bt{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px;background:var(--bg)}.btH{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.btH b{flex:1;min-width:6rem}.btH .ghost{width:26px;height:26px;font-size:14px;padding:0}.btB{margin-top:8px}.btB label{display:grid;gap:3px;font-size:.85rem;margin-top:6px}.bfc{font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-right:6px;color:var(--mute);white-space:nowrap}.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{border:0;background:var(--bg);padding:8px 16px;color:var(--ink);font:inherit}.seg button[aria-pressed=true]{background:var(--accent2);color:var(--onacc)}
 .remrow{display:flex;flex-direction:row;gap:8px;align-items:center;color:var(--ink)}
 #spSndSel{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:5px 8px;max-width:11rem}
 .chrow{grid-template-columns:1fr 110px 100px auto}
@@ -959,7 +959,7 @@ var cards=[[fmt(bdv),'record day ('+dl(bd,{day:"numeric",month:"short",year:"num
 $("xRec").innerHTML='<h2>🏆 Personal records</h2><div class="stats" style="margin:0">'+cards.map(function(x){return '<div class="stat"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("")+'</div>'}
 
 /* ===== Editor system: tabs, desk, chapters, to-do, stats ===== */
-var EG=new Map(),TBE=[["edesk","🖊️","Desk"],["echap","📑","Chapters"],["etodo","📋","To-do"],["estats","📊","Stats"],["settings","⚙️","Settings"]],CST=["Idea","Draft","Revised","Done"];
+var EG=new Map(),TBE=[["edesk","🖊️","Desk"],["echap","📑","Chapters"],["etodo","📋","To-do"],["ebeta","💬","Beta readers"],["estats","📊","Stats"],["efr","👯","Friends"],["settings","⚙️","Settings"]],CST=["Idea","Draft","Revised","Done"];
 function curTB(){return Y.mode==="editor"?TBE:TB}
 function buildNav(){nav.innerHTML=curTB().map(function(t){return '<button class="tab" type="button" data-t="'+t[0]+'">'+t[1]+' '+t[2]+'</button>'}).join("")}
 window.WTNAV=function(){buildNav();showTab((Y.tb&&Y.tb[Y.mode])||curTB()[0][0])};
@@ -1150,7 +1150,80 @@ else if(k==="str"){var st=streakNow(),bs=bestStreak(),sb=[st.n===1?"day in a row
 else if(k==="tot"){o={em:"📚",head:"Words written in total",big:fmt(allWords()),sub:["across all my manuscripts"],f:"wt-total.png"}}
 else if(k==="chp"){var dc=doneChaps(),c=dc[+($("xShCh")?$("xShCh").value:0)]||dc[0];if(!c)return;o={em:"✅",head:"Chapter finished",big:c.n,sub:[c.ms,fmt(c.w)+" words"],f:"wt-chapter.png"}}
 if(o)shareCard(o)});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV()};
+
+/* v32: editor friends tab, beta readers, side widgets */
+var gbt=mkc("xBeta");gtd.after(gbt);G.push(["-",gbt]);EG.set(gbt,"ebeta");
+var BST=["Invited","Reading","Feedback in","Thanked"],betaView="reader",betaF="*",betaHide=false,betaOpen={},betaDel="";
+function cid(c){if(!c.id)c.id="c"+Math.random().toString(36).slice(2,8);return c.id}
+function bData(ms){var b=ms.beta||(ms.beta={readers:[]});return b.readers}
+function cNm(ms,id){if(!id)return "Whole book";var c=chaps(ms).filter(function(x){return x.id===id})[0];return c?c.n:"(deleted chapter)"}
+function bfOk(f){return(betaF==="*"||f.c===betaF)&&!(betaHide&&f.x)}
+function betaV(){var ms=curMsE(),R=bData(ms),cs=chaps(ms),kp={},tot=0,open=0;["xBdN","xBfT","xBfR","xBfC"].forEach(function(i){if($(i))kp[i]=$(i).value});
+R.forEach(function(r){(r.fb||[]).forEach(function(f){tot++;if(!f.x)open++})});
+var co='<option value="">Whole book</option>'+cs.map(function(c){return '<option value="'+cid(c)+'">'+esc(c.n)+'</option>'}).join("");
+var h='<h2>💬 <span>Beta readers</span></h2><div class="pct">'+esc(ms.name)+' · '+R.length+' <span>readers</span> · '+tot+' <span>comments</span> · '+open+' <span>to address</span></div>';
+h+='<div class="row" style="margin-top:10px;align-items:stretch"><input type="text" id="xBdN" class="cni" maxlength="40" placeholder="Beta reader’s name" aria-label="Beta reader’s name"><button class="save" id="xBdA" type="button">Add reader</button></div>';
+if(R.length){h+='<div class="subs" style="margin-top:14px"><b><span>Add feedback</span></b><div class="row" style="margin-top:6px"><label><span>From</span><select id="xBfR">'+R.map(function(r,i){return '<option value="'+i+'">'+esc(r.n)+'</option>'}).join("")+'</select></label><label><span>About</span><select id="xBfC">'+co+'</select></label></div><div class="row" style="margin-top:6px;align-items:stretch"><input type="text" id="xBfT" class="cni" maxlength="300" placeholder="What did they say?" aria-label="Feedback"><button class="save" id="xBfA" type="button">Add feedback</button></div></div>';
+h+='<div class="row" style="margin-top:14px;align-items:center"><div class="seg" id="xBvw"><button type="button" data-v="reader" aria-pressed="'+(betaView==="reader")+'">By reader</button><button type="button" data-v="chapter" aria-pressed="'+(betaView==="chapter")+'">By chapter</button></div><label style="display:inline-flex"><span class="pct">Show</span><select id="xBflt"><option value="*">All chapters</option>'+co.replace('Whole book','Whole book')+'</select></label><label class="remrow"><input type="checkbox" id="xBhide"'+(betaHide?' checked':'')+'><span>Hide addressed</span></label></div>'}
+if(!R.length)h+='<div class="pct" style="margin-top:10px">No beta readers yet. Add the people reading your book, then note their feedback.</div>';
+else if(betaView==="reader"){h+=R.map(function(r,i){var fb=r.fb||[],dn=fb.filter(function(f){return f.x}).length,op=betaOpen[r.id]!==false,rows=fb.map(function(f,j){return[f,j]}).filter(function(z){return bfOk(z[0])});
+var b='<div class="bt" data-i="'+i+'"><div class="btH">'+WTDH+'<button class="ghost bto" type="button" data-i="'+i+'" aria-label="Show or hide">'+(op?'▾':'▸')+'</button><b>'+esc(r.n)+'</b><select class="bst" data-i="'+i+'" aria-label="Status">'+BST.map(function(x){return '<option'+(x===r.st?' selected':'')+'>'+x+'</option>'}).join("")+'</select><span class="pct">'+dn+'/'+fb.length+'</span><button class="ghost bdr" type="button" data-i="'+i+'" aria-label="Delete reader">'+(betaDel===r.id?'?':'×')+'</button></div>';
+if(op){b+='<div class="btB"><div class="row"><label><span>Contact (optional)</span><input type="text" class="bct cni" data-i="'+i+'" maxlength="80" value="'+esc(r.ct||"")+'"></label><label><span>Sent on</span><input type="date" class="bsd" data-i="'+i+'" value="'+esc(r.sent||"")+'"></label></div>';
+b+=rows.length?rows.map(function(z){var f=z[0],j=z[1];return '<div class="cnrow"><input type="checkbox" class="bfx" data-i="'+i+'" data-j="'+j+'"'+(f.x?' checked':'')+'><span class="cnt'+(f.x?' dn':'')+'"><span class="bfc">'+esc(cNm(ms,f.c))+'</span>'+esc(f.t)+'</span>'+(f.c&&!f.td?'<button class="ghost bft" type="button" data-i="'+i+'" data-j="'+j+'" aria-label="Add to revision to-do" title="Add to revision to-do">📋</button>':'')+'<button class="ghost bfd" type="button" data-i="'+i+'" data-j="'+j+'" aria-label="Delete">×</button></div>'}).join(""):'<div class="pct" style="margin-top:8px">No feedback to show.</div>';b+='</div>'}
+return b+'</div>'}).join("")}
+else{var gs=[""].concat(cs.map(function(c){return c.id})),any=false;gs.forEach(function(g){var it=[];R.forEach(function(r,i){(r.fb||[]).forEach(function(f,j){if((f.c||"")===g&&bfOk(f))it.push([r,i,f,j])})});if(!it.length)return;any=true;
+h+='<div class="tdch"><b>'+esc(cNm(ms,g))+'</b>'+it.map(function(z){var r=z[0],i=z[1],f=z[2],j=z[3];return '<div class="cnrow"><input type="checkbox" class="bfx" data-i="'+i+'" data-j="'+j+'"'+(f.x?' checked':'')+'><span class="cnt'+(f.x?' dn':'')+'"><b>'+esc(r.n)+':</b> '+esc(f.t)+'</span>'+(f.c&&!f.td?'<button class="ghost bft" type="button" data-i="'+i+'" data-j="'+j+'" aria-label="Add to revision to-do" title="Add to revision to-do">📋</button>':'')+'<button class="ghost bfd" type="button" data-i="'+i+'" data-j="'+j+'" aria-label="Delete">×</button></div>'}).join("")+'</div>'});
+if(!any)h+='<div class="pct" style="margin-top:10px">No feedback to show.</div>'}
+$("xBeta").innerHTML=h;Object.keys(kp).forEach(function(i){if($(i)&&kp[i]!=="")$(i).value=kp[i]});if($("xBflt"))$("xBflt").value=betaF}
+gbt.addEventListener("click",function(e){var ms=curMsE(),R=bData(ms),t=e.target,cl=t.classList,i=+t.dataset.i,j=+t.dataset.j,rd=R[i];
+if(t.id==="xBdA"){var nm=$("xBdN").value.trim();if(!nm)return;var o={id:"b"+Math.random().toString(36).slice(2,8),n:nm.slice(0,40),st:"Invited",sent:todayKey,ct:"",fb:[]};R.push(o);betaOpen[o.id]=true;$("xBdN").value=""}
+else if(t.id==="xBfA"){var ri=+$("xBfR").value,tx=$("xBfT").value.trim();if(!tx||!R[ri])return;var rr=R[ri];(rr.fb||(rr.fb=[])).push({t:tx.slice(0,300),c:$("xBfC").value,x:0,d:todayKey});if(rr.st!=="Thanked")rr.st="Feedback in";$("xBfT").value=""}
+else if(t.closest&&t.closest("#xBvw")&&t.dataset.v){betaView=t.dataset.v;betaV();return}
+else if(cl.contains("bto")){betaOpen[rd.id]=betaOpen[rd.id]===false;betaV();return}
+else if(cl.contains("bdr")){if(!(rd.fb||[]).length||betaDel===rd.id){R.splice(i,1);betaDel=""}else{betaDel=rd.id;betaV();return}}
+else if(cl.contains("bfd")){rd.fb.splice(j,1)}
+else if(cl.contains("bft")){var f0=rd.fb[j],c0=chaps(ms).filter(function(x){return x.id===f0.c})[0];if(!c0)return;(c0.nt||(c0.nt=[])).push({t:"["+rd.n+"] "+f0.t,x:0});f0.td=1}
+else return;save();render()});
+gbt.addEventListener("change",function(e){var ms=curMsE(),R=bData(ms),t=e.target,cl=t.classList,i=+t.dataset.i,j=+t.dataset.j;
+if(cl.contains("bst")){R[i].st=t.value}
+else if(cl.contains("bct")){R[i].ct=t.value.trim().slice(0,80)}
+else if(cl.contains("bsd")){R[i].sent=t.value}
+else if(cl.contains("bfx")){R[i].fb[j].x=t.checked?1:0}
+else if(t.id==="xBflt"){betaF=t.value;betaV();return}
+else if(t.id==="xBhide"){betaHide=t.checked;betaV();return}
+else return;save();render()});
+gbt.addEventListener("keydown",function(e){if(e.key!=="Enter")return;if(e.target.id==="xBdN"){e.preventDefault();$("xBdA").click()}else if(e.target.id==="xBfT"){e.preventDefault();$("xBfA").click()}});
+wtDrag(gbt,".bt",function(from,to){var R=bData(curMsE());R.splice(to,0,R.splice(from,1)[0]);save();render()});
+
+/* side widgets */
+var SWG=[["goal","🎯","Today’s goal"],["month","📅","Month progress"],["streak","🔥","Streak"],["book","📖","Book progress"],["race","🏁","Progress race"],["friends","👯","Friends today"],["week","✅","Goals of the week"],["todo","📋","Revision to-do"],["beta","💬","Beta feedback"],["phase","🧭","Editing phase"],["quote","💭","Writing quote"]];
+if(!Y.sw)Y.sw=[];
+function swBar(p){return '<div class="bar"><i style="width:'+Math.max(0,Math.min(100,p))+'%"></i></div>'}
+var SWF={
+goal:function(){var q=dailyGap(),c=S.challenges[todayKey.slice(0,7)];if(!c||!q)return '<div class="pct"><span>Open the current month to start your challenge.</span></div>';var tw=((c.entries[todayKey]||{}).words)||0,g=tw+q.need;if(g<=0)return '<div class="swn">🎉</div><div class="pct"><span>Goal reached</span></div>';return '<div class="swn">'+fmt(tw)+'</div><div class="pct"><span>of</span> <b>'+fmt(g)+'</b> <span>words today</span></div>'+swBar(tw/g*100)},
+month:function(){var c=S.challenges[todayKey.slice(0,7)];if(!c)return '<div class="pct"><span>Open the current month to start your challenge.</span></div>';var t=sumC(c),n=new Date().getDate(),dm=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();return '<div class="swn">'+fmt(t)+'</div><div class="pct"><span>of</span> <b>'+fmt(c.goal)+'</b> <span>words</span> · '+(dm-n+1)+' <span>days left</span></div>'+swBar(c.goal>0?t/c.goal*100:0)},
+streak:function(){var st=streakNow();return '<div class="swn">🔥 '+st.n+'</div><div class="pct"><span>'+(st.n===1?'day in a row':'days in a row')+'</span> · '+(st.today?'✅ <span>wrote today</span>':'<span>not yet today</span>')+'</div>'},
+book:function(){var ms=curMsE(),dd=window.wtDaily(ms.id),t=ms.base||0,k;for(k in dd)t+=dd[k];var g=ms.goal||0;return '<div class="pct">'+esc(ms.name)+'</div><div class="swn">'+fmt(t)+'</div>'+(g?'<div class="pct"><span>of</span> <b>'+fmt(g)+'</b> <span>words</span> · '+Math.round(Math.min(100,t/g*100))+'%</div>'+swBar(t/g*100):'')},
+race:function(){var c=S.challenges[todayKey.slice(0,7)],ex=readEx(),mkk=todayKey.slice(0,7);if(!c)return '<div class="pct"><span>Open the current month to start your challenge.</span></div>';var rows=[{n:(ex.me||"Me")+" ("+"you)",w:sumC(c)}].concat((ex.friends||[]).filter(function(f){return f.m===mkk}).map(function(f){return{n:f.n,w:f.w}})).concat((window.WTLIVE?window.WTLIVE.rows():[]).filter(function(f){return f.row}).map(function(f){return{n:f.name,w:f.row.words}}));rows.sort(function(a,b){return b.w-a.w});var g=c.goal||1;return rows.slice(0,6).map(function(q){return '<div class="swr"><div style="display:flex;justify-content:space-between;gap:6px"><span>'+esc(q.n)+'</span><b>'+fmt(q.w)+'</b></div>'+swBar(q.w/g*100)+'</div>'}).join("")},
+friends:function(){var L=window.WTLIVE?window.WTLIVE.rows():[],dn=new Date().getDate();if(!L.length)return '<div class="pct"><span>Add friends in the Friends tab.</span></div>';return L.map(function(f){var sr=f.row&&f.row.series?f.row.series.map(Number):[],b=sr.length>=dn?sr[dn-1]-(dn>1?sr[dn-2]:0):null;return '<div class="cnrow"><span class="cnt">'+esc(f.name)+'</span><span>'+(b===null?'·':b>0?'✅':'💤')+'</span></div>'}).join("")},
+week:function(){var L=wgList(curMsE());return L.length?L.map(function(q,j){return '<div class="cnrow"><input type="checkbox" class="swx" data-j="'+j+'"'+(q.x?' checked':'')+'><span class="cnt'+(q.x?' dn':'')+'">'+esc(q.t)+'</span></div>'}).join(""):'<div class="pct"><span>No goals this week</span></div>'},
+todo:function(){var cs=chaps(curMsE()),op=[];cs.forEach(function(c){(c.nt||[]).forEach(function(q){if(!q.x)op.push(c.n+": "+q.t)})});return '<div class="swn">'+op.length+'</div><div class="pct"><span>to do</span></div>'+op.slice(0,3).map(function(x){return '<div class="pct" style="margin-top:4px">• '+esc(x)+'</div>'}).join("")},
+beta:function(){var R=bData(curMsE()),open=0;R.forEach(function(r){(r.fb||[]).forEach(function(f){if(!f.x)open++})});if(!R.length)return '<div class="pct"><span>No beta readers yet</span></div>';return '<div class="swn">'+open+'</div><div class="pct"><span>to address</span></div>'+R.filter(function(r){return r.st!=="Thanked"}).slice(0,4).map(function(r){return '<div class="cnrow"><span class="cnt">'+esc(r.n)+'</span><span class="pct">'+r.st+'</span></div>'}).join("")},
+phase:function(){var ms=curMsE(),ph=ms.phase||0;return '<div class="swn">'+PHI[ph]+'</div><div class="pct"><b>'+PHN[ph]+'</b> · '+(ph+1)+'/8</div>'+swBar((ph+1)/8*100)},
+quote:function(){return '<div class="pct" style="font-style:italic">“'+(typeof pi==="number"&&PR[pi]?PR[pi]:PR[0])+'”</div>'}};
+var gsx=document.createElement("aside"),gsy=document.createElement("aside"),gst=document.createElement("div");gsx.id="xSideR";gsx.className="xside xr";gsy.id="xSideL";gsy.className="xside xl";gst.id="xStrip";gst.className="xstrip";document.body.appendChild(gsx);document.body.appendChild(gsy);nav.after(gst);
+function sideV(){var L=Y.sw||[],R=[],Lf=[],strip='';
+L.forEach(function(w){var d=SWG.filter(function(x){return x[0]===w.k})[0],f=SWF[w.k];if(!d||!f)return;var html='<div class="swg" data-k="'+w.k+'"><h3>'+d[1]+' <span>'+d[2]+'</span></h3>'+f()+'</div>';(w.s==="l"?Lf:R).push(html);strip+=html});
+$("xSideR").innerHTML=R.join("");$("xSideL").innerHTML=Lf.join("");$("xSideR").classList.toggle("on",R.length>0);$("xSideL").classList.toggle("on",Lf.length>0);$("xStrip").innerHTML=strip;$("xStrip").classList.toggle("on",!!strip&&Y.swStrip!==false)}
+document.addEventListener("change",function(e){if(!e.target.classList||!e.target.classList.contains("swx"))return;var L=wgList(curMsE());if(!L[+e.target.dataset.j])return;L[+e.target.dataset.j].x=e.target.checked?1:0;save();render()});
+var gsw=mkc("xSideCfg");$("xPrefs").after(gsw);G.push(["settings",gsw]);EG.set(gsw,"settings");
+function swCfgV(){var L=Y.sw||[],used={};L.forEach(function(w){used[w.k]=1});
+$("xSideCfg").innerHTML='<h2>📌 <span>Side widgets</span></h2><div class="pct"><span>Keep widgets in view on every tab and in both modes. On wide screens they sit in the empty space on the sides. On smaller screens they appear in a strip under the tabs.</span></div><label style="margin-top:10px"><span>Add a widget</span><select id="xSwAdd"><option value="">—</option>'+SWG.filter(function(x){return!used[x[0]]}).map(function(x){return '<option value="'+x[0]+'">'+x[1]+' '+x[2]+'</option>'}).join("")+'</select></label><div id="xSwList">'+L.map(function(w,i){var d=SWG.filter(function(x){return x[0]===w.k})[0];if(!d)return"";return '<div class="cnrow swrow" data-i="'+i+'">'+WTDH+'<span class="cnt">'+d[1]+' <span>'+d[2]+'</span></span><button class="ghost sws" data-i="'+i+'" type="button" style="width:auto;padding:0 10px;font-size:.8rem">'+(w.s==="l"?'◀ <span>Left</span>':'<span>Right</span> ▶')+'</button><button class="ghost swd" data-i="'+i+'" type="button" aria-label="Remove">×</button></div>'}).join("")+'</div><label class="remrow" style="margin-top:10px"><input type="checkbox" id="xSwStrip"'+(Y.swStrip!==false?' checked':'')+'><span>Show them in a strip on small screens</span></label>'}
+gsw.addEventListener("change",function(e){if(e.target.id==="xSwAdd"){var k=e.target.value;if(!k)return;var nl=Y.sw.filter(function(w){return w.s==="l"}).length;Y.sw.push({k:k,s:nl<Y.sw.length-nl?"l":"r"})}else if(e.target.id==="xSwStrip"){Y.swStrip=e.target.checked}else return;saveY();render()});
+gsw.addEventListener("click",function(e){var t=e.target,i=+t.dataset.i;if(t.classList.contains("sws")){Y.sw[i].s=Y.sw[i].s==="l"?"r":"l"}else if(t.classList.contains("swd")){Y.sw.splice(i,1)}else return;saveY();render()});
+wtDrag(gsw,".swrow",function(from,to){var L=Y.sw;L.splice(to,0,L.splice(from,1)[0]);saveY();render()});
+G.forEach(function(g){if(g[0]==="friends")EG.set(g[1],"efr")});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1293,6 +1366,53 @@ if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","e
 function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
 var IDX={fr:0,es:1,sl:2};
 var DL=[
+["Beta readers", "Bêta-lecteurs", "Lectores beta", "Beta bralci"],
+["readers", "lecteurs", "lectores", "bralcev"],
+["comments", "retours", "comentarios", "komentarjev"],
+["to address", "à traiter", "por abordar", "za obravnavo"],
+["Beta reader’s name", "Nom du bêta-lecteur", "Nombre del lector beta", "Ime beta bralca"],
+["Add reader", "Ajouter un lecteur", "Añadir lector", "Dodaj bralca"],
+["Add feedback", "Ajouter un retour", "Añadir comentario", "Dodaj povratno informacijo"],
+["From", "De", "De", "Od"],
+["About", "À propos de", "Sobre", "O"],
+["What did they say?", "Qu’a-t-il dit ?", "¿Qué dijo?", "Kaj je rekel?"],
+["By reader", "Par lecteur", "Por lector", "Po bralcu"],
+["By chapter", "Par chapitre", "Por capítulo", "Po poglavju"],
+["Show", "Afficher", "Mostrar", "Prikaži"],
+["All chapters", "Tous les chapitres", "Todos los capítulos", "Vsa poglavja"],
+["Whole book", "Tout le livre", "Todo el libro", "Cela knjiga"],
+["Hide addressed", "Masquer les traités", "Ocultar los abordados", "Skrij obravnavane"],
+["Contact (optional)", "Contact (facultatif)", "Contacto (opcional)", "Stik (neobvezno)"],
+["Sent on", "Envoyé le", "Enviado el", "Poslano dne"],
+["Invited", "Invité", "Invitado", "Povabljen"],
+["Reading", "En lecture", "Leyendo", "Bere"],
+["Feedback in", "Retours reçus", "Comentarios recibidos", "Povratne informacije prejete"],
+["Thanked", "Remercié", "Agradecido", "Zahvaljen"],
+["No feedback to show.", "Aucun retour à afficher.", "Ningún comentario que mostrar.", "Ni povratnih informacij za prikaz."],
+["No beta readers yet. Add the people reading your book, then note their feedback.", "Pas encore de bêta-lecteurs. Ajoute les personnes qui lisent ton livre, puis note leurs retours.", "Aún no hay lectores beta. Añade a las personas que leen tu libro y anota sus comentarios.", "Še ni beta bralcev. Dodaj osebe, ki berejo tvojo knjigo, in zapiši njihove povratne informacije."],
+["No beta readers yet", "Pas encore de bêta-lecteurs", "Aún no hay lectores beta", "Še ni beta bralcev"],
+["Side widgets", "Widgets latéraux", "Widgets laterales", "Stranski pripomočki"],
+["Keep widgets in view on every tab and in both modes. On wide screens they sit in the empty space on the sides. On smaller screens they appear in a strip under the tabs.", "Garde des widgets sous les yeux dans tous les onglets et les deux modes. Sur grand écran, ils se placent dans l’espace vide sur les côtés. Sur petit écran, ils apparaissent dans une bande sous les onglets.", "Mantén widgets a la vista en todas las pestañas y en ambos modos. En pantallas grandes se colocan en el espacio vacío de los lados. En pantallas pequeñas aparecen en una franja bajo las pestañas.", "Pripomočke imej na očeh v vseh zavihkih in obeh načinih. Na velikih zaslonih so v praznem prostoru ob straneh. Na manjših zaslonih so v traku pod zavihki."],
+["Add a widget", "Ajouter un widget", "Añadir un widget", "Dodaj pripomoček"],
+["Left", "Gauche", "Izquierda", "Levo"],
+["Right", "Droite", "Derecha", "Desno"],
+["Show them in a strip on small screens", "Les afficher dans une bande sur petit écran", "Mostrarlos en una franja en pantallas pequeñas", "Prikaži jih v traku na majhnih zaslonih"],
+["Month progress", "Progression du mois", "Progreso del mes", "Napredek meseca"],
+["Streak", "Série", "Racha", "Serija"],
+["Book progress", "Progression du livre", "Progreso del libro", "Napredek knjige"],
+["Progress race", "Course de progression", "Carrera de progreso", "Tekma napredka"],
+["Friends today", "Amies aujourd’hui", "Amigas hoy", "Prijateljice danes"],
+["Goals of the week", "Objectifs de la semaine", "Objetivos de la semana", "Cilji tedna"],
+["Revision to-do", "À faire pour la révision", "Pendientes de revisión", "Opravila za revizijo"],
+["Beta feedback", "Retours des bêta-lecteurs", "Comentarios beta", "Povratne informacije beta"],
+["Editing phase", "Phase de révision", "Fase de edición", "Faza urejanja"],
+["Writing quote", "Citation d’écriture", "Cita de escritura", "Pisalni citat"],
+["Goal reached", "Objectif atteint", "Objetivo alcanzado", "Cilj dosežen"],
+["days left", "jours restants", "días restantes", "dni do konca"],
+["not yet today", "pas encore aujourd’hui", "aún no hoy", "danes še ne"],
+["Add friends in the Friends tab.", "Ajoute des amies dans l’onglet Amies.", "Añade amigas en la pestaña Amigas.", "Dodaj prijateljice v zavihku Prijateljice."],
+["No goals this week", "Aucun objectif cette semaine", "Sin objetivos esta semana", "Ni ciljev ta teden"],
+["to do", "à faire", "pendientes", "za narediti"],
 ["Less", "Moins", "Menos", "Manj"],
 ["More", "Plus", "Más", "Več"],
 ["Rest day", "Jour de repos", "Día de descanso", "Dan počitka"],
