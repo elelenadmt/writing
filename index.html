@@ -292,9 +292,10 @@ body.dnd{user-select:none;-webkit-user-select:none;cursor:grabbing}
     <label>A note (optional)<textarea id="note" placeholder="Scene written, idea, writer’s block…"></textarea></label>
     <div class="sprint">
       <div style="font-size:.88rem;color:var(--mute)">Writing sprint</div>
-      <div class="row"><label>Minutes<select id="spMin"><option>5</option><option>10</option><option>15</option><option selected>25</option><option>45</option></select></label><label>Custom (min)<input type="number" id="spCustom" min="1" max="240" step="1" style="width:5.2rem"></label><button class="ghost" id="spSet" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Set</button><div class="spt" id="spT">25:00</div><button class="save" id="spGo" type="button">Start</button><button class="ghost" id="spReset" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button></div>
+      <div class="row"><label>Minutes<select id="spMin"><option>5</option><option>10</option><option>15</option><option selected>25</option><option>45</option></select></label><label>Custom (min)<input type="number" id="spCustom" min="1" max="240" step="1" style="width:5.2rem"></label><button class="ghost" id="spSet" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Set</button><div class="spt" id="spT">25:00</div><button class="save" id="spGo" type="button">Start</button><button class="ghost" id="spReset" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Reset</button><button class="ghost" id="spStop" type="button" style="width:auto;padding:0 14px;font-size:.9rem" hidden>Stop &amp; log words</button></div>
       <div id="spDone" hidden><div class="row"><label>Words written in the sprint<input type="number" id="spW" min="0" step="10"></label><button class="save" id="spAdd" type="button">Add to today</button></div></div>
       <div class="toast" id="spMsg" role="status"></div>
+      <div id="xAskBoxS" hidden></div>
     </div>
     <div class="row"><button class="save" id="save">Save session</button><button class="ghost" id="del" style="width:auto;padding:0 16px;font-size:.9rem">Clear this day</button><span class="toast" id="toast" role="status"></span></div>
   </div>
@@ -366,7 +367,7 @@ function paintMood(){document.querySelectorAll(".mood").forEach(function(b){b.se
 function loadForm(){
   $("date").value=sel;
   var e=E()[sel];
-  $("words").value="";$("setTot").checked=false;$("restDay").checked=!!(e&&e.rest&&!(e.words>0));$("dayN").textContent=fmt(e?e.words||0:0);
+  $("words").value="";$("setTot").checked=false;$("restDay").checked=!!(e&&e.rest&&!(e.words>0));$("dayN").textContent=fmt(e?e.words||0:0)+(e&&e.rest&&!(e.words>0)?" 😴":"");
   $("note").value=e&&e.note?e.note:"";
   S.mood=e?e.mood:3;paintMood();
 }
@@ -445,7 +446,7 @@ $("save").addEventListener("click",function(){
   if(w<0){toast("Enter a word count (0 or more).");return}
   var nw=rep?w:((old&&old.words)||0)+w,ent={words:nw,mood:S.mood,note:$("note").value},dl=nw-((old&&old.words)||0);if(old&&old.h)ent.h=old.h;if(dl>0&&sel===todayKey){var hh=new Date().getHours();ent.h=Object.assign({},ent.h||{});ent.h[hh]=(ent.h[hh]||0)+dl}
   var dd0=window.wtDaily?window.wtDaily():{},pb=0,any0=0;Object.keys(dd0).forEach(function(k0){if(k0!==sel){any0++;if(dd0[k0]>pb)pb=dd0[k0]}});var rec=any0>=3&&nw>pb&&nw>0;
-  if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(rec?"🏆 New personal record! Share it from the Progress tab.":["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
+  if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(ent.rest?"😴 Rest day saved. Your streak is safe.":rec?"🏆 New personal record! Share it from the Progress tab.":["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
   if(dl>0&&window.wtAskCh)window.wtAskCh(dl);
 });
 $("setTot").addEventListener("change",function(){var e=E()[sel];$("words").value=$("setTot").checked&&e?e.words||0:"";$("words").focus()});
@@ -643,20 +644,22 @@ $("xAdd").addEventListener("click",function(){var v=$("xFin").value.trim();try{i
 X.friends=X.friends.filter(function(f){return!(f.n===o.n&&f.m===o.m)});X.friends.push({n:o.n.slice(0,30),m:o.m,w:+o.w,g:+o.g,t:String(o.t||"").slice(0,80),s:Array.isArray(o.s)?o.s.slice(0,31).map(function(v){return+v||0}):null});saveX();$("xFin").value="";$("xFmsg").textContent=o.m===mk()?"Friend added!":"Added for "+o.m+": go to that month to see it.";xr()}catch(e){$("xFmsg").textContent="This code is not valid."}});
 $("xFr").addEventListener("click",function(e){var b=e.target.closest(".fdel");if(!b)return;X.friends=X.friends.filter(function(f){return!(f.n===b.dataset.n&&f.m===mk())});saveX();xr()});
 
-var T={run:false,end:0,left:0,iv:null,m:25};
+var T={run:false,end:0,left:0,iv:null,m:25,rec:0};
 function mmss(ms){var s=Math.max(0,Math.round(ms/1000));return pad(Math.floor(s/60))+":"+pad(s%60)}
 function spShow(){$("spT").textContent=mmss(T.run?T.end-Date.now():(T.left||(+$("spMin").value)*60000))}
 $("spMin").addEventListener("change",function(){if(!T.run){T.left=0;spShow()}});
 $("spGo").addEventListener("click",function(){
 if(T.run){T.left=T.end-Date.now();T.run=false;clearInterval(T.iv);$("spGo").textContent="Resume";spShow();return}
-if(!T.left)T.left=(+$("spMin").value)*60000;T.m=+$("spMin").value;T.end=Date.now()+T.left;T.run=true;$("spGo").textContent="Pause";$("spDone").hidden=true;$("spMsg").textContent="";
-T.iv=setInterval(function(){if(T.end-Date.now()<=0){clearInterval(T.iv);T.run=false;T.left=0;$("spGo").textContent="Start";$("spT").textContent="00:00";$("spDone").hidden=false;$("spMsg").textContent="Time’s up! 🎉 How many words did you write?";try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}$("spW").focus()}else spShow()},250)});
-$("spReset").addEventListener("click",function(){clearInterval(T.iv);T.run=false;T.left=0;$("spGo").textContent="Start";$("spDone").hidden=true;$("spMsg").textContent="";spShow()});
+if(!T.left)T.left=(+$("spMin").value)*60000;if(!T.started){T.m=+$("spMin").value;T.started=1}T.rec=0;T.end=Date.now()+T.left;T.run=true;$("spGo").textContent="Pause";$("spStop").hidden=false;$("spDone").hidden=true;$("spMsg").textContent="";
+T.iv=setInterval(function(){if(T.end-Date.now()<=0){clearInterval(T.iv);T.run=false;T.left=0;$("spGo").textContent="Start";T.started=0;$("spStop").hidden=true;$("spT").textContent="00:00";$("spDone").hidden=false;$("spMsg").textContent="Time’s up! 🎉 How many words did you write?";try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}$("spW").focus()}else spShow()},250)});
+$("spReset").addEventListener("click",function(){clearInterval(T.iv);T.run=false;T.left=0;T.started=0;T.rec=0;$("spStop").hidden=true;$("spGo").textContent="Start";$("spDone").hidden=true;$("spMsg").textContent="";spShow()});
+$("spStop").addEventListener("click",function(){var rem=T.run?T.end-Date.now():T.left,el=(T.m*60000-rem)/60000;if(!(el>=0.5)){$("spMsg").textContent="Write for at least 30 seconds first.";return}
+clearInterval(T.iv);T.run=false;T.left=0;T.started=0;T.rec=Math.round(el*10)/10;$("spGo").textContent="Start";$("spStop").hidden=true;$("spT").textContent=mmss(T.rec*60000);$("spDone").hidden=false;$("spMsg").textContent="Stopped after "+T.rec+" min. How many words did you write?";$("spW").focus()});
 $("spAdd").addEventListener("click",function(){var w=parseInt($("spW").value,10);if(isNaN(w)||w<0){$("spMsg").textContent="Enter the number of words.";return}
 cur={y:now.getFullYear(),m:now.getMonth()};sel=todayKey;var e=E()[todayKey]||{words:0,mood:3,note:""};e.words=(e.words||0)+w;E()[todayKey]=e;
-var m=T.m||25;X.sprints.push({d:todayKey,min:m,w:w});if(X.sprints.length>100)X.sprints.shift();save();loadForm();render();
+var m=T.rec||T.m||25;T.rec=0;if(w>0){var hh2=new Date().getHours();e.h=Object.assign({},e.h||{});e.h[hh2]=(e.h[hh2]||0)+w}X.sprints.push({d:todayKey,min:m,w:w});if(X.sprints.length>100)X.sprints.shift();save();loadForm();render();
 var best=0;X.sprints.forEach(function(s){best=Math.max(best,s.w/s.min)});$("spDone").hidden=true;$("spW").value="";
-$("spMsg").textContent=w+" words in "+m+" min = "+(Math.round(w/m*10)/10)+" words/min (best: "+(Math.round(best*10)/10)+"). Added to today!"});
+$("spMsg").textContent=w+" words in "+(Math.round(m*10)/10)+" min = "+(Math.round(w/m*10)/10)+" words/min (best: "+(Math.round(best*10)/10)+"). Added to today!";if(w>0&&window.wtAskCh)window.wtAskCh(w,"sp")});
 
 function xr(){setPlant();msX();chap();yearV();badgesV();friendsV()}
 var _r=render;render=function(){_r();xr()};
@@ -1072,7 +1075,7 @@ var SX={en:["Your streak is at risk 🔥","Write a few words tonight to keep you
 function streakNow(){var dd=window.wtDaily(),d=new Date(),k=window.wtDstr(d),today=(dd[k]||0)>0,n=0,i;for(i=today?0:1;i<4000;i++){var kk=window.wtDstr(new Date(d.getFullYear(),d.getMonth(),d.getDate()-i));if((dd[kk]||0)>0)n++;else if(wtRestK(kk))continue;else break}return{n:n,today:today,rest:wtRestK(k)}}
 function bestStreak(){var dd=window.wtDaily(),ks=Object.keys(dd).filter(function(q){return dd[q]>0}).sort();if(!ks.length)return 0;var p=ks[0].split("-"),d=new Date(+p[0],+p[1]-1,+p[2]),end=new Date(),run=0,mx=0;while(d<=end){var kk=window.wtDstr(d);if((dd[kk]||0)>0){run++;if(run>mx)mx=run}else if(!wtRestK(kk))run=0;d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)}return mx}
 function remTick(){var R=Y.rem;if(!R||!R.on)return;var d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes()),q=dailyGap(),can=typeof Notification!=="undefined"&&Notification.permission==="granted",tk=wmDay(d);
-if(q&&R.d!==q.tk&&hm>=R.t){if(q.need>0&&can){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}",fmt(q.need)))}R.d=q.tk;saveY()}
+if(q&&R.d!==q.tk&&hm>=R.t){if(q.need>0&&can&&!wtRestK(todayKey)){var x=NTX[Y.lang]||NTX.en;notify(x[0],x[1].replace("{n}",fmt(q.need)))}R.d=q.tk;saveY()}
 if(R.s&&R.sd!==tk&&hm>="20:30"){var st=streakNow();if(st.n>=2&&!st.today&&!st.rest&&can){var z=SX[Y.lang]||SX.en;notify(z[0],z[1].replace("{n}",st.n))}R.sd=tk;saveY()}
 remBnV()}
 setInterval(remTick,30000);setTimeout(remTick,1500);
@@ -1113,9 +1116,10 @@ else if(t.id==="pFile"&&t.files&&t.files[0]){var f=t.files[0],rd=new FileReader(
 /* v31: reminder banner, hours insight, share cards */
 var gbn=document.createElement("div");gbn.className="gcard";gbn.id="xRemBn";gbn.hidden=true;gc.parentNode.insertBefore(gbn,gc);G.push(["today",gbn]);var bnOff="";
 function remBnV(){var R=Y.rem,box=$("xRemBn");if(!R||!R.on){box.hidden=true;return}var d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes()),q=dailyGap(),st=streakNow();
-if(!q||q.need<=0||hm<R.t||bnOff===q.tk){box.hidden=true;return}
-box.hidden=false;box.innerHTML='<h2>⏰ <span>Time to write!</span></h2><div class="pct">'+fmt(q.need)+' <span>words to go today</span>'+(st.n>=2&&!st.today?' · 🔥 <span>Keep your streak alive</span>':'')+'</div><div class="row" style="margin-top:8px"><button class="save" id="xBnGo" type="button">Write now</button><button class="ghost" id="xBnLater" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Later</button></div>'}
-$("xRemBn").addEventListener("click",function(e){if(e.target.id==="xBnLater"){var q=dailyGap();bnOff=q?q.tk:"";remBnV()}else if(e.target.id==="xBnGo"){if(sel!==todayKey){sel=todayKey;cur={y:+sel.slice(0,4),m:+sel.slice(5,7)-1};loadForm();render()}var w=$("words");if(w.scrollIntoView)w.scrollIntoView({behavior:"smooth",block:"center"});w.focus()}});
+if(!q||q.need<=0||hm<R.t||bnOff===q.tk||wtRestK(todayKey)){box.hidden=true;return}
+box.hidden=false;box.innerHTML='<h2>⏰ <span>Time to write!</span></h2><div class="pct">'+fmt(q.need)+' <span>words to go today</span>'+(st.n>=2&&!st.today?' · 🔥 <span>Keep your streak alive</span>':'')+'</div><div class="row" style="margin-top:8px"><button class="save" id="xBnGo" type="button">Write now</button><button class="ghost" id="xBnLater" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Later</button><button class="ghost" id="xBnRest" type="button" style="width:auto;padding:0 14px;font-size:.9rem">😴 Take a rest day</button></div>'}
+$("xRemBn").addEventListener("click",function(e){if(e.target.id==="xBnLater"){var q=dailyGap();bnOff=q?q.tk:"";remBnV()}else if(e.target.id==="xBnRest"){cur={y:now.getFullYear(),m:now.getMonth()};sel=todayKey;var c0=E()[todayKey];if(c0&&c0.words>0)return;E()[todayKey]=Object.assign(c0||{mood:3,note:""},{words:0,rest:1});save();loadForm();render();toast("😴 Rest day saved. Your streak is safe.")}
+else if(e.target.id==="xBnGo"){if(sel!==todayKey){sel=todayKey;cur={y:+sel.slice(0,4),m:+sel.slice(5,7)-1};loadForm();render()}var w=$("words");if(w.scrollIntoView)w.scrollIntoView({behavior:"smooth",block:"center"});w.focus()}});
 
 var ghr=document.createElement("div");ghr.className="gcard";ghr.id="xHrs";gi.parentNode.insertBefore(ghr,gi);G.push(["progress",ghr]);var hrMsg="",hrPeak=0;
 function hrsV(){var h=[],i,tot=0,P=[["Night",0,5],["Morning",5,12],["Afternoon",12,18],["Evening",18,24]],ps=[0,0,0,0],body;for(i=0;i<24;i++)h.push(0);
@@ -1201,7 +1205,7 @@ var SWG=[["goal","🎯","Today’s goal"],["month","📅","Month progress"],["st
 if(!Y.sw)Y.sw=[];
 function swBar(p){return '<div class="bar"><i style="width:'+Math.max(0,Math.min(100,p))+'%"></i></div>'}
 var SWF={
-goal:function(){var q=dailyGap(),c=S.challenges[todayKey.slice(0,7)];if(!c||!q)return '<div class="pct"><span>Open the current month to start your challenge.</span></div>';var tw=((c.entries[todayKey]||{}).words)||0,g=tw+q.need;if(g<=0)return '<div class="swn">🎉</div><div class="pct"><span>Goal reached</span></div>';return '<div class="swn">'+fmt(tw)+'</div><div class="pct"><span>of</span> <b>'+fmt(g)+'</b> <span>words today</span></div>'+swBar(tw/g*100)},
+goal:function(){if(wtRestK(todayKey))return '<div class="swn">😴</div><div class="pct"><span>Rest day</span></div>';var q=dailyGap(),c=S.challenges[todayKey.slice(0,7)];if(!c||!q)return '<div class="pct"><span>Open the current month to start your challenge.</span></div>';var tw=((c.entries[todayKey]||{}).words)||0,g=tw+q.need;if(g<=0)return '<div class="swn">🎉</div><div class="pct"><span>Goal reached</span></div>';return '<div class="swn">'+fmt(tw)+'</div><div class="pct"><span>of</span> <b>'+fmt(g)+'</b> <span>words today</span></div>'+swBar(tw/g*100)},
 month:function(){var c=S.challenges[todayKey.slice(0,7)];if(!c)return '<div class="pct"><span>Open the current month to start your challenge.</span></div>';var t=sumC(c),n=new Date().getDate(),dm=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();return '<div class="swn">'+fmt(t)+'</div><div class="pct"><span>of</span> <b>'+fmt(c.goal)+'</b> <span>words</span> · '+(dm-n+1)+' <span>days left</span></div>'+swBar(c.goal>0?t/c.goal*100:0)},
 streak:function(){var st=streakNow();return '<div class="swn">🔥 '+st.n+'</div><div class="pct"><span>'+(st.n===1?'day in a row':'days in a row')+'</span> · '+(st.today?'✅ <span>wrote today</span>':'<span>not yet today</span>')+'</div>'},
 book:function(){var ms=curMsE(),dd=window.wtDaily(ms.id),t=ms.base||0,k;for(k in dd)t+=dd[k];var g=ms.goal||0;return '<div class="pct">'+esc(ms.name)+'</div><div class="swn">'+fmt(t)+'</div>'+(g?'<div class="pct"><span>of</span> <b>'+fmt(g)+'</b> <span>words</span> · '+Math.round(Math.min(100,t/g*100))+'%</div>'+swBar(t/g*100):'')},
@@ -1226,14 +1230,15 @@ wtDrag(gsw,".swrow",function(from,to){var L=Y.sw;L.splice(to,0,L.splice(from,1)[
 G.forEach(function(g){if(g[0]==="friends")EG.set(g[1],"efr")});
 
 /* v34: ask which chapter new words belong to */
-var askN=0,gsb=document.createElement("div");gsb.id="xAskBox";gsb.hidden=true;$("save").closest(".row").after(gsb);
-function askBoxV(){var box=$("xAskBox");if(!askN||Y.ask===false){box.hidden=true;box.innerHTML="";return}var ms=curMsE(),cs=chaps(ms);
+var askN=0,askSrc="s",gsb=document.createElement("div");gsb.id="xAskBox";gsb.hidden=true;$("save").closest(".row").after(gsb);
+function askBoxV(){var box=askSrc==="sp"?$("xAskBoxS"):$("xAskBox"),oth=askSrc==="sp"?$("xAskBox"):$("xAskBoxS");oth.hidden=true;oth.innerHTML="";if(!askN||Y.ask===false){box.hidden=true;box.innerHTML="";return}var ms=curMsE(),cs=chaps(ms);
 var old=$("xAskC")?$("xAskC").value:"",def=0;if(Y.lc!==undefined&&cs[Y.lc])def=Y.lc;else{for(var i=0;i<cs.length;i++){if(cs[i].s!=="Done"){def=i;break}}}
 box.hidden=false;box.innerHTML='<div class="fr" style="margin-top:12px"><div class="pct" style="margin-bottom:6px">📥 <b>+'+fmt(askN)+'</b> <span>words</span> · <span>Put them in a chapter?</span></div><div class="row"><select id="xAskC" aria-label="Chapter">'+cs.map(function(c,k){return '<option value="'+k+'"'+(k===def?' selected':'')+'>'+esc(c.n)+' · '+fmt(c.w||0)+'</option>'}).join("")+'<option value="new"'+(cs.length?'':' selected')+'>＋ New chapter</option></select><button class="save" id="xAskGo" type="button">Add</button><button class="ghost" id="xAskNo" type="button" style="width:auto;padding:0 14px;font-size:.9rem">Skip</button></div></div>';if(old!==""&&$("xAskC").querySelector('option[value="'+old+'"]'))$("xAskC").value=old}
-window.wtAskCh=function(n){if(Y.ask===false||!(n>0))return;askN=n;askBoxV()};
-gsb.addEventListener("click",function(e){var t=e.target;
+window.wtAskCh=function(n,src){if(Y.ask===false||!(n>0))return;askN=n;askSrc=src||"s";askBoxV()};
+function askClick(e){var t=e.target;
 if(t.id==="xAskNo"){askN=0;askBoxV();return}
-if(t.id==="xAskGo"){var cs=chaps(curMsE()),v=$("xAskC").value,i=v==="new"?cs.length:+v;if(v==="new")cs.push({n:"Chapter "+(cs.length+1),s:"Draft",w:0});var c=cs[i];if(!c)return;c.w=(c.w||0)+askN;if(c.s==="Idea")c.s="Draft";Y.lc=i;var n=askN;askN=0;saveY();save();render();$("toast").textContent="+"+fmt(n)+" words added to "+c.n;setTimeout(function(){$("toast").textContent=""},3500)}});
+if(t.id==="xAskGo"){var cs=chaps(curMsE()),v=$("xAskC").value,i=v==="new"?cs.length:+v;if(v==="new")cs.push({n:"Chapter "+(cs.length+1),s:"Draft",w:0});var c=cs[i];if(!c)return;c.w=(c.w||0)+askN;if(c.s==="Idea")c.s="Draft";Y.lc=i;var n=askN;askN=0;saveY();save();render();$("toast").textContent="+"+fmt(n)+" words added to "+c.n;setTimeout(function(){$("toast").textContent=""},3500)}}
+gsb.addEventListener("click",askClick);$("xAskBoxS").addEventListener("click",askClick);
 var gac=mkc("xAskCfg");$("xPrefs").after(gac);G.push(["settings",gac]);EG.set(gac,"settings");
 function askCfgV(){$("xAskCfg").innerHTML='<h2>📑 <span>Chapter prompt</span></h2><label class="remrow"><input type="checkbox" id="xAskOn"'+(Y.ask!==false?' checked':'')+'><span>After saving words, ask which chapter they belong to</span></label><div class="pct"><span>Your chapters’ word counts then add up by themselves.</span></div>'}
 gac.addEventListener("change",function(e){if(e.target.id!=="xAskOn")return;Y.ask=e.target.checked;saveY()});
@@ -1380,6 +1385,10 @@ if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","e
 function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
 var IDX={fr:0,es:1,sl:2};
 var DL=[
+["Stop & log words", "Arrêter et noter les mots", "Parar y anotar palabras", "Ustavi in zapiši besede"],
+["Write for at least 30 seconds first.", "Écris d’abord au moins 30 secondes.", "Escribe primero al menos 30 segundos.", "Najprej piši vsaj 30 sekund."],
+["😴 Rest day saved. Your streak is safe.", "😴 Jour de repos enregistré. Ta série est sauvée.", "😴 Día de descanso guardado. Tu racha está a salvo.", "😴 Dan počitka shranjen. Tvoja serija je varna."],
+["😴 Take a rest day", "😴 Prendre un jour de repos", "😴 Tomar un día de descanso", "😴 Vzemi dan počitka"],
 ["＋ New chapter", "＋ Nouveau chapitre", "＋ Nuevo capítulo", "＋ Novo poglavje"],
 ["Put them in a chapter?", "Les mettre dans un chapitre ?", "¿Ponerlas en un capítulo?", "Jih dam v poglavje?"],
 ["Add", "Ajouter", "Añadir", "Dodaj"],
@@ -1674,6 +1683,7 @@ var DL=[
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
+[/^Stopped after ([\d.]+) min\. How many words did you write\?$/,["Arrêté après $1 min. Combien de mots as-tu écrits ?","Parado tras $1 min. ¿Cuántas palabras escribiste?","Ustavljeno po $1 min. Koliko besed si napisala?"]],
 [/^\+([\d,]+) words added to (.*)$/,["+$1 mots ajoutés à $2","+$1 palabras añadidas a $2","+$1 besed dodanih k $2"]],
 [/^Reminder set for (\d\d:\d\d)$/,["Rappel réglé à $1","Recordatorio fijado a las $1","Opomnik nastavljen na $1"]],
 [/^best streak: (\d+)$/,["ma meilleure série : $1","mi mejor racha: $1","moja najboljša serija: $1"]],
