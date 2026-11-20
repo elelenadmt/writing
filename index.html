@@ -100,7 +100,23 @@ section.panel:nth-of-type(n) h2::before{content:attr(data-i) " "}
 .chrow{display:grid;grid-template-columns:1fr 110px 100px 38px;gap:8px;margin-bottom:8px}
 .chrow input,.chrow select,#xFin,#xName,#msGoal,#xFcode,#spMin,#spW{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
 .chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.85rem;background:var(--bg)}.chip.ok{background:var(--accent2);color:var(--onacc);border-color:transparent}
-.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}.badge{display:grid;gap:2px;justify-items:center;text-align:center;padding:12px 8px;border-radius:16px;border:1px solid var(--line);background:var(--bg);font-size:.8rem}.badge b{font-size:1.8rem}.badge.off{opacity:.45;filter:grayscale(1)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}.badge{display:grid;gap:2px;justify-items:center;text-align:center;padding:12px 8px;border-radius:16px;border:1px solid var(--line);background:var(--bg);font-size:.8rem}.badge b{font-size:1.8rem}#xSplash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--accent2) 20%,var(--bg)),var(--bg) 72%);transition:opacity .55s ease;cursor:pointer;overflow:hidden}#xSplash.out{opacity:0;pointer-events:none}
+#xSplash .spIn{width:min(560px,86vw);text-align:center;position:relative}
+#xSplash .spHi{font:700 1.55rem/1.2 Fraunces,Georgia,serif;color:var(--ink);opacity:0;animation:spUp .7s .1s forwards}
+#xSplash .spW{position:relative;width:min(300px,70vw);margin:12px auto 0}
+#xSplash .spLine{display:block;width:100%;height:auto;overflow:visible}
+#xSplash .spLine path{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:spDraw 1.5s .5s ease forwards}
+#xSplash .spPen{position:absolute;left:0;top:-6px;font-size:1.7rem;opacity:0;transform-origin:bottom left;animation:spPen 1.5s .5s ease forwards}
+#xSplash .spQ{font:italic 1.2rem/1.55 Fraunces,Georgia,serif;margin:26px 0 4px;color:var(--ink)}
+#xSplash .spQ span{display:inline-block;opacity:0;animation:spUp .5s forwards;animation-delay:calc(1.5s + var(--i)*.08s)}
+#xSplash .spTap{display:block;margin-top:20px;color:var(--mute);font-size:.8rem;opacity:0;animation:spUp .6s 2.6s forwards}
+#xSplash .spk{position:absolute;bottom:-20px;color:var(--accent2);opacity:0;animation:spFloat var(--t,4s) var(--d,0s) ease-in infinite;font-style:normal;pointer-events:none}
+@keyframes spUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes spDraw{to{stroke-dashoffset:0}}
+@keyframes spPen{0%{left:0;top:-6px;opacity:1;transform:rotate(-12deg)}20%{top:-24px}45%{top:2px;transform:rotate(-2deg)}70%{top:-16px}100%{left:calc(100% - 14px);top:-20px;opacity:1;transform:rotate(-14deg)}}
+@keyframes spFloat{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.9}100%{transform:translateY(-75vh) scale(1.15) rotate(40deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){#xSplash *{animation:none!important;opacity:1!important}#xSplash .spLine path{stroke-dashoffset:0!important}#xSplash .spk{display:none}}
+.badge.lk{opacity:.6;filter:grayscale(1);border-style:dashed}.badge small{color:var(--mute);font-size:.72rem}.badge .bp{width:80%;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:2px}.badge .bp i{display:block;height:100%;background:var(--accent2)}
 .yr{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px}.yr i{border-radius:3px;background:var(--line);cursor:pointer}.yr i.ytd{outline:2px solid var(--accent);outline-offset:-1px}.yr i.ysel{outline:2px solid var(--ink);outline-offset:1px;position:relative;z-index:2}.yr i.yrs,.yleg i.yrs{background:repeating-linear-gradient(45deg,var(--line) 0 2px,transparent 2px 4px)}.ymo{position:relative;height:16px;font-size:11px;color:var(--mute)}.ymo span{position:absolute;top:0}.yleg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mute);margin-top:8px;flex-wrap:wrap}.yleg i{width:12px;height:12px;border-radius:3px;display:inline-block}
 .fr{display:grid;gap:4px;margin-top:10px}.fbar{height:12px;border-radius:9px;background:var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--accent2)}
 @media (max-width:520px){.chrow{grid-template-columns:1fr 90px 38px}.chrow .chn{grid-column:1/-1}}
@@ -234,6 +250,25 @@ body.dnd{user-select:none;-webkit-user-select:none;cursor:grabbing}
 </style>
 </head>
 <body>
+<script>
+window.wtSplash=function(){var old=document.getElementById("xSplash");if(old)old.remove();
+var LG=["en","fr","es","sl"],QT=[["A story is just a promise you keep one page at a time.", "Une histoire n’est qu’une promesse tenue, une page à la fois.", "Una historia es solo una promesa que cumples página a página.", "Zgodba je le obljuba, ki jo držiš stran za stranjo."], ["Write the scene that scares you first.", "Écris d’abord la scène qui te fait peur.", "Escribe primero la escena que te da miedo.", "Najprej napiši prizor, ki te straši."], ["Every chapter you finish is a door you open for someone else.", "Chaque chapitre terminé est une porte ouverte pour quelqu’un d’autre.", "Cada capítulo que terminas es una puerta que abres para otra persona.", "Vsako končano poglavje so vrata, ki jih odpreš nekomu drugemu."], ["Messy first drafts are where the magic hides.", "C’est dans les brouillons imparfaits que se cache la magie.", "En los borradores desordenados se esconde la magia.", "V neurejenih osnutkih se skriva čarovnija."], ["You don’t need the whole map. Just the next page.", "Pas besoin de toute la carte. Juste de la prochaine page.", "No necesitas todo el mapa. Solo la siguiente página.", "Ne potrebuješ celotnega zemljevida. Samo naslednjo stran."], ["Your characters are waiting for you. Don’t leave them standing.", "Tes personnages t’attendent. Ne les laisse pas debout.", "Tus personajes te esperan. No los dejes de pie.", "Tvoji liki te čakajo. Ne pusti jih stati."], ["Small words, every day, build whole worlds.", "De petits mots, chaque jour, construisent des mondes entiers.", "Palabras pequeñas, cada día, construyen mundos enteros.", "Majhne besede, vsak dan, zgradijo cele svetove."], ["The only draft you can’t fix is the one you didn’t write.", "Le seul brouillon qu’on ne peut pas corriger est celui qu’on n’a pas écrit.", "El único borrador que no se puede arreglar es el que no escribiste.", "Edinega osnutka, ki ga ni mogoče popraviti, nisi napisala."], ["Be brave with your first draft and kind to yourself.", "Sois courageuse avec ton premier jet, et douce avec toi-même.", "Sé valiente con tu primer borrador y amable contigo misma.", "Bodi pogumna s prvim osnutkom in prijazna do sebe."], ["Somewhere, a reader needs exactly the book you’re writing.", "Quelque part, un lecteur a besoin exactement du livre que tu écris.", "En algún lugar, un lector necesita justo el libro que estás escribiendo.", "Nekje bralec potrebuje natanko knjigo, ki jo pišeš."], ["A dragon is built one scale at a time.", "Un dragon se construit écaille après écaille.", "Un dragón se construye escama a escama.", "Zmaj se gradi luska za lusko."], ["Ink first, doubts later.", "L’encre d’abord, les doutes ensuite.", "Primero la tinta, las dudas después.", "Najprej črnilo, dvomi pozneje."]],GR={"en": ["Good morning", "Good afternoon", "Good evening", "Hello, night owl"], "fr": ["Bonjour", "Bon après-midi", "Bonsoir", "Coucou, oiseau de nuit"], "es": ["Buenos días", "Buenas tardes", "Buenas noches", "Hola, búho nocturno"], "sl": ["Dobro jutro", "Dober dan", "Dober večer", "Živjo, nočna ptica"]},TP={"en": "Tap to start writing", "fr": "Touche pour écrire", "es": "Toca para escribir", "sl": "Dotakni se za pisanje"},L="",nm="",mob=false;
+try{var p=JSON.parse(localStorage.getItem("wt-lang")||"{}");L=p.l||""}catch(e){}
+if(LG.indexOf(L)<0)L=((navigator.language||"en").slice(0,2));if(LG.indexOf(L)<0)L="en";
+try{nm=(JSON.parse(localStorage.getItem("wt-extra")||"{}").me||"").trim()}catch(e){}
+var h=new Date().getHours(),g=GR[L][h>=5&&h<12?0:h>=12&&h<18?1:h>=18?2:3],q=QT[Math.floor(Math.random()*QT.length)][LG.indexOf(L)];
+var el=document.createElement("div");el.id="xSplash";el.setAttribute("role","status");
+var words=q.split(" ").map(function(w,i){var s=document.createElement("span");s.style.setProperty("--i",i);s.textContent=w;return s.outerHTML}).join(" ");
+function esc(t){return t.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+el.innerHTML='<div class="spIn"><div class="spHi">'+esc(g)+(nm?", "+esc(nm):"")+' ✨</div><div class="spW"><svg class="spLine" viewBox="0 0 300 40" aria-hidden="true"><path d="M8 28 C 45 4, 78 42, 118 22 S 188 6, 228 26 S 280 22, 292 12"/></svg><span class="spPen" aria-hidden="true">🖋️</span></div><p class="spQ">'+words+'</p><small class="spTap">'+esc(TP[L])+'</small></div>';
+for(var i=0;i<14;i++){var k=document.createElement("i");k.className="spk";k.textContent="✦";k.setAttribute("aria-hidden","true");k.style.left=(Math.random()*96+2)+"%";k.style.fontSize=(10+Math.random()*14)+"px";k.style.setProperty("--d",(Math.random()*2.4)+"s");k.style.setProperty("--t",(3+Math.random()*2.5)+"s");el.appendChild(k)}
+document.body.insertBefore(el,document.body.firstChild);
+var done=false,rm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function bye(){if(done)return;done=true;clearTimeout(tm);document.removeEventListener("keydown",kd);el.classList.add("out");setTimeout(function(){if(el.parentNode)el.remove()},600)}
+function kd(e){if(e.key==="Escape"||e.key==="Enter"||e.key===" ")bye()}
+var tm=setTimeout(bye,rm?2600:4600);el.addEventListener("click",bye);document.addEventListener("keydown",kd)};
+try{if((JSON.parse(localStorage.getItem("wt-extra2")||"{}")).splash!==false)window.wtSplash()}catch(e){window.wtSplash()}
+</script>
 <main>
 <header>
   <h1 style="font-size:1.1rem;color:var(--mute)">❄️ Writing challenge winter</h1>
@@ -266,7 +301,7 @@ body.dnd{user-select:none;-webkit-user-select:none;cursor:grabbing}
   <div class="row" style="margin-top:12px"><label>This challenge is for<select id="chMs"></select></label></div>
   <div class="count">
     <div class="big" id="total">0</div>
-    <div class="of">words out of <input type="number" id="goal" min="100" step="500" aria-label="Monthly goal"> to write this month</div>
+    <div class="of">words out of <input type="number" id="goal" min="100" step="500" list="goalOpts" aria-label="Monthly goal"><datalist id="goalOpts"><option value="10000"><option value="15000"><option value="20000"><option value="25000"><option value="30000"><option value="35000"><option value="40000"><option value="45000"><option value="50000"></datalist> to write this month</div>
   </div>
   <div class="plantbox"><div id="plant" aria-hidden="true">❄️</div><div class="plantlbl" id="plantLbl"></div></div>
   <div class="bar"><i id="fill" style="width:0"></i></div>
@@ -335,6 +370,7 @@ body.dnd{user-select:none;-webkit-user-select:none;cursor:grabbing}
 </section>
 </main>
 
+<footer id="xVer" style="text-align:center;font-size:.75rem;color:var(--mute);padding:18px 16px 28px">Version 40 · 20 Nov 2026</footer>
 <script>
 var MOODS=[["😫","Drained"],["😕","Meh"],["😐","Neutral"],["🙂","Good"],["🤩","Inspired"]];
 var S={manuscripts:[],challenges:{},mood:3};
@@ -630,8 +666,17 @@ function badgesV(){var dd=daily(),ks=Object.keys(dd).filter(function(k){return d
 ks.forEach(function(k){var p=k.split("-"),t=new Date(+p[0],+p[1]-1,+p[2]).getTime();run=prev!==null&&wtGapOK(prev,t)?run+1:1;prev=t;if(run>best)best=run;if(dd[k]>mxd)mxd=dd[k]});
 var gh=Object.keys(S.challenges).some(function(k){var c=S.challenges[k],t=sumC(c);return t>0&&t>=c.goal}),big=0;
 S.manuscripts.forEach(function(m){var t=m.base||0,x=daily(m.id),k;for(k in x)t+=x[k];if(t>big)big=t});
-var L=[["✍️","First session",ks.length>=1],["🔥","3-day streak",best>=3],["🔥","7-day streak",best>=7],["🔥","14-day streak",best>=14],["🌟","30-day streak",best>=30],["⚡","1,000 words in a day",mxd>=1000],["📅","10 days written",ks.length>=10],["📆","50 days written",ks.length>=50],["🏆","Challenge goal reached",gh],["📚","10,000 words in a book",big>=10000],["📘","25,000 words in a book",big>=25000],["📕","50,000 words in a book",big>=50000],["🎉","80,000 words in a book",big>=80000],["⏱️","First sprint",X.sprints.length>=1],["🏃","10 sprints",X.sprints.length>=10],["👯","Friend added",X.friends.length>=1]];
-$("xBadges").innerHTML='<div class="pct" style="grid-column:1/-1">'+L.filter(function(b){return b[2]}).length+' / '+L.length+' badges earned</div>'+L.map(function(b){return '<div class="badge'+(b[2]?'':' off')+'"><b>'+b[0]+'</b>'+b[1]+'</div>'}).join("")}
+var L=[],nm=function(n){return n.toLocaleString("en-US")},add=function(em,name,cur,tg){L.push([em,name,cur>=tg,cur,tg])},i;
+add("✍️","First session",ks.length,1);
+[[3,"🔥"],[7,"🔥"],[14,"🔥"],[30,"🌟"],[60,"💫"],[100,"👑"]].forEach(function(q){add(q[1],q[0]+"-day streak",best,q[0])});
+[[10,"📅"],[25,"🗓️"],[50,"📆"],[100,"💯"]].forEach(function(q){add(q[1],q[0]+" days written",ks.length,q[0])});
+[[100,"✏️"],[500,"📝"],[1000,"⚡"],[2000,"🚀"]].forEach(function(q){add(q[1],nm(q[0])+" words in a day",mxd,q[0])});
+L.push(["🏆","Challenge goal reached",gh]);
+[[5000,"🌱"],[10000,"📚"],[15000,"📗"],[20000,"📙"],[25000,"📘"],[30000,"📓"],[35000,"📔"],[40000,"📒"],[45000,"📃"],[50000,"📕"],[60000,"🏔️"],[70000,"🌋"],[80000,"🎉"],[90000,"🌠"],[100000,"👑"]].forEach(function(q){add(q[1],nm(q[0])+" words in a book",big,q[0])});
+[[1,"⏱️"],[10,"🏃"],[25,"🏅"],[50,"🥈"],[100,"🥇"]].forEach(function(q){add(q[1],q[0]===1?"First sprint":q[0]+" sprints",X.sprints.length,q[0])});
+L.push(["👯","Friend added",X.friends.length>=1]);
+$("xBadges").innerHTML='<div class="pct" style="grid-column:1/-1">'+L.filter(function(b){return b[2]}).length+' / '+L.length+' badges earned</div>'+L.map(function(b){if(b[2])return '<div class="badge"><b>'+b[0]+'</b>'+b[1]+'</div>';var pr=b[4]>1?'<span class="bp"><i style="width:'+Math.min(100,Math.round(b[3]/b[4]*100))+'%"></i></span><small>🔒 '+nm(Math.min(b[3],b[4]))+' / '+nm(b[4])+'</small>':'<small>🔒</small>';return '<div class="badge lk"><b>'+b[0]+'</b>'+b[1]+pr+'</div>'}).join("");
+try{var ear=L.filter(function(b){return b[2]}).map(function(b){return b[1]}),old=JSON.parse(localStorage.getItem("wt-badges")||"null");if(old===null){localStorage.setItem("wt-badges",JSON.stringify(ear))}else{var nw2=ear.filter(function(n){return old.indexOf(n)<0});if(nw2.length||ear.length!==old.length)localStorage.setItem("wt-badges",JSON.stringify(ear));if(nw2.length)setTimeout(function(){toast("🏅 New badge: "+nw2[0]+(nw2.length>1?" +"+(nw2.length-1):""))},1800)}}catch(e){}}
 
 function code(){var c=ch(),d=0,k;for(k in c.entries)if(c.entries[k].words>0)d++;return "WT1:"+btoa(unescape(encodeURIComponent(JSON.stringify({n:X.me||"Me",m:mk(),w:sumC(c),g:c.goal,d:d,s:(function(){var y0=+mk().slice(0,4),m0=+mk().slice(5,7),n0=new Date(y0,m0,0).getDate(),lim=mk()===todayKey.slice(0,7)?now.getDate():n0,cm=0,o=[];for(var i=1;i<=lim;i++){var e=c.entries[mk()+"-"+pad(i)];cm+=(e&&e.words)||0;o.push(cm)}return o})(),t:(function(){try{return String(JSON.parse(localStorage.getItem("wt-extra2")).msg||"").slice(0,80)}catch(e){return ""}})()}))))}
 function friendsV(){var c=ch(),rows=[{n:(X.me||"Me")+" (you)",w:sumC(c),g:c.goal}].concat(X.friends.filter(function(f){return f.m===mk()}));
@@ -1242,7 +1287,12 @@ gsb.addEventListener("click",askClick);$("xAskBoxS").addEventListener("click",as
 var gac=mkc("xAskCfg");$("xPrefs").after(gac);G.push(["settings",gac]);EG.set(gac,"settings");
 function askCfgV(){$("xAskCfg").innerHTML='<h2>📑 <span>Chapter prompt</span></h2><label class="remrow"><input type="checkbox" id="xAskOn"'+(Y.ask!==false?' checked':'')+'><span>After saving words, ask which chapter they belong to</span></label><div class="pct"><span>Your chapters’ word counts then add up by themselves.</span></div>'}
 gac.addEventListener("change",function(e){if(e.target.id!=="xAskOn")return;Y.ask=e.target.checked;saveY()});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV();askCfgV();askBoxV()};
+
+var gsp=mkc("xSplashCfg");$("xPrefs").after(gsp);G.push(["settings",gsp]);EG.set(gsp,"settings");
+function splashCfgV(){$("xSplashCfg").innerHTML='<h2>✨ <span>Opening animation</span></h2><label class="remrow"><input type="checkbox" id="xSplOn"'+(Y.splash!==false?' checked':'')+'><span>Show a short animation and a quote when I open the app</span></label><div class="row" style="margin-top:8px"><button class="ghost" id="xSplGo" type="button" style="width:auto;padding:0 14px;font-size:.9rem">▶ Preview</button></div>'}
+gsp.addEventListener("change",function(e){if(e.target.id!=="xSplOn")return;Y.splash=e.target.checked;saveY()});
+gsp.addEventListener("click",function(e){if(e.target.id==="xSplGo"&&window.wtSplash)window.wtSplash()});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV();askCfgV();askBoxV();splashCfgV()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1385,6 +1435,9 @@ if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","e
 function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
 var IDX={fr:0,es:1,sl:2};
 var DL=[
+["Opening animation", "Animation d’ouverture", "Animación de apertura", "Uvodna animacija"],
+["Show a short animation and a quote when I open the app", "Afficher une courte animation et une citation à l’ouverture de l’appli", "Mostrar una breve animación y una cita al abrir la app", "Ob odprtju aplikacije prikaži kratko animacijo in citat"],
+["▶ Preview", "▶ Aperçu", "▶ Vista previa", "▶ Predogled"],
 ["Stop & log words", "Arrêter et noter les mots", "Parar y anotar palabras", "Ustavi in zapiši besede"],
 ["Write for at least 30 seconds first.", "Écris d’abord au moins 30 secondes.", "Escribe primero al menos 30 segundos.", "Najprej piši vsaj 30 sekund."],
 ["😴 Rest day saved. Your streak is safe.", "😴 Jour de repos enregistré. Ta série est sauvée.", "😴 Día de descanso guardado. Tu racha está a salvo.", "😴 Dan počitka shranjen. Tvoja serija je varna."],
@@ -1683,6 +1736,12 @@ var DL=[
 ];
 var DICT={};DL.forEach(function(r){DICT[r[0]]=[r[1],r[2],r[3]]});
 var RX=[
+[/^([\d,]+) words in a book$/,["$1 mots dans un livre","$1 palabras en un libro","$1 besed v knjigi"]],
+[/^([\d,]+) words in a day$/,["$1 mots en un jour","$1 palabras en un día","$1 besed v enem dnevu"]],
+[/^(\d+)-day streak$/,["série de $1 jours","racha de $1 días","serija $1 dni"]],
+[/^(\d+) days written$/,["$1 jours écrits","$1 días escritos","$1 dni pisanja"]],
+[/^(\d+) sprints$/,["$1 sprints","$1 sprints","$1 šprintov"]],
+[/^🏅 New badge: (.*)$/,["🏅 Nouveau badge : $1","🏅 Nueva insignia: $1","🏅 Nova značka: $1"]],
 [/^Stopped after ([\d.]+) min\. How many words did you write\?$/,["Arrêté après $1 min. Combien de mots as-tu écrits ?","Parado tras $1 min. ¿Cuántas palabras escribiste?","Ustavljeno po $1 min. Koliko besed si napisala?"]],
 [/^\+([\d,]+) words added to (.*)$/,["+$1 mots ajoutés à $2","+$1 palabras añadidas a $2","+$1 besed dodanih k $2"]],
 [/^Reminder set for (\d\d:\d\d)$/,["Rappel réglé à $1","Recordatorio fijado a las $1","Opomnik nastavljen na $1"]],
