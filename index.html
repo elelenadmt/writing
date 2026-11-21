@@ -116,6 +116,10 @@ section.panel:nth-of-type(n) h2::before{content:attr(data-i) " "}
 @keyframes spPen{0%{left:0;top:-6px;opacity:1;transform:rotate(-12deg)}20%{top:-24px}45%{top:2px;transform:rotate(-2deg)}70%{top:-16px}100%{left:calc(100% - 14px);top:-20px;opacity:1;transform:rotate(-14deg)}}
 @keyframes spFloat{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.9}100%{transform:translateY(-75vh) scale(1.15) rotate(40deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){#xSplash *{animation:none!important;opacity:1!important}#xSplash .spLine path{stroke-dashoffset:0!important}#xSplash .spk{display:none}}
+.xmw{display:grid;gap:6px;max-height:320px;overflow:auto;padding:6px 2px;margin-top:8px}.xmb{max-width:82%;padding:7px 11px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:.93rem;word-break:break-word;white-space:pre-wrap}.xmb.me{margin-left:auto;background:var(--accent);color:var(--onacc);border-color:transparent}.xmb small{display:block;opacity:.7;font-size:.7rem;margin-top:2px}.xmb.rx{font-size:1.5rem;padding:4px 10px;white-space:normal}.xmb .xmX{background:none;border:0;color:inherit;opacity:.6;cursor:pointer;font-size:.8rem;padding:0 0 0 6px}
+.xbdg{background:var(--accent);color:var(--onacc);border-radius:999px;padding:1px 8px;font-size:.75rem;margin-left:6px;font-weight:700}.tab[data-n]::after{content:attr(data-n);margin-left:6px;background:var(--accent2);color:var(--onacc);border-radius:999px;padding:0 7px;font-size:.72rem}
+.xmbars{display:inline-flex;align-items:flex-end;gap:2px;height:22px;vertical-align:middle;margin:0 6px}.xmbars i{display:block;width:5px;background:var(--accent2);border-radius:2px;opacity:.75}.xmbars i:last-child{opacity:1;background:var(--accent)}
+.xmrow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;font:inherit;color:var(--ink);cursor:pointer}.xmrow small{color:var(--mute);display:block;font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}.xmst{font-size:.8rem;color:var(--mute);margin-top:6px}.xmrx{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.xmrx button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 10px;font-size:1.1rem;cursor:pointer}
 .badge.lk{opacity:.6;filter:grayscale(1);border-style:dashed}.badge small{color:var(--mute);font-size:.72rem}.badge .bp{width:80%;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:2px}.badge .bp i{display:block;height:100%;background:var(--accent2)}
 .yr{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px}.yr i{border-radius:3px;background:var(--line);cursor:pointer}.yr i.ytd{outline:2px solid var(--accent);outline-offset:-1px}.yr i.ysel{outline:2px solid var(--ink);outline-offset:1px;position:relative;z-index:2}.yr i.yrs,.yleg i.yrs{background:repeating-linear-gradient(45deg,var(--line) 0 2px,transparent 2px 4px)}.ymo{position:relative;height:16px;font-size:11px;color:var(--mute)}.ymo span{position:absolute;top:0}.yleg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mute);margin-top:8px;flex-wrap:wrap}.yleg i{width:12px;height:12px;border-radius:3px;display:inline-block}
 .fr{display:grid;gap:4px;margin-top:10px}.fbar{height:12px;border-radius:9px;background:var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--accent2)}
@@ -292,6 +296,7 @@ try{if((JSON.parse(localStorage.getItem("wt-extra2")||"{}")).splash!==false)wind
       <label>Words already in it before tracking<input type="number" id="msBase" min="0" step="100" placeholder="ex. 12000"></label>
     </div>
     <div class="mstotal"><div class="big" id="msTotal">0</div><div class="of" id="msDetail"></div></div>
+    <div id="xBkDet"></div>
     <div id="msExtra"></div>
   </div>
 </section>
@@ -318,6 +323,7 @@ try{if((JSON.parse(localStorage.getItem("wt-extra2")||"{}")).splash!==false)wind
       <label>Words written in this session<input type="number" id="words" min="0" step="10" placeholder="ex. 350"></label>
     </div>
     <div class="pct" id="dayTot"><span>Total for this day</span> <b id="dayN">0</b> <span>words</span></div>
+    <div id="xSaveHint" class="pct" style="margin:-2px 0 8px"></div>
     <label class="remrow" style="font-size:.88rem;color:var(--mute)"><input type="checkbox" id="setTot"> Replace the day’s total instead of adding</label>
     <label class="remrow" style="font-size:.88rem;color:var(--mute)"><input type="checkbox" id="restDay"> 😴 Rest day (keeps my streak)</label>
     <div>
@@ -370,7 +376,7 @@ try{if((JSON.parse(localStorage.getItem("wt-extra2")||"{}")).splash!==false)wind
 </section>
 </main>
 
-<footer id="xVer" style="text-align:center;font-size:.75rem;color:var(--mute);padding:18px 16px 28px">Version 40 · 20 Nov 2026</footer>
+<footer id="xVer" style="text-align:center;font-size:.75rem;color:var(--mute);padding:18px 16px 28px">Version 42 · 22 Nov 2026</footer>
 <script>
 var MOODS=[["😫","Drained"],["😕","Meh"],["😐","Neutral"],["🙂","Good"],["🤩","Inspired"]];
 var S={manuscripts:[],challenges:{},mood:3};
@@ -485,6 +491,9 @@ $("save").addEventListener("click",function(){
   if(rd&&!(nw>0))ent.rest=1;E()[sel]=ent;save();loadForm();render();toast(ent.rest?"😴 Rest day saved. Your streak is safe.":rec?"🏆 New personal record! Share it from the Progress tab.":["Another snowflake on your tree ❄️","Cozy words, warm cocoa ☕","Ho ho, nice writing! 🎅","A new ornament for your tree 🎄"][Math.floor(Math.random()*4)]);
   if(dl>0&&window.wtAskCh)window.wtAskCh(dl);
 });
+
+function dayCheck(){var d=new Date(),k=d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());if(k===todayKey)return;var onToday=sel===todayKey,onMonth=mk()===todayKey.slice(0,7);now=d;todayKey=k;if(onMonth)cur={y:d.getFullYear(),m:d.getMonth()};if(onToday||(onMonth&&!sel))sel=todayKey;else if(onMonth&&sel.slice(0,7)!==mk())sel=todayKey;loadForm();render();toast("🌅 New day, fresh page. Today is "+d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+".")}
+window.wtDayCheck=dayCheck;setInterval(dayCheck,15000);document.addEventListener("visibilitychange",function(){if(!document.hidden)dayCheck()});window.addEventListener("focus",dayCheck);window.addEventListener("pageshow",dayCheck);
 $("setTot").addEventListener("change",function(){var e=E()[sel];$("words").value=$("setTot").checked&&e?e.words||0:"";$("words").focus()});
 $("del").addEventListener("click",function(){delete E()[sel];save();loadForm();render();toast("Day cleared.")});
 $("cname").addEventListener("input",function(){ch().name=$("cname").value;save()});
@@ -1026,7 +1035,7 @@ var chs0=$("xChBody").closest("section");chs0.parentNode.insertBefore(gcs,chs0);
 [[gph,"-","edesk"],[ge,"-","edesk"],[gwg,"today","edesk"],[gcs,"-","echap"],[gtd,"-","etodo"],[ges,"-","estats"]].forEach(function(q){G.push([q[1],q[0]]);EG.set(q[0],q[2])});
 EG.set(gq,"edesk");EG.set(chs0,"echap");EG.set(gt,"etodo");EG.set(gn,"etodo");
 G.forEach(function(g){if(g[0]==="settings")EG.set(g[1],"settings")});
-var gl=document.createElement("div");gl.className="gcard";gl.id="xLive";$("xFcode").closest("section").before(gl);G.push(["friends",gl]);
+var gl=document.createElement("div");gl.className="gcard";gl.id="xLive";$("xFcode").closest("section").before(gl);G.push(["friends",gl]);var gmsg=document.createElement("div");gmsg.className="gcard";gmsg.id="xMsg";gl.after(gmsg);G.push(["friends",gmsg]);
 var gacc=document.createElement("div");gacc.className="gcard acct";gacc.id="xAcct";$("xPrefs").after(gacc);G.push(["settings",gacc]);EG.set(gacc,"settings");
 
 /* stopwatch */
@@ -1292,7 +1301,20 @@ var gsp=mkc("xSplashCfg");$("xPrefs").after(gsp);G.push(["settings",gsp]);EG.set
 function splashCfgV(){$("xSplashCfg").innerHTML='<h2>✨ <span>Opening animation</span></h2><label class="remrow"><input type="checkbox" id="xSplOn"'+(Y.splash!==false?' checked':'')+'><span>Show a short animation and a quote when I open the app</span></label><div class="row" style="margin-top:8px"><button class="ghost" id="xSplGo" type="button" style="width:auto;padding:0 14px;font-size:.9rem">▶ Preview</button></div>'}
 gsp.addEventListener("change",function(e){if(e.target.id!=="xSplOn")return;Y.splash=e.target.checked;saveY()});
 gsp.addEventListener("click",function(e){if(e.target.id==="xSplGo"&&window.wtSplash)window.wtSplash()});
-var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV();askCfgV();askBoxV();splashCfgV()};
+
+function saveHintV(){var h=$("xSaveHint");if(!h)return;var e=E()[sel],c0=e?e.words||0:0,v=parseInt($("words").value,10),rep=$("setTot").checked,lb=sel===todayKey?"Today so far":"That day so far";
+if(isNaN(v)||v<=0&&!rep){h.innerHTML='<span>'+lb+'</span> <b>'+fmt(c0)+'</b>';return}
+h.innerHTML=rep?'<span>Will replace the total</span> <b>'+fmt(c0)+'</b> → <b>'+fmt(v)+'</b>':'<span>Will add</span> <b>+'+fmt(v)+'</b> · <b>'+fmt(c0)+'</b> → <b>'+fmt(c0+v)+'</b>'}
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="words")saveHintV()});
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="setTot")saveHintV()});
+var bkOpen=false;
+function bookDetV(){var box=$("xBkDet");if(!box)return;var ms=curMsE(),rows=[],days=[];Object.keys(S.challenges).sort().reverse().forEach(function(k){var c=S.challenges[k];if(c.ms!==ms.id)return;var t=sumC(c);if(t>0)rows.push([k,c.name,t]);Object.keys(c.entries).forEach(function(d){var w=c.entries[d].words||0;if(w>0)days.push([d,w])})});
+days.sort(function(a,b){return b[1]-a[1]});var tr=0;rows.forEach(function(x){tr+=x[2]});
+var h='<details id="xBkD"'+(bkOpen?' open':'')+'><summary style="cursor:pointer;color:var(--mute);font-size:.88rem;margin-top:6px">Where do these words come from?</summary><div style="margin-top:8px;font-size:.9rem"><div class="pct"><span>Before tracking</span> <b>'+fmt(ms.base||0)+'</b></div>'+rows.map(function(x){return '<div class="pct" style="display:flex;justify-content:space-between;gap:10px"><span>'+esc(x[1])+' ('+x[0]+')</span><b>'+fmt(x[2])+'</b></div>'}).join("")+'<div class="pct" style="margin-top:6px"><span>Biggest days</span></div>'+days.slice(0,5).map(function(x){return '<div class="pct" style="display:flex;justify-content:space-between;gap:10px"><button type="button" class="ghost xBkJ" data-d="'+x[0]+'" style="width:auto;min-height:0;padding:2px 10px;font-size:.82rem">'+x[0]+'</button><b>'+fmt(x[1])+'</b></div>'}).join("")+'<div class="pct" style="margin-top:8px">Too high? A day may have been saved twice. Tap a day above, then tick “Replace the day’s total” and enter the right number.</div></div></details>';
+if(box.dataset.h!==h){box.dataset.h=h;box.innerHTML=h}}
+document.addEventListener("toggle",function(e){if(e.target&&e.target.id==="xBkD")bkOpen=e.target.open},true);
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".xBkJ");if(!b)return;var d=b.dataset.d;cur={y:+d.slice(0,4),m:+d.slice(5,7)-1};sel=d;loadForm();render();var w=$("words");if(w.scrollIntoView)w.scrollIntoView({behavior:"smooth",block:"center"})});
+var _r2=render;render=function(){_r2();goalV();insV();cheerV();promptV();notesV();wkV();spdV();editV();bingoV();tropeV();todV();raceV();recV();colSync();avV();recapV();hrsV();remBnV();shareV();betaV();swCfgV();sideV();askCfgV();askBoxV();splashCfgV();saveHintV();bookDetV();if(window.wtMsgBadge)window.wtMsgBadge()};
 vine();parts();showTab(Y.tab);render();
 })();
 </script>
@@ -1345,7 +1367,7 @@ st.busy=true;st.msg="";ui();api("/auth/v1/otp?redirect_to="+encodeURIComponent(s
 function google(){location.href=SB+"/auth/v1/authorize?provider=google&redirect_to="+encodeURIComponent(site())}
 function signout(msg){var t=sess&&sess.access_token;if(t)api("/auth/v1/logout",{method:"POST",headers:{Authorization:"Bearer "+t}}).catch(function(){});setSess(null);try{localStorage.removeItem(SK)}catch(e){}ready=false;clearTimeout(tm);live={fr:[],inc:[],out:[],ok:true,msg:"",sig:""};lastPG="";liveUi();st={s:"idle",conflict:null,msg:msg||"Signed out. Your data stays on this device.",busy:false,del:false};ui()}
 function delOnline(){if(!st.del){st.del=true;ui();setTimeout(function(){if(st.del){st.del=false;ui()}},4000);return}
-st.del=false;var uid=encodeURIComponent(sess.user.id);authed("/rest/v1/progress?user_id=eq."+uid,{method:"DELETE"}).catch(function(){}).then(function(){return authed("/rest/v1/friendships?or=(requester.eq."+uid+",addressee.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/nudges?or=(from_user.eq."+uid+",to_user.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/backups?user_id=eq."+uid,{method:"DELETE"})}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
+st.del=false;var uid=encodeURIComponent(sess.user.id);authed("/rest/v1/progress?user_id=eq."+uid,{method:"DELETE"}).catch(function(){}).then(function(){return authed("/rest/v1/friendships?or=(requester.eq."+uid+",addressee.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/nudges?or=(from_user.eq."+uid+",to_user.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/messages?or=(from_user.eq."+uid+",to_user.eq."+uid+")",{method:"DELETE"})}).catch(function(){}).then(function(){return authed("/rest/v1/backups?user_id=eq."+uid,{method:"DELETE"})}).then(function(r){if(!r.ok)throw 0;signout("Online data deleted and signed out. Your data stays on this device.")}).catch(function(){st.msg="Something went wrong. Try again.";ui()})}
 var inp='style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%"';
 function ui(){var keep={xaE:val("xaE")},pw=document.getElementById("xaP")?document.getElementById("xaP").value:"",h='<h2>☁️ Account &amp; sync</h2>';
 if(!sess){h+='<p class="pct" style="margin:0 0 12px">Sign in to save your data online and use it on all your devices. The site also works without an account.</p>'
@@ -1390,8 +1412,45 @@ if(run>0)h+='🤝 <span>Pact streak:</span> <b>'+run+'</b> <span>days in a row, 
 if(ft===true)h+='✅ <span>wrote today</span>';else if(ft===false)h+='💤 <span>hasn’t written yet today</span>';
 if(ft!==true&&live.nv!==false)h+=' <button class="ghost xlN" type="button" data-uid="'+esc(x.uid)+'" style="width:auto;padding:0 10px;font-size:.8rem;margin-left:4px">💌 <span>Nudge</span></button>';
 return h+'</div>'}
+
+var MG={ok:true,list:[],open:"",draft:"",init:false},mbox=document.getElementById("xMsg"),REACTS=["🔥","👏","❤️","💪","✨"];
+function msgFetch(){var since=new Date(Date.now()-45*864e5).toISOString();return authed("/rest/v1/messages?select=id,from_user,to_user,from_name,body,kind,read_at,created_at&created_at=gte."+encodeURIComponent(since)+"&order=created_at.desc&limit=500").catch(function(){return null})}
+function msgIn(r){if(!r||!sess)return;if(r.status===404){MG.ok=false;return}if(!r.ok)return;MG.ok=true;var first=!MG.init;MG.init=true;MG.list=(r.j||[]).slice().reverse();var seen=[],me=sess.user.id;try{seen=JSON.parse(sessionStorage.getItem("wt-msseen"))||[]}catch(e){}
+MG.list.forEach(function(m){if(seen.indexOf(m.id)<0){seen.push(m.id);if(!first&&m.to_user===me&&window.WTNOTIFY&&typeof Notification!=="undefined"&&Notification.permission==="granted")window.WTNOTIFY((m.from_name||"?")+" 💬",m.body)}});try{sessionStorage.setItem("wt-msseen",JSON.stringify(seen.slice(-200)))}catch(e){}}
+function wkStart(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x.getTime()}
+function msgStats(uid){var w0=wkStart(new Date()),W=6,bins=[0,0,0,0,0,0],sn=0,rv=0,me=sess.user.id;MG.list.forEach(function(m){if(uid&&m.from_user!==uid&&m.to_user!==uid)return;var t=new Date(m.created_at).getTime(),k=t>=w0?0:Math.ceil((w0-t)/6048e5);if(k<W)bins[k]++;if(k===0){if(m.from_user===me)sn++;else rv++}});return{bins:bins,sn:sn,rv:rv,tot:sn+rv}}
+function barsH(b){var mx=Math.max.apply(null,b.concat([1]));return '<span class="xmbars" aria-hidden="true">'+b.slice().reverse().map(function(v){return '<i style="height:'+(v?Math.max(4,Math.round(v/mx*22)):2)+'px"></i>'}).join("")+'</span>'}
+function unreadN(uid){if(!sess)return 0;var me=sess.user.id;return MG.list.filter(function(m){return m.to_user===me&&!m.read_at&&(!uid||m.from_user===uid)}).length}
+function msT(iso){var d=new Date(iso),n=new Date(),p=function(x){return(x<10?"0":"")+x};return d.toDateString()===n.toDateString()?p(d.getHours())+":"+p(d.getMinutes()):p(d.getDate())+"/"+p(d.getMonth()+1)}
+window.wtMsgBadge=function(){var n=unreadN();document.querySelectorAll('.tab[data-t="friends"],.tab[data-t="efr"]').forEach(function(t){if(n>0)t.setAttribute("data-n",n>9?"9+":String(n));else t.removeAttribute("data-n")})};
+function markRead(uid){var me=sess.user.id,now=new Date().toISOString(),any=false;MG.list.forEach(function(m){if(m.from_user===uid&&m.to_user===me&&!m.read_at){m.read_at=now;any=true}});if(any){authed("/rest/v1/messages?to_user=eq."+encodeURIComponent(me)+"&from_user=eq."+encodeURIComponent(uid)+"&read_at=is.null",{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({read_at:now})}).catch(function(){});window.wtMsgBadge()}return any}
+function msgUi(){if(!mbox)return;if(!sess||!live.ok){mbox.style.display="none";return}mbox.style.display="";
+var act=document.activeElement,hadF=act&&act.id==="xMsgT",ss=hadF?act.selectionStart:0,un=unreadN(),h='<h2>💬 <span>Messages</span>'+(un?'<span class="xbdg">'+un+'</span>':'')+'</h2>';
+if(!MG.ok)h+='<p class="pct"><span>Messages are not set up yet. Run the messages SQL in Supabase.</span></p>';
+else if(!live.fr.length)h+='<p class="pct"><span>Add a friend first to send messages.</span></p>';
+else if(MG.open&&live.fr.some(function(x){return x.uid===MG.open})){var uid=MG.open,f=live.fr.filter(function(x){return x.uid===uid})[0],me=sess.user.id,st=msgStats(uid);markRead(uid);
+var ms=MG.list.filter(function(m){return(m.from_user===uid&&m.to_user===me)||(m.from_user===me&&m.to_user===uid)});
+h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><button class="ghost" id="xMsgB" type="button" style="width:auto;padding:0 12px;font-size:.85rem">← <span>Back</span></button><b>'+esc(f.name)+'</b></div><div class="xmst"><span>This week with</span> '+esc(f.name)+' <b>'+st.tot+'</b>'+barsH(st.bins)+'<span>last 6 weeks</span></div>';
+h+='<div class="xmw" id="xMsgW">'+(ms.length?ms.map(function(m){var mine=m.from_user===me;return '<div class="xmb'+(mine?' me':'')+(m.kind==="react"?' rx':'')+'">'+esc(m.body)+'<small>'+msT(m.created_at)+(mine?'<button class="xmX" type="button" data-id="'+esc(m.id)+'" aria-label="Delete">×</button>':'')+'</small></div>'}).join(""):'<div class="pct"><span>No messages yet. Say hi 👋</span></div>')+'</div>';
+h+='<div class="xmrx">'+REACTS.map(function(e){return '<button type="button" class="xmR" data-e="'+e+'" aria-label="'+e+'">'+e+'</button>'}).join("")+'</div>';
+h+='<div class="row" style="align-items:stretch;margin-top:8px"><textarea id="xMsgT" rows="2" maxlength="300" placeholder="Write a message…" aria-label="Write a message" style="flex:1;min-width:180px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"></textarea><button class="save" id="xMsgS" type="button"><span>Send</span></button></div><div class="xmst"><span id="xMsgC">'+MG.draft.length+'</span>/300</div><div class="toast" role="status">'+esc(MG.msg||"")+'</div>'}
+else{MG.open="";var st0=msgStats();
+h+='<div class="xmst" style="margin:0 0 6px">📊 <span>This week</span> <b>'+st0.tot+'</b> <span>messages</span> (<b>'+st0.sn+'</b> <span>sent</span> · <b>'+st0.rv+'</b> <span>received</span>)'+barsH(st0.bins)+'<span>last 6 weeks</span></div>';
+var me2=sess.user.id,rows=live.fr.map(function(x){var ms2=MG.list.filter(function(m){return(m.from_user===x.uid&&m.to_user===me2)||(m.from_user===me2&&m.to_user===x.uid)}),l=ms2[ms2.length-1];return{x:x,l:l,u:unreadN(x.uid)}});rows.sort(function(a,b){return(b.l?new Date(b.l.created_at).getTime():0)-(a.l?new Date(a.l.created_at).getTime():0)});
+h+=rows.map(function(o){return '<button type="button" class="xmrow xmO" data-u="'+esc(o.x.uid)+'"><span><b>'+esc(o.x.name)+'</b>'+(o.u?'<span class="xbdg">'+o.u+'</span>':'')+'<small>'+(o.l?(o.l.from_user===me2?'↩ ':'')+esc(o.l.body):'')+'</small></span><span class="xmst" style="margin:0">'+(o.l?msT(o.l.created_at):'›')+'</span></button>'}).join("");
+h+='<div class="pct" style="margin-top:10px"><span>Only you and your friend can read these messages. The app shows the last 45 days. Keep them kind 💛</span></div>'}
+mbox.innerHTML=h;var t=document.getElementById("xMsgT");if(t){t.value=MG.draft;if(hadF){t.focus();try{t.setSelectionRange(ss,ss)}catch(e){}}}var w=document.getElementById("xMsgW");if(w)w.scrollTop=w.scrollHeight;window.wtMsgBadge()}
+function msgSend(uid,body,kind){if(!body)return;MG.msg="";authed("/rest/v1/messages",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({from_user:sess.user.id,to_user:uid,from_name:myNm(),body:body.slice(0,300),kind:kind})}).then(function(r){if(r.status===404){MG.ok=false;msgUi();return}if(!r.ok){MG.msg="Something went wrong. Try again.";msgUi();return}if(kind==="msg")MG.draft="";return msgFetch().then(function(x){msgIn(x);msgUi()})}).catch(function(){MG.msg="Something went wrong. Try again.";msgUi()})}
+if(mbox){mbox.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+if(b.classList.contains("xmO")){MG.open=b.dataset.u;MG.msg="";msgUi()}
+else if(b.id==="xMsgB"){MG.open="";MG.draft="";msgUi()}
+else if(b.classList.contains("xmR"))msgSend(MG.open,b.dataset.e,"react");
+else if(b.id==="xMsgS"){var tx=(document.getElementById("xMsgT").value||"").trim();if(tx)msgSend(MG.open,tx,"msg")}
+else if(b.classList.contains("xmX")){authed("/rest/v1/messages?id=eq."+encodeURIComponent(b.dataset.id),{method:"DELETE"}).then(function(){return msgFetch()}).then(function(x){msgIn(x);msgUi()}).catch(function(){})}});
+mbox.addEventListener("input",function(e){if(e.target.id==="xMsgT"){MG.draft=e.target.value;var c=document.getElementById("xMsgC");if(c)c.textContent=MG.draft.length}});
+mbox.addEventListener("keydown",function(e){if(e.target.id==="xMsgT"&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();var tx=e.target.value.trim();if(tx)msgSend(MG.open,tx,"msg")}})}
 function liveRefresh(){if(!sess){live.fr=[];live.inc=[];live.out=[];liveUi();return Promise.resolve()}
-return pushProgress().catch(function(){}).then(function(){return Promise.all([authed("/rest/v1/friendships?select=*&order=created_at"),authed("/rest/v1/progress?select=user_id,name,month,words,goal,series,msg,updated_at&month=eq."+monthKey()),authed("/rest/v1/nudges?select=id,from_name,text,created_at&to_user=eq."+encodeURIComponent(sess.user.id)+"&order=created_at.desc&limit=8").catch(function(){return null})])}).then(function(a){var f=a[0],p=a[1],nv=a[2];nudgeIn(nv);
+return pushProgress().catch(function(){}).then(function(){return Promise.all([authed("/rest/v1/friendships?select=*&order=created_at"),authed("/rest/v1/progress?select=user_id,name,month,words,goal,series,msg,updated_at&month=eq."+monthKey()),authed("/rest/v1/nudges?select=id,from_name,text,created_at&to_user=eq."+encodeURIComponent(sess.user.id)+"&order=created_at.desc&limit=8").catch(function(){return null}),msgFetch()])}).then(function(a){var f=a[0],p=a[1],nv=a[2];nudgeIn(nv);msgIn(a[3]);
 if(f.status===404||p.status===404){live.ok=false;liveUi();return}
 if(!f.ok||!p.ok)throw 0;live.ok=true;var me=sess.user.id,rows={};(p.j||[]).forEach(function(x){if(x.user_id!==me)rows[x.user_id]=x});
 var fr=[],inc=[],out=[];(f.j||[]).forEach(function(x){var mine=x.requester===me,other=mine?x.addressee:x.requester;
@@ -1411,7 +1470,7 @@ h+='<div class="pct" style="margin-top:12px">Your friends</div>';
 if(live.fr.length&&live.nv!==false)h+='<label style="margin:6px 0 4px"><span>Nudge message</span><select id="xNvT"><option>You’ve got this! ✍️</option><option>Your story is waiting 📖</option><option>Just 100 words today? 💪</option></select></label>';
 h+=live.fr.length?live.fr.map(function(x){var r0=x.row;return '<div class="fr"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(x.name)+'</span><span>'+(r0?fmt(r0.words)+' / '+fmt(r0.goal)+' <span>words</span>':'<span class="pct">no data yet this month</span>')+' <button class="ghost xlR" type="button" data-id="'+esc(x.id)+'" aria-label="Remove friend" style="width:26px;height:26px;font-size:14px;padding:0">×</button></span></div>'+(r0?'<div class="fbar"><i style="width:'+Math.min(100,r0.goal>0?r0.words/r0.goal*100:0)+'%"></i></div>'+(r0.msg?'<div class="pct">“'+esc(r0.msg)+'”</div>':'')+pactHtml(x):'')+'</div>'}).join(""):'<div class="pct">No friends yet. Invite someone by email.</div>';
 h+='<div class="pct" style="margin-top:12px">Friends you accept can see your name, this month’s word count, goal and daily curve. Nothing else.</div>'}
-lbox.innerHTML=h;if(ke&&document.getElementById("xLvE"))document.getElementById("xLvE").value=ke}
+lbox.innerHTML=h;if(ke&&document.getElementById("xLvE"))document.getElementById("xLvE").value=ke;msgUi()}
 if(lbox)lbox.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var i=b.id,id=b.dataset.id;
 if(i==="xLvGo"){var tb=document.querySelector('.tab[data-t="settings"]');if(tb)tb.click();setTimeout(function(){var a=document.getElementById("xAcct");if(a&&a.scrollIntoView)a.scrollIntoView({behavior:"smooth",block:"start"})},80)}
 else if(i==="xLvRe"){live.ok=true;liveRefresh()}
@@ -1435,6 +1494,29 @@ if(!P.l){var nl=(navigator.language||"en").slice(0,2).toLowerCase();P.l=["fr","e
 function saveP(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
 var IDX={fr:0,es:1,sl:2};
 var DL=[
+["Messages", "Messages", "Mensajes", "Sporočila"],
+["This week", "Cette semaine", "Esta semana", "Ta teden"],
+["messages", "messages", "mensajes", "sporočil"],
+["sent", "envoyés", "enviados", "poslanih"],
+["received", "reçus", "recibidos", "prejetih"],
+["last 6 weeks", "6 dernières semaines", "últimas 6 semanas", "zadnjih 6 tednov"],
+["This week with", "Cette semaine avec", "Esta semana con", "Ta teden z"],
+["Back", "Retour", "Atrás", "Nazaj"],
+["Send", "Envoyer", "Enviar", "Pošlji"],
+["Write a message…", "Écris un message…", "Escribe un mensaje…", "Napiši sporočilo …"],
+["Write a message", "Écris un message", "Escribe un mensaje", "Napiši sporočilo"],
+["No messages yet. Say hi 👋", "Pas encore de messages. Dis bonjour 👋", "Aún no hay mensajes. Saluda 👋", "Še ni sporočil. Reci živjo 👋"],
+["Messages are not set up yet. Run the messages SQL in Supabase.", "Les messages ne sont pas encore activés. Lance le SQL des messages dans Supabase.", "Los mensajes aún no están activados. Ejecuta el SQL de mensajes en Supabase.", "Sporočila še niso nastavljena. Zaženi SQL za sporočila v Supabase."],
+["Add a friend first to send messages.", "Ajoute d’abord un ami pour envoyer des messages.", "Añade primero a un amigo para enviar mensajes.", "Najprej dodaj prijatelja, da lahko pošiljaš sporočila."],
+["Only you and your friend can read these messages. The app shows the last 45 days. Keep them kind 💛", "Seuls toi et ton amie pouvez lire ces messages. L’appli affiche les 45 derniers jours. Reste bienveillante 💛", "Solo tú y tu amiga podéis leer estos mensajes. La app muestra los últimos 45 días. Sed amables 💛", "Samo ti in prijateljica lahko berete ta sporočila. Aplikacija prikaže zadnjih 45 dni. Bodita prijazni 💛"],
+["Today so far", "Aujourd’hui jusqu’ici", "Hoy hasta ahora", "Danes doslej"],
+["That day so far", "Ce jour-là jusqu’ici", "Ese día hasta ahora", "Ta dan doslej"],
+["Will add", "Va ajouter", "Se añadirá", "Dodano bo"],
+["Will replace the total", "Va remplacer le total", "Reemplazará el total", "Zamenjalo bo skupno"],
+["Where do these words come from?", "D’où viennent ces mots ?", "¿De dónde vienen estas palabras?", "Od kod te besede?"],
+["Before tracking", "Avant le suivi", "Antes del seguimiento", "Pred spremljanjem"],
+["Biggest days", "Plus gros jours", "Días con más palabras", "Dnevi z največ besedami"],
+["Too high? A day may have been saved twice. Tap a day above, then tick “Replace the day’s total” and enter the right number.", "Trop élevé ? Un jour a peut-être été enregistré deux fois. Touche un jour ci-dessus, coche « Remplacer le total du jour » et entre le bon nombre.", "¿Demasiado alto? Puede que un día se haya guardado dos veces. Toca un día de arriba, marca «Reemplazar el total del día» e introduce el número correcto.", "Preveč? Morda je bil dan shranjen dvakrat. Dotakni se dneva zgoraj, obkljukaj »Zamenjaj skupno za dan« in vnesi pravo število."],
 ["Opening animation", "Animation d’ouverture", "Animación de apertura", "Uvodna animacija"],
 ["Show a short animation and a quote when I open the app", "Afficher une courte animation et une citation à l’ouverture de l’appli", "Mostrar una breve animación y una cita al abrir la app", "Ob odprtju aplikacije prikaži kratko animacijo in citat"],
 ["▶ Preview", "▶ Aperçu", "▶ Vista previa", "▶ Predogled"],
